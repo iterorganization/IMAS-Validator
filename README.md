@@ -31,8 +31,8 @@
 - Report
 
 # Examples
-- Rule
-`@validator("*")
+```
+@validator("*")
 def validate_ids_common(ids):
   Exists(
     ids.ids_properties.comment,
@@ -61,3 +61,4 @@ def validate_gyrokinetics_electron_definition(gk):
     break
   else:
     error("No electron species found", gk.species)`
+```
