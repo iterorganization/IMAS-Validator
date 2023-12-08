@@ -1,7 +1,5 @@
 """ """
 
-from typing import List, Any
-
 import click
 
 @click.group()
