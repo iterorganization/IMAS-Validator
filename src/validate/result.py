@@ -2,16 +2,23 @@
 This file describes the data class for successes and failures of the
 validation tool
 """
-from typing import Any
-
-
 class IDSValidationResult():
   """"""
-  def __init__(self, var1: Any, var2: Any, operator: str, result: bool):
-    # name (var1)
-    # name2 (var2, optional)
-    # var1
-    # var2
-    # operator
+  def __init__(self):
+    # file
+    # rule_name
+    # List[IDSValidationLineResult]
+    pass
+  
+  def save_line_result():
+    # save IDSValidationLineResult
+    pass
+
+class IDSValidationLineResult():
+  def __init__(self):
+    # line_num
+    # vars
+    # rule/line (var1 + var2 == var3)
     # result
+    # take size into account (only save part of array)
     pass

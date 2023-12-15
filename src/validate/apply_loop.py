@@ -6,8 +6,9 @@ from typing import List
 
 from imaspy import DBEntry, IDSToplevel
 
-from ..rules.data import IDSValidationRule
 from .result import  IDSValidationResult
+from .overload_class import OverloadClass
+from ..rules.data import IDSValidationRule
 
 def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule])-> List[IDSValidationResult]:
   """"""
@@ -24,9 +25,11 @@ def find_matching_rules(ids_names: List[str], rules: List[IDSValidationRule]):
   # how to optimize ids combinations in memory?
   pass
 
-def apply_rule(ids_instances: List[IDSToplevel], rule_func:function) -> IDSValidationResult:
+def apply_rule(ids_instances: List[IDSToplevel], rule: IDSValidationRule) -> IDSValidationResult:
   """"""
-  # rule_func(*ids_instances)
+  # val_result = IDSValidationResult(rule_name)
+  # rule.apply(*map(lambda x: OverloadClass(x, val_result), ids_instances), **kwargs)
   # make overload for operators and checks to log successful and failed assertions
   # generate IDSValidationResult based assertions
+  # return val_result
   pass
