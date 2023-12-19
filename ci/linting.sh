@@ -25,5 +25,5 @@ python -m venv venv
 # Install and run linters
 pip install --upgrade black flake8
 
-black --check imas_ids_validator
-flake8 imas_ids_validator
+black --check src
+flake8 src

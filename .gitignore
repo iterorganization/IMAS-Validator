@@ -9,4 +9,9 @@ __pycache__/
 # Unit test / coverage reports
 .cache
 
+.coverage
+.venv
 venv
+build
+junit.xml
+
