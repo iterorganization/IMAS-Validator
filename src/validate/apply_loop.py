@@ -6,8 +6,8 @@ from typing import List
 
 from imaspy import DBEntry, IDSToplevel
 
+# from .overload_class import OverloadClass
 from .result import IDSValidationResult
-from .overload_class import OverloadClass
 from ..rules.data import IDSValidationRule
 
 
