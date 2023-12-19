@@ -1,14 +1,13 @@
 [build-system]
 # Minimum requirements for the build system to execute.
-# Keep this on a single line for the grep magic of build scripts to work
-requires = ["setuptools>=61", "wheel", "Cython>=0.28", "numpy", "gitpython", "packaging", "tomli;python_version<'3.11'", "versioneer[toml]"]
+requires = ["setuptools>=61", "wheel", "packaging", "tomli;python_version<'3.11'", "versioneer[toml]"]
 
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "imas_ids_validator"
+name = "ids_validator"
 authors = [
-  {name = "IMASPy Developers"},
+  {name = "IDS Validator Developers"},
   {name = "Olivier Hoenen", email = "olivier.hoenen@iter.org"},
 ]
 description = "Data validation for IMAS IDS data"
@@ -19,10 +18,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Environment :: Plugins",
-    "Environment :: X11 Applications",
     "Framework :: Flake8",
-    "Framework :: IPython",
-    "Framework :: Matplotlib",
     "Framework :: Pytest",
     "Framework :: Sphinx",
 # Custom trove classifiers are not allowed, and newer versions of python setuptools will fail to build
@@ -42,11 +38,8 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Unix Shell",
-    "Topic :: Database",
-    "Topic :: Database :: Front-Ends",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
-    "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System",
@@ -56,26 +49,21 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "numpy>=1.15.4",
-    "cached-property; python_version < '3.8'",
-    "tree-format",
-    "scipy",
-    "click",
     "importlib_resources",
     "packaging",
+    "black",
+    "flake8",
 ]
 
 [project.optional-dependencies]
 # these self-dependencies are available since pip 21.2
 all = [
-    "imaspy[test,docs]"
+    "ids-validator[test,docs]"
 ]
 docs = [
     "sphinx>=6.0.0,<7.0.0",
     "sphinx_rtd_theme>=0.5",
     "recommonmark>=0.6",
-    "sphinx-autosummary-accessors>=0.1.2",
-    "sphinx-autodoc-typehints>=1.1.1",
-    "sphinxcontrib.mermaid>=0.8"
 ]
 test = [
     "pytest>=5.4.1",
@@ -84,25 +72,17 @@ test = [
     "pytest-randomly",
 ]
 
-[project.scripts]
-build_DD = "imaspy.dd_helpers:prepare_data_dictionaries"
-imaspy = "imaspy.command.cli:cli"
-
 [project.urls]
-homepage = "https://git.iter.org/projects/IMAS/repos/imaspy"
+homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["imaspy*"]
+include = ["src*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--strict-markers"
-markers = [
-    "cli: Tests for the command line interface.",
-    "slow: Slow tests.",
-]
-testpaths = "imaspy"
+testpaths = "tests"
 
 [tool.versioneer]
 VCS = "git"

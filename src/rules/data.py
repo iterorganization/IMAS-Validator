@@ -13,10 +13,13 @@ class IDSValidationRule():
     self.kwfields = kwfields
     # kwfields explicitly parsed
 
-  def apply(self, *args, **kwargs):
-    return self.func(*args, **kwargs)
-
 class ValidatorRegistry():
+  """
+  EXAMPLE:
+  @val_registry.ids_validator('core_profiles')
+  def ids_rule(cp):
+    cp != None
+  """
   def __init__(self):
     self.validators: List[IDSValidationRule] = []
 
@@ -26,8 +29,3 @@ class ValidatorRegistry():
       self.validators.append(IDSValidationRule(func, *dd_types, **kwfields))
       return func
     return decorator
-
-## EXAMPLE
-# @val_registry.ids_validator('core_profiles')
-# def ids_rule(cp):
-#   cp != None
