@@ -1,18 +1,23 @@
 """
 This file describes the helper functions for the validation rules
 """
+
+
 def Increasing(self):
-  """"""
-  pass
+    """"""
+    pass
+
 
 def Decreasing(self):
-  """"""
-  pass
+    """"""
+    pass
+
 
 def Match(self):
-  """"""
-  pass
+    """"""
+    pass
+
 
 def Exists(self):
-  """"""
-  pass
+    """"""
+    pass
