@@ -77,7 +77,7 @@ homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
+include = ["ids_validator*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -87,11 +87,11 @@ testpaths = "tests"
 [tool.versioneer]
 VCS = "git"
 style = "pep440"
-versionfile_source = "src/_version.py"
-versionfile_build = "src/_version.py"
+versionfile_source = "ids_validator/_version.py"
+versionfile_build = "ids_validator/_version.py"
 tag_prefix = ""
 parentdir_prefix = ""
 
 [tool.black]
 # Exclude versioneer-generated file
-force-exclude = "src/_version.py"
+force-exclude = "ids_validator/_version.py"

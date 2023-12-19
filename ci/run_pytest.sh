@@ -33,4 +33,4 @@ pip freeze
 # Clean artifacts created by pytest
 rm -f junit.xml
 rm -rf htmlcov
-pytest -n=auto --cov=src --cov-report=term-missing --cov-report=html --junit-xml=junit.xml
+pytest -n=auto --cov=ids_validator --cov-report=term-missing --cov-report=html --junit-xml=junit.xml

@@ -25,5 +25,5 @@ python -m venv venv
 # Install and run linters
 pip install --upgrade black flake8
 
-black --check src
-flake8 src
+black --check ids_validator
+flake8 ids_validator
