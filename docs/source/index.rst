@@ -23,7 +23,7 @@ It provides:
 README
 ------
 
-The README is best read on :ids_validator:`#imaspy`.
+The README is best read on :ids_validator:`#ids_validator`.
 
 For developers
 ==============
