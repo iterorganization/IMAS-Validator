@@ -18,6 +18,7 @@ It provides:
 
    self
    installing
+   usage
 
 
 README

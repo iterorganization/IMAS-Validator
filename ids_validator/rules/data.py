@@ -3,14 +3,22 @@ This file describes the data class for rules that are saved and generated for
 the validation tool
 """
 from typing import List, Any, Dict, Callable
+from pathlib import Path
 
 
 class IDSValidationRule:
     """"""
 
-    def __init__(self, func: Callable, *dd_types: str, **kwfields: Dict[str, Any]):
-        # self.name = ruleset/file/func_name
+    def __init__(
+        self,
+        rule_path: Path,
+        func: Callable,
+        *dd_types: str,
+        **kwfields: Dict[str, Any],
+    ):
         self.func = func
+        # name: ruleset/file/func_name
+        self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
         self.dd_types = dd_types
         self.kwfields = kwfields
         # kwfields explicitly parsed
@@ -24,13 +32,16 @@ class ValidatorRegistry:
       cp != None
     """
 
-    def __init__(self):
+    def __init__(self, rule_path: Path):
         self.validators: List[IDSValidationRule] = []
+        self.rule_path: Path = rule_path
 
     def ids_validator(self, *dd_types: str, **kwfields: Dict[str, Any]):
         # explicit kwfields
         def decorator(func: Callable):
-            self.validators.append(IDSValidationRule(func, *dd_types, **kwfields))
+            self.validators.append(
+                IDSValidationRule(self.rule_path, func, *dd_types, **kwfields)
+            )
             return func
 
         return decorator

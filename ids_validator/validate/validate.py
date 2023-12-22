@@ -14,7 +14,17 @@ from ..rules.loading import load_rules
 def validate(
     ids_url: str, extra_rule_dirs: List[Path] = [], apply_generic: bool = True
 ) -> List[IDSValidationResult]:
-    """Main function"""
+    """
+    Main function
+    Args:
+        ids_url [str]: url for DBEntry object
+        extra_rule_dirs [List[Pathlib.Path]]: List of names for ruleset groups that
+            should be applied
+        apply_generic [bool]: Whether or not to apply the generic ruleset
+
+    Returns:
+        List of IDSValidationResult objects
+    """
     dbentry = DBEntry(url=ids_url)
     rules = load_rules(extra_rule_dirs, apply_generic=apply_generic)
     results = apply_rules_to_data(dbentry, rules)
