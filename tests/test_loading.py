@@ -124,8 +124,8 @@ def test_load_rules_from_path():
     for path in rule_modules:
         rules += load_rules_from_path(path)
     assert len(rules) == 1
-    assert rules[0].name == 'generic/core_profiles.py/core_profiles_rule'
-    assert rules[0].dd_types == ('core_profiles',)
+    assert rules[0].name == "generic/core_profiles.py/core_profiles_rule"
+    assert rules[0].dd_types == ("core_profiles",)
     assert rules[0].kwfields == {}
 
 
@@ -137,6 +137,7 @@ def test_load_rules_from_path_empty_file():
     for path in rule_modules:
         rules += load_rules_from_path(path)
     assert len(rules) == 0
+
 
 # def test_handle_entrypoints():
 #     pass
