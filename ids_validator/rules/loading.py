@@ -119,7 +119,7 @@ def load_rules_from_path(rule_path: Path) -> List[IDSValidationRule]:
         List IDSValidationRule objects from given file
     """
     val_registry = ValidatorRegistry(rule_path)
-    run_path(rule_path, init_globals={"val_registry": val_registry})
+    run_path(str(rule_path), init_globals={"val_registry": val_registry})
     return val_registry.validators
 
 
