@@ -5,6 +5,12 @@ from pathlib import Path
 from runpy import run_path
 
 from .data import IDSValidationRule, ValidatorRegistry
+from ids_validator.rules.exceptions import (
+    InvalidRulesetPath,
+    InvalidRulesetName,
+    EmptyRuleFileWarning,
+    WrongFileExtensionError,
+)
 
 
 def load_rules(
@@ -50,6 +56,8 @@ def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
     # ARG PARSING
     rule_dirs = []
     for rule_dir in extra_rule_dirs:
+        if not rule_dir.exists():
+            raise InvalidRulesetPath(rule_dir)
         for path in get_child_dirs(rule_dir):
             if "ruleset" in str(path):
                 rule_dirs.append(path)
@@ -79,12 +87,18 @@ def filter_rulesets(
         List of directories corresponding to given rule sets
     """
     filtered_rulesets = []
+    filtered_ruleset_names = []
     for ruleset_dir in ruleset_dirs:
-        parts = ruleset_dir.parts
-        if apply_generic and "generic" in parts:
+        name = ruleset_dir.parts[-1]
+        if apply_generic and name == "generic":
             filtered_rulesets.append(ruleset_dir)
-        elif any([(ruleset in parts) for ruleset in rulesets]):
+            filtered_ruleset_names.append(name)
+        elif any([(name == ruleset) for ruleset in rulesets]):
             filtered_rulesets.append(ruleset_dir)
+            filtered_ruleset_names.append(name)
+    for ruleset in rulesets:
+        if ruleset not in filtered_ruleset_names:
+            raise InvalidRulesetName(ruleset, ruleset_dirs)
     return filtered_rulesets
 
 
@@ -118,8 +132,12 @@ def load_rules_from_path(rule_path: Path) -> List[IDSValidationRule]:
     Returns:
         List IDSValidationRule objects from given file
     """
+    if str(rule_path)[-3:] != ".py":
+        raise WrongFileExtensionError(rule_path)
     val_registry = ValidatorRegistry(rule_path)
     run_path(str(rule_path), init_globals={"val_registry": val_registry})
+    if len(val_registry.validators) == 0:
+        raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators
 
 
@@ -134,6 +152,8 @@ def handle_env_var_rule_dirs() -> List[Path]:
     env_var_dir_string_list = os.environ.get("RULESET_PATH", "").split(":")
     env_var_dirs = []
     for env_var_dir in env_var_dir_string_list:
+        if not Path(env_var_dir).exists():
+            raise InvalidRulesetPath(env_var_dir)
         for path in get_child_dirs(Path(env_var_dir)):
             if "ruleset" in str(path):
                 env_var_dirs.append(path)
