@@ -3,13 +3,10 @@ from pathlib import Path
 from collections import Counter
 
 from ids_validator.rules.loading import (
-    load_rules,
     discover_rulesets,
     filter_rulesets,
     discover_rule_modules,
     load_rules_from_path,
-    handle_env_var_rule_dirs,
-    handle_entrypoints,
 )
 
 
