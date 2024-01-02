@@ -4,7 +4,7 @@ Using IMAS IDS Validation
 Defining IDSValidationRules
 ---------------------------
 
-IDSValidationRule functions are defined in directories containing the string 'ruleset'.
+IDSValidationRule functions are defined in directories as provided by the user.
 They are grouped in directories per ruleset by name based on which they are filtered in the loading function.
 Inside these directories are python files which contain the rules
 The folder structure is as follows:
