@@ -18,31 +18,35 @@ from ids_validator.rules.exceptions import (
 
 def test_discover_rulesets_explicit():
     rulesets_dirs = [
-        Path("tests"),
         Path("tests/rulesets"),
-        Path("tests/rulesets/generic"),
+        Path("tests/rulesets/base"),
+        Path("tests/rulesets/base/generic"),
     ]
     unfiltered_rulesets = [
-        Path("tests/rulesets"),
-        Path("tests/rulesets_env_var"),
-        Path("tests/rulesets_exceptions"),
-        Path("tests/rulesets/generic"),
-        Path("tests/rulesets/ITER-MD"),
+        Path("tests/rulesets/base"),
+        Path("tests/rulesets/env_var"),
+        Path("tests/rulesets/env_var2"),
+        Path("tests/rulesets/exceptions"),
+        Path("tests/rulesets/base/generic"),
+        Path("tests/rulesets/base/ITER-MD"),
     ]
     assert Counter(discover_rulesets(rulesets_dirs)) == Counter(unfiltered_rulesets)
 
 
 def test_discover_rulesets_env_var(monkeypatch):
-    monkeypatch.setenv("RULESET_PATH", "tests/rulesets_env_var")
+    monkeypatch.setenv("RULESET_PATH", "tests/rulesets/env_var:tests/rulesets/env_var2")
     unfiltered_rulesets = [
-        Path("tests/rulesets_env_var/generic"),
-        Path("tests/rulesets_env_var/ITER-MD"),
+        Path("tests/rulesets/env_var/generic"),
+        Path("tests/rulesets/env_var/ITER-MD"),
+        Path("tests/rulesets/env_var2/generic"),
     ]
     assert Counter(discover_rulesets([])) == Counter(unfiltered_rulesets)
 
 
 def test_discover_rulesets_invalid_env_var(monkeypatch):
-    monkeypatch.setenv("RULESET_PATH", "tests/rulesets_env_var_invalid")
+    monkeypatch.setenv(
+        "RULESET_PATH", "tests/rulesets/env_var:tests/rulesets/env_var_invalid"
+    )
     with pytest.raises(InvalidRulesetPath):
         discover_rulesets([])
 
@@ -52,7 +56,7 @@ def test_discover_rulesets_invalid_env_var(monkeypatch):
 
 
 def test_filter_rulesets_all():
-    base = "tests/rulesets"
+    base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     rulesets = ["ITER-MD"]
     apply_generic = True
@@ -63,7 +67,7 @@ def test_filter_rulesets_all():
 
 
 def test_filter_rulesets_none():
-    base = "tests/rulesets"
+    base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     rulesets = []
     apply_generic = False
@@ -74,7 +78,7 @@ def test_filter_rulesets_none():
 
 
 def test_filter_rulesets_apply_generic():
-    base = "tests/rulesets"
+    base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     rulesets = []
     apply_generic = True
@@ -85,7 +89,7 @@ def test_filter_rulesets_apply_generic():
 
 
 def test_filter_rulesets_with_rulesets():
-    base = "tests/rulesets"
+    base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     rulesets = ["ITER-MD"]
     apply_generic = False
@@ -96,7 +100,7 @@ def test_filter_rulesets_with_rulesets():
 
 
 def test_filter_rulesets_invalid_ruleset():
-    base = "tests/rulesets"
+    base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     rulesets = ["ITER-MD-woops-typo"]
     apply_generic = False
@@ -105,7 +109,7 @@ def test_filter_rulesets_invalid_ruleset():
 
 
 def test_discover_rule_modules():
-    base = "tests/rulesets"
+    base = "tests/rulesets/base"
     filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     rule_modules = [
         Path(f"{base}/generic/common_ids.py"),
@@ -118,7 +122,7 @@ def test_discover_rule_modules():
 
 def test_load_rules_from_path():
     rule_modules = [
-        Path("tests/rulesets/generic/core_profiles.py"),
+        Path("tests/rulesets/base/generic/core_profiles.py"),
     ]
     rules = []
     for path in rule_modules:
@@ -130,19 +134,19 @@ def test_load_rules_from_path():
 
 
 def test_load_rules_from_path_empty_file():
-    path = Path("tests/rulesets_exceptions/generic/empty.py")
+    path = Path("tests/rulesets/exceptions/generic/empty.py")
     with pytest.raises(EmptyRuleFileWarning):
         rules = load_rules_from_path(path)
         assert len(rules) == 0
 
 
 def test_load_rules_syntax_error():
-    path = Path("tests/rulesets_exceptions/generic/syntax_error.py")
+    path = Path("tests/rulesets/exceptions/generic/syntax_error.py")
     with pytest.raises(ZeroDivisionError):
         load_rules_from_path(path)
 
 
 def test_load_rules_file_extension_error():
-    path = [Path("tests/rulesets_exceptions/generic/wrong_file_extension.pie")]
+    path = Path("tests/rulesets/exceptions/generic/wrong_file_extension.pie")
     with pytest.raises(WrongFileExtensionError):
         load_rules_from_path(path)

@@ -17,10 +17,9 @@ def validate(
     """
     Main function
     Args:
-        ids_url [str]: url for DBEntry object
-        extra_rule_dirs [List[Pathlib.Path]]: List of names for ruleset groups that
-            should be applied
-        apply_generic [bool]: Whether or not to apply the generic ruleset
+        ids_url: url for DBEntry object
+        extra_rule_dirs: List of names for ruleset groups that should be applied
+        apply_generic: Whether or not to apply the generic ruleset
 
     Returns:
         List of IDSValidationResult objects

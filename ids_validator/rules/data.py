@@ -36,12 +36,10 @@ class ValidatorRegistry:
         self.validators: List[IDSValidationRule] = []
         self.rule_path: Path = rule_path
 
-    def ids_validator(self, *dd_types: str, **kwfields: Dict[str, Any]):
+    def ids_validator(self, *ids_names: str):
         # explicit kwfields
         def decorator(func: Callable):
-            self.validators.append(
-                IDSValidationRule(self.rule_path, func, *dd_types, **kwfields)
-            )
+            self.validators.append(IDSValidationRule(self.rule_path, func, *ids_names))
             return func
 
         return decorator

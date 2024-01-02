@@ -8,7 +8,7 @@ IDSValidationRule functions are defined in directories containing the string 'ru
 They are grouped in directories per ruleset by name based on which they are filtered in the loading function.
 Inside these directories are python files which contain the rules
 The folder structure is as follows:
-::
+.. code-block:: text
 
   |-- rulesets
   |   |-- generic
@@ -30,24 +30,14 @@ The rules are defined inside the python files as follows:
 
 .. code-block:: python
 
-  @val_registry.ids_validator("*")  # noqa: F821
-  def validate_ids_common(ids):
-    Exists(
-      ids.ids_properties.comment,
-      ids.ids_properties.source,
-      ids.ids_properties.provider,
-    )
-    if hasattr(ids, "time"):
-      ids.time == Increasing()
-          
-  @val_registry.ids_validator("*", min_dd_version="3.39.0")  # noqa: F821
+  @ids_validator("*", min_dd_version="3.39.0")  # noqa: F821
   def validate_ids_plugins_metadata(ids):
     plugins = ids.ids_properties.plugins
     plugins.node[:].path != ""
     plugins.node[:].put_operation[:].name != ""
     # etc.
 
-  @val_registry.ids_validator("gyrokinetics")  # noqa: F821
+  @ids_validator("gyrokinetics")  # noqa: F821
   def validate_gyrokinetics_electron_definition(gk):
     # check electron definition
     for species in gk.species:
