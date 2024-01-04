@@ -22,7 +22,7 @@ class InvalidRulesetName(ValueError):
         if close_matches:
             suggestions = f"Did you mean {close_matches[0]!r}?"
         else:
-            suggestions = f"Available versions are {', '.join(sorted(available_list))}"
+            suggestions = f"Available rulesets are {', '.join(sorted(available_list))}"
         super().__init__(f"Ruleset name {name!r} cannot be found. {suggestions}")
 
 

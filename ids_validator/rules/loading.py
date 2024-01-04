@@ -140,10 +140,8 @@ def handle_env_var_rule_dirs() -> List[Path]:
     Returns:
         List of directories corresponding to given rule sets
     """
-    env_ruleset_path = filter(
-        lambda x: len(x) > 0, os.environ.get("RULESET_PATH", "").split(":")
-    )
-    rule_dirs = map(Path, env_ruleset_path)
+    env_ruleset_paths = os.environ.get("RULESET_PATH", "")
+    rule_dirs = [Path(part) for part in env_ruleset_paths.split(":") if part]
     env_var_dirs = []
     for rule_dir in rule_dirs:
         if not rule_dir.exists():
