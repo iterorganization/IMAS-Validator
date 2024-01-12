@@ -3,30 +3,34 @@ This file describes the functions for ast rewriting
 """
 import ast
 from copy import deepcopy
-import inspect
-from typing import List, Callable
 
 
-def fix_func(func: Callable, transformer_list: List[ast.NodeTransformer] = []):
-    code = inspect.getsource(func)
+def rewrite_assert(code: str):
+    """
+    Rewrite block of code to swap assert statement with given assert_ function
+
+    Args:
+        code: Block of code, most of the time entire file
+
+    Returns:
+        Rewritten block of code
+    """
     # Parse the code into an AST
     tree = ast.parse(code)
     # Apply the transformation
     transformed_tree = deepcopy(tree)
-    for transformer in transformer_list:
-        transformed_tree = transformer.visit(transformed_tree)
+    transformed_tree = AssertTransformer().visit(transformed_tree)
     transformed_tree = ast.fix_missing_locations(transformed_tree)
     # Convert the modified AST back to code
     new_code = compile(transformed_tree, filename="", mode="exec")
     return new_code
 
 
-class FunctionDefTransformer(ast.NodeTransformer):
-    def visit_FunctionDef(self, node: ast.AST):
-        return node.body
-
-
 class AssertTransformer(ast.NodeTransformer):
+    """
+    Node transformer that swaps assert statement with given assert_ function
+    """
+
     def visit_Assert(self, node: ast.AST):
         if node.msg is None:
             args = [node.test]
