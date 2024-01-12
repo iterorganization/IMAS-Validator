@@ -2,15 +2,17 @@
 This file describes the functions for ast rewriting
 """
 import ast
-from copy import deepcopy
 
 
-def rewrite_assert(code: str, filename: str = ""):
+def rewrite_assert(code: str, filename: str):
     """
     Rewrite block of code to swap assert statement with given assert function
 
     Args:
         code: Block of code, most of the time entire file
+        filename: Should give the file from which the code was read; pass some
+            recognizable value if it wasn’t read from a file ('<string>' is commonly
+            used).
 
     Returns:
         Rewritten block of code
@@ -18,7 +20,7 @@ def rewrite_assert(code: str, filename: str = ""):
     # Parse the code into an AST
     tree = ast.parse(code)
     # Apply the transformation
-    transformed_tree = deepcopy(tree)
+    transformed_tree = tree
     transformed_tree = AssertTransformer().visit(transformed_tree)
     transformed_tree = ast.fix_missing_locations(transformed_tree)
     # Convert the modified AST back to code

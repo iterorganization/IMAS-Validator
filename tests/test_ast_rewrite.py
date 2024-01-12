@@ -11,7 +11,7 @@ class WrapperClass:
 
 def test_rewrite_assert():
     code = "x = 2"
-    new_code = rewrite_assert(code)
+    new_code = rewrite_assert(code, '<string>')
     glob = {}
     exec(new_code, glob)
     assert glob["x"] == 2
@@ -19,7 +19,7 @@ def test_rewrite_assert():
 
 def test_wrapperClass_in_target():
     code = "x = wrapperClass(2)"
-    new_code = rewrite_assert(code)
+    new_code = rewrite_assert(code, '<string>')
     glob = {"wrapperClass": WrapperClass}
     exec(new_code, glob)
     assert glob["x"].val == 2
@@ -33,7 +33,7 @@ def test_overwritten_assert():
         assert x == 2
         """
     )
-    new_code = rewrite_assert(code)
+    new_code = rewrite_assert(code, '<string>')
     mock = unittest.mock.Mock()
     glob = {"assert": mock}
     exec(new_code, glob)
@@ -47,7 +47,7 @@ def test_overwritten_assert_with_msg():
         assert x == 3, 'test_string'
         """
     )
-    new_code = rewrite_assert(code)
+    new_code = rewrite_assert(code, '<string>')
     mock = unittest.mock.Mock()
     glob = {"assert": mock}
     exec(new_code, glob)
