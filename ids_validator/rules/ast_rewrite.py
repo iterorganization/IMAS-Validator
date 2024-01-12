@@ -20,8 +20,7 @@ def rewrite_assert(code: str, filename: str):
     # Parse the code into an AST
     tree = ast.parse(code)
     # Apply the transformation
-    transformed_tree = tree
-    transformed_tree = AssertTransformer().visit(transformed_tree)
+    transformed_tree = AssertTransformer().visit(tree)
     transformed_tree = ast.fix_missing_locations(transformed_tree)
     # Convert the modified AST back to code
     new_code = compile(transformed_tree, filename=filename, mode="exec")
