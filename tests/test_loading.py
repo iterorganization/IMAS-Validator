@@ -170,3 +170,24 @@ def test_error_if_no_assert_inserted():
     assert len(rules) == 1
     with pytest.raises(NameError):
         rules[0].func(1)
+
+
+def test_apply():
+    path = Path("tests/rulesets/base/generic/core_profiles.py")
+    rules = load_rules_from_path(path)
+    assert len(rules) == 1
+    mock = unittest.mock.Mock()
+    rules[0].assert_ = mock
+    rules[0].apply(1)
+    mock.assert_called_with(True)
+    assert "assert" not in rules[0].glob.keys()
+
+
+def test_apply_always_removes_assert_from_glob():
+    path = Path("tests/rulesets/base/generic/core_profiles.py")
+    rules = load_rules_from_path(path)
+    assert len(rules) == 1
+    rules[0].assert_ = None
+    with pytest.raises(TypeError):
+        rules[0].apply(1)
+    assert "assert" not in rules[0].glob.keys()

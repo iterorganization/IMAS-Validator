@@ -24,6 +24,18 @@ class IDSValidationRule:
         self.kwfields = kwfields
         # kwfields explicitly parsed
 
+    def assert_(self, test, msg=""):
+        pass
+
+    def apply(self, *args, **kwargs):
+        try:
+            self.glob["assert"] = self.assert_
+            self.func(*args, **kwargs)
+        except Exception as e:
+            raise e
+        finally:
+            self.glob.pop("assert")
+
 
 class ValidatorRegistry:
     """
