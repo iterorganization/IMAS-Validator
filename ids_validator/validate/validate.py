@@ -6,7 +6,8 @@ from pathlib import Path
 
 from imaspy import DBEntry
 
-from .result import IDSValidationResult, ResultCollector
+from .result import IDSValidationResult
+from .result_collector import ResultCollector
 from .apply_loop import apply_rules_to_data
 from ..rules.loading import load_rules
 
