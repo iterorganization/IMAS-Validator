@@ -21,10 +21,9 @@ from ids_validator.rules.ast_rewrite import run_path
 
 @pytest.fixture()
 def res_collector():
-    # return ResultCollector()
-    beep = unittest.mock.MagicMock()
-    beep.assert_ = unittest.mock.Mock()
-    return beep
+    mock = unittest.mock.MagicMock()
+    mock.assert_ = unittest.mock.Mock()
+    return mock
 
 
 def test_discover_rulesets_explicit():
