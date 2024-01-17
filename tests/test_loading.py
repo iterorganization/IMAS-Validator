@@ -1,6 +1,7 @@
 import pytest
 from pathlib import Path
 from collections import Counter
+import unittest.mock
 
 from ids_validator.rules.loading import (
     discover_rulesets,
@@ -150,3 +151,22 @@ def test_load_rules_file_extension_error():
     path = Path("tests/rulesets/exceptions/generic/wrong_file_extension.pie")
     with pytest.raises(WrongFileExtensionError):
         load_rules_from_path(path)
+
+
+@pytest.mark.parametrize("arg,result", [(1, True), (None, False)])
+def test_rewrite_assert_in_loaded_func(arg, result):
+    path = Path("tests/rulesets/base/generic/core_profiles.py")
+    rules = load_rules_from_path(path)
+    assert len(rules) == 1
+    mock = unittest.mock.Mock()
+    rules[0].glob["assert"] = mock
+    rules[0].func(arg)
+    mock.assert_called_with(result)
+
+
+def test_error_if_no_assert_inserted():
+    path = Path("tests/rulesets/base/generic/core_profiles.py")
+    rules = load_rules_from_path(path)
+    assert len(rules) == 1
+    with pytest.raises(NameError):
+        rules[0].func(1)

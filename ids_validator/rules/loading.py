@@ -2,9 +2,9 @@
 import os
 from typing import List
 from pathlib import Path
-from runpy import run_path
 
 from .data import IDSValidationRule, ValidatorRegistry
+from ids_validator.rules.ast_rewrite import rewrite_assert
 from ids_validator.rules.exceptions import (
     InvalidRulesetPath,
     InvalidRulesetName,
@@ -126,7 +126,16 @@ def load_rules_from_path(rule_path: Path) -> List[IDSValidationRule]:
     if rule_path.suffix != ".py":
         raise WrongFileExtensionError(rule_path)
     val_registry = ValidatorRegistry(rule_path)
-    run_path(str(rule_path), init_globals={"ids_validator": val_registry.ids_validator})
+
+    with open(str(rule_path), "r") as file:
+        file_content = file.read()
+    new_code = rewrite_assert(file_content, str(rule_path))
+    glob = {
+        "ids_validator": val_registry.ids_validator,
+    }
+    exec(new_code, glob)
+    for rule in val_registry.validators:
+        rule.glob = glob
     if len(val_registry.validators) == 0:
         raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators
