@@ -3,8 +3,9 @@ import os
 from typing import List
 from pathlib import Path
 
+from ids_validator.validate.result import ResultCollector
 from .data import IDSValidationRule, ValidatorRegistry
-from ids_validator.rules.ast_rewrite import rewrite_assert
+from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.exceptions import (
     InvalidRulesetPath,
     InvalidRulesetName,
@@ -14,7 +15,10 @@ from ids_validator.rules.exceptions import (
 
 
 def load_rules(
-    rulesets: List[str], apply_generic: bool, extra_rule_dirs: List[Path] = []
+    rulesets: List[str],
+    apply_generic: bool,
+    extra_rule_dirs: List[Path],
+    result_collector: ResultCollector,
 ) -> List[IDSValidationRule]:
     """
     Load IDSValidationRule objects from given rulesets and directories
@@ -36,7 +40,7 @@ def load_rules(
     paths = discover_rule_modules(filtered_dirs)
     rules = []
     for path in paths:
-        rules += load_rules_from_path(path)
+        rules += load_rules_from_path(path, result_collector)
     return rules
 
 
@@ -113,7 +117,9 @@ def discover_rule_modules(ruleset_dirs: List[Path]) -> List[Path]:
     return rule_modules
 
 
-def load_rules_from_path(rule_path: Path) -> List[IDSValidationRule]:
+def load_rules_from_path(
+    rule_path: Path, result_collector: ResultCollector
+) -> List[IDSValidationRule]:
     """
     Make a list of files that might contain rulesets
 
@@ -127,15 +133,7 @@ def load_rules_from_path(rule_path: Path) -> List[IDSValidationRule]:
         raise WrongFileExtensionError(rule_path)
     val_registry = ValidatorRegistry(rule_path)
 
-    with open(str(rule_path), "r") as file:
-        file_content = file.read()
-    new_code = rewrite_assert(file_content, str(rule_path))
-    glob = {
-        "ids_validator": val_registry.ids_validator,
-    }
-    exec(new_code, glob)
-    for rule in val_registry.validators:
-        rule.glob = glob
+    run_path(rule_path, val_registry, result_collector)
     if len(val_registry.validators) == 0:
         raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators

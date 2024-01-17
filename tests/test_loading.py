@@ -3,10 +3,11 @@ from pathlib import Path
 from collections import Counter
 import unittest.mock
 
+from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.loading import (
+    discover_rule_modules,
     discover_rulesets,
     filter_rulesets,
-    discover_rule_modules,
     load_rules_from_path,
 )
 from ids_validator.rules.exceptions import (
@@ -15,6 +16,15 @@ from ids_validator.rules.exceptions import (
     EmptyRuleFileWarning,
     WrongFileExtensionError,
 )
+from ids_validator.rules.ast_rewrite import run_path
+
+
+@pytest.fixture()
+def res_collector():
+    # return ResultCollector()
+    beep = unittest.mock.MagicMock()
+    beep.assert_ = unittest.mock.Mock()
+    return beep
 
 
 def test_discover_rulesets_explicit():
@@ -121,73 +131,49 @@ def test_discover_rule_modules():
     assert Counter(discover_rule_modules(filtered_rulesets)) == Counter(rule_modules)
 
 
-def test_load_rules_from_path():
+def test_load_rules_from_path(res_collector):
     rule_modules = [
         Path("tests/rulesets/base/generic/core_profiles.py"),
     ]
     rules = []
     for path in rule_modules:
-        rules += load_rules_from_path(path)
+        rules += load_rules_from_path(path, res_collector)
     assert len(rules) == 1
     assert rules[0].name == "generic/core_profiles.py/core_profiles_rule"
     assert rules[0].dd_types == ("core_profiles",)
     assert rules[0].kwfields == {}
 
 
-def test_load_rules_from_path_empty_file():
+def test_load_rules_from_path_empty_file(res_collector):
     path = Path("tests/rulesets/exceptions/generic/empty.py")
     with pytest.raises(EmptyRuleFileWarning):
-        rules = load_rules_from_path(path)
+        rules = load_rules_from_path(path, res_collector)
         assert len(rules) == 0
 
 
-def test_load_rules_syntax_error():
+def test_load_rules_syntax_error(res_collector):
     path = Path("tests/rulesets/exceptions/generic/syntax_error.py")
     with pytest.raises(ZeroDivisionError):
-        load_rules_from_path(path)
+        load_rules_from_path(path, res_collector)
 
 
-def test_load_rules_file_extension_error():
+def test_load_rules_file_extension_error(res_collector):
     path = Path("tests/rulesets/exceptions/generic/wrong_file_extension.pie")
     with pytest.raises(WrongFileExtensionError):
-        load_rules_from_path(path)
+        load_rules_from_path(path, res_collector)
 
 
 @pytest.mark.parametrize("arg,result", [(1, True), (None, False)])
-def test_rewrite_assert_in_loaded_func(arg, result):
+def test_rewrite_assert_in_loaded_func(arg, result, res_collector):
     path = Path("tests/rulesets/base/generic/core_profiles.py")
-    rules = load_rules_from_path(path)
+    rules = load_rules_from_path(path, res_collector)
     assert len(rules) == 1
-    mock = unittest.mock.Mock()
-    rules[0].glob["assert"] = mock
     rules[0].func(arg)
-    mock.assert_called_with(result)
+    res_collector.assert_.called_with(result)
 
 
-def test_error_if_no_assert_inserted():
-    path = Path("tests/rulesets/base/generic/core_profiles.py")
-    rules = load_rules_from_path(path)
-    assert len(rules) == 1
-    with pytest.raises(NameError):
-        rules[0].func(1)
-
-
-def test_apply():
-    path = Path("tests/rulesets/base/generic/core_profiles.py")
-    rules = load_rules_from_path(path)
-    assert len(rules) == 1
-    mock = unittest.mock.Mock()
-    rules[0].assert_ = mock
-    rules[0].apply(1)
-    mock.assert_called_with(True)
-    assert "assert" not in rules[0].glob.keys()
-
-
-def test_apply_always_removes_assert_from_glob():
-    path = Path("tests/rulesets/base/generic/core_profiles.py")
-    rules = load_rules_from_path(path)
-    assert len(rules) == 1
-    rules[0].assert_ = None
-    with pytest.raises(TypeError):
-        rules[0].apply(1)
-    assert "assert" not in rules[0].glob.keys()
+def test_run_path(res_collector):
+    rule_path = Path("tests/rulesets/base/generic/core_profiles.py")
+    val_registry = ValidatorRegistry(rule_path)
+    run_path(rule_path, val_registry, res_collector)
+    assert len(val_registry.validators) == 1

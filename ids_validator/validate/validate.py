@@ -6,7 +6,7 @@ from pathlib import Path
 
 from imaspy import DBEntry
 
-from .result import IDSValidationResult
+from .result import IDSValidationResult, ResultCollector
 from .apply_loop import apply_rules_to_data
 from ..rules.loading import load_rules
 
@@ -25,6 +25,9 @@ def validate(
         List of IDSValidationResult objects
     """
     dbentry = DBEntry(url=ids_url)
-    rules = load_rules(extra_rule_dirs, apply_generic=apply_generic)
+    result_collector = ResultCollector()
+    rules = load_rules(
+        extra_rule_dirs, apply_generic=apply_generic, result_collector=result_collector
+    )
     results = apply_rules_to_data(dbentry, rules)
     return results

@@ -2,6 +2,10 @@
 This file describes the functions for ast rewriting
 """
 import ast
+from ids_validator.validate.result import ResultCollector
+from .data import ValidatorRegistry
+
+from pathlib import Path
 
 
 def rewrite_assert(code: str, filename: str):
@@ -45,3 +49,17 @@ class AssertTransformer(ast.NodeTransformer):
             )
         )
         return replacement
+
+
+def run_path(
+    rule_path: Path,
+    val_registry: ValidatorRegistry,
+    result_collector: ResultCollector,
+):
+    file_content = rule_path.read_text()
+    new_code = rewrite_assert(file_content, str(rule_path))
+    glob = {
+        "ids_validator": val_registry.ids_validator,
+        "assert": result_collector.assert_,
+    }
+    exec(new_code, glob)

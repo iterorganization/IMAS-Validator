@@ -58,11 +58,18 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
 .. code-block:: python
 
   from ids_validator.rules.loading import load_rules
+  from ids_validator.validate.result import ResultCollector
 
   rulesets = ['ITER-MD', 'MyCustomRules']
   apply_generic = True
   extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
-  rules_list = load_rules(rulesets=rulesets, apply_generic=apply_generic, extra_rule_dirs=extra_rule_dirs)
+  res_collector = ResultCollector()
+  rules_list = load_rules(
+    rulesets=rulesets,
+    apply_generic=apply_generic,
+    extra_rule_dirs=extra_rule_dirs,
+    result_collector=result_collector
+  )
 
 You can also set the environment variable `RULESET_PATH` to show the loading tool where to look for rule sets.
 

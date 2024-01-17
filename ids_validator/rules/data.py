@@ -17,24 +17,11 @@ class IDSValidationRule:
         **kwfields: Dict[str, Any],
     ):
         self.func = func
-        self.glob = {}
         # name: ruleset/file/func_name
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
         self.dd_types = dd_types
         self.kwfields = kwfields
         # kwfields explicitly parsed
-
-    def assert_(self, test, msg=""):
-        pass
-
-    def apply(self, *args, **kwargs):
-        try:
-            self.glob["assert"] = self.assert_
-            self.func(*args, **kwargs)
-        except Exception as e:
-            raise e
-        finally:
-            self.glob.pop("assert")
 
 
 class ValidatorRegistry:
