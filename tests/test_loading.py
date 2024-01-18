@@ -163,18 +163,13 @@ def test_load_rules_file_extension_error(res_collector):
         load_rules_from_path(path, res_collector)
 
 
-def test_rewrite_assert_in_loaded_func_successful_assert(res_collector):
+def test_rewrite_assert_in_loaded_func(res_collector):
     path = Path("tests/rulesets/base/generic/core_profiles.py")
     rules = load_rules_from_path(path, res_collector)
     assert len(rules) == 1
     rules[0].func(1)
     res_collector.assert_.assert_called_with(True)
-
-
-def test_rewrite_assert_in_loaded_func_failed_assert(res_collector):
-    path = Path("tests/rulesets/base/generic/core_profiles.py")
-    rules = load_rules_from_path(path, res_collector)
-    assert len(rules) == 1
+    res_collector.assert_.reset_mock()
     rules[0].func(None)
     res_collector.assert_.assert_called_with(False)
 
