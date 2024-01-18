@@ -61,7 +61,7 @@ def run_path(
     Any found validator tests will be added to the given ValidatorRegistry
 
     Args:
-        rule_path: Path to file that will be run
+        rule_path: Path to file that contains ids validators tests
         val_registry: ValidatorRegistry in which the found tests will be placed
         result_collector: ResultCollector where the found tests will deposit their
             results after being run

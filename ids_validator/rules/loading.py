@@ -127,6 +127,8 @@ def load_rules_from_path(
 
     Args:
         rule_path: Path for file that might contain rulesets
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
 
     Returns:
         List IDSValidationRule objects from given file
