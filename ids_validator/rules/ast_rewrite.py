@@ -56,6 +56,16 @@ def run_path(
     val_registry: ValidatorRegistry,
     result_collector: ResultCollector,
 ):
+    """
+    Run the file corresponding to the given path with rewritten assert statements.
+    Any found validator tests will be added to the given ValidatorRegistry
+
+    Args:
+        rule_path: Path to file that will be run
+        val_registry: ValidatorRegistry in which the found tests will be placed
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
+    """
     file_content = rule_path.read_text()
     new_code = rewrite_assert(file_content, str(rule_path))
     glob = {

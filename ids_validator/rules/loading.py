@@ -29,6 +29,8 @@ def load_rules(
         apply_generic: Whether or not to apply the generic ruleset that applies to
             all IDSs
         extra_rule_dirs: List of directories in which to look for rulesets
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
 
     Returns:
         Loaded validation rules.

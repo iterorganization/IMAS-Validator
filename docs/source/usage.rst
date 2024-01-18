@@ -63,7 +63,7 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
   rulesets = ['ITER-MD', 'MyCustomRules']
   apply_generic = True
   extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
-  res_collector = ResultCollector()
+  result_collector = ResultCollector()
   rules_list = load_rules(
     rulesets=rulesets,
     apply_generic=apply_generic,
