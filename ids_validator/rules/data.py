@@ -14,13 +14,13 @@ class IDSValidationRule:
         self,
         rule_path: Path,
         func: Callable,
-        *dd_types: str,
+        *ids_names: str,
         **kwfields: Dict[str, Any],
     ):
         self.func = func
         # name: ruleset/file/func_name
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
-        self.dd_types = dd_types
+        self.ids_names = ids_names
         self.kwfields = kwfields
         # kwfields explicitly parsed
 

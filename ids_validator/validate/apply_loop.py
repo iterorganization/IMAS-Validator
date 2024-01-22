@@ -62,3 +62,8 @@ def apply_rule(
     # generate IDSValidationResult based assertions
     # return val_result
     pass
+
+
+def get_ids_instance_args(ids_instances: List[IDSToplevel], ids_names: List[str]):
+    # return list of args in proper order
+    pass
