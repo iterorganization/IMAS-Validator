@@ -5,6 +5,8 @@ the validation tool
 from typing import List, Any, Dict, Callable
 from pathlib import Path
 
+from ids_validator.validate.ids_wrapper import IDSWrapper
+
 
 class IDSValidationRule:
     """"""
@@ -13,15 +15,21 @@ class IDSValidationRule:
         self,
         rule_path: Path,
         func: Callable,
-        *dd_types: str,
+        *ids_names: str,
         **kwfields: Dict[str, Any],
     ):
         self.func = func
         # name: ruleset/file/func_name
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
-        self.dd_types = dd_types
+        self.ids_names = ids_names
         self.kwfields = kwfields
         # kwfields explicitly parsed
+
+    def apply(self, *args, **kwargs):
+        if set(arg.name for arg in args) != set(self.ids_names):
+            raise ValueError()
+        args = [IDSWrapper(arg) for arg in args]
+        self.func(*args, **kwargs)
 
 
 class ValidatorRegistry:
