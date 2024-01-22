@@ -6,20 +6,20 @@ import operator
 
 
 def _binary_wrapper(op, name):
-    def func(self, other):
+    def func(self: IDSWrapper, other):
         if isinstance(other, IDSWrapper):
-            other = other.value
-        return op(self.value, other)
+            other = other.obj
+        return IDSWrapper(op(self.obj, other))
 
     func.__name__ = f"__{name}__"
     return func
 
 
 def _reflected_binary_wrapper(op, name):
-    def func(self, other):
+    def func(self: IDSWrapper, other):
         if isinstance(other, IDSWrapper):
-            other = other.value
-        return op(other, self.value)
+            other = other.obj
+        return IDSWrapper(op(other, self.obj))
 
     func.__name__ = f"__r{name}__"
     return func
@@ -30,20 +30,20 @@ def _numeric_wrapper(op, name):
 
 
 def _unary_wrapper(op, name):
-    def func(self):
-        return op(self.value)
+    def func(self: IDSWrapper):
+        return IDSWrapper(op(self.obj))
 
     func.__name__ = f"__{name}__"
     return func
 
 
 class IDSWrapper:
-    # how to handle if statements? (asserts?)
-    # error on assignment operators
-    # ids_primitive for operator list
-
+    """
+    Wrapper objects with operator overloads for reporting validation test results
+    """
     def __init__(self, obj: Any):
-        # check if value/array/whatever
+        if isinstance(obj, IDSWrapper):
+            raise ValueError('Cannot wrap already wrapped object')
         self.obj = obj
 
     def __getattr__(self, attr: Any):
