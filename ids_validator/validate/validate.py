@@ -25,7 +25,7 @@ def validate(
     Returns:
         List of IDSValidationResult objects
     """
-    dbentry = DBEntry(url=ids_url)
+    dbentry = DBEntry(ids_url, "r")
     result_collector = ResultCollector()
     rules = load_rules(
         extra_rule_dirs, apply_generic=apply_generic, result_collector=result_collector
