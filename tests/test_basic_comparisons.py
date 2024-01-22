@@ -64,7 +64,7 @@ def check_test_result(test, expected):
 
 
 def test_cannot_wrap_wrapper():
-    with pytest.raises(DoubleWrapError):
+    with pytest.raises(RuntimeError):
         IDSWrapper(IDSWrapper(1))
 
 
@@ -111,12 +111,10 @@ def test_validate_flt_0d(core_profiles):
     check_test_result(test, True)
 
     test = bool(zmin)
-    check_test_result(test, True)
+    assert test is True
 
 
-@pytest.mark.skip(reason="official DD has no CPX_0D nodes")
-def test_validate_cpx_0d(waves):
-    pass
+# official DD has no CPX_0D nodes
 
 
 def test_validate_str_0d(core_profiles):
@@ -135,6 +133,7 @@ def test_validate_str_0d(core_profiles):
     test = "omm" in comment
     check_test_result(test, True)
 
+    # TODO: separate test module for method/property calls of wrapped objects
     test = comment.startswith("XYZ")
     check_test_result(test, False)
 
@@ -171,6 +170,9 @@ def test_validate_int_1d(waves):
 
     test = (ntor[2:5] == numpy.arange(2, 5, dtype=numpy.int32)).all()
     check_test_result(test, True)
+
+    test = ntor == 1
+    check_test_result(test, False)
 
     with pytest.raises(ValueError):
         ntor == numpy.arange(9)
@@ -242,6 +244,12 @@ def test_validate_flt_2d(waves):
     test = len(pdnt[0]) == 3
     check_test_result(test, True)
 
+    test = pdnt > 0
+    check_test_result(test, True)
+
+    test = pdnt == [1, 2, 3]
+    check_test_result(test, False)
+
 
 def test_validate_flt_3d(waves):
     pdnt = waves.coherent_wave[0].profiles_2d[0].power_density_n_tor
@@ -252,9 +260,8 @@ def test_validate_flt_3d(waves):
     test = pdnt.size == 24
     check_test_result(test, True)
 
+    test = pdnt[1] > 4
+    check_test_result(test, True)
 
-# TODO:
-# Test 1 or 2 higher dimensional types (FLT_2D and FLT_3D?), they use the same
-# underlying objects (IDSWrapper -> IDSNumericArray -> numpy.ndarray) so shouldn't
-# behave different compared to the 1D data types
-# broadcasting
+    test = pdnt[1] == [[2.0, 3.0, 4.0], [5.0, 6.0, 7.0]]
+    check_test_result(test, False)
