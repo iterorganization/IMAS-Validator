@@ -41,9 +41,10 @@ class IDSWrapper:
     """
     Wrapper objects with operator overloads for reporting validation test results
     """
+
     def __init__(self, obj: Any):
         if isinstance(obj, IDSWrapper):
-            raise ValueError('Cannot wrap already wrapped object')
+            raise ValueError("Cannot wrap already wrapped object")
         self.obj = obj
 
     def __getattr__(self, attr: Any):
