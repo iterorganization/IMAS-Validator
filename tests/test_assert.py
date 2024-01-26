@@ -33,29 +33,35 @@ def call_func_error(res_collector):
     return mock
 
 
-def test_attrs(val_result, bool_result):
+def test_attrs(val_result, bool_result, wrapped):
     assert val_result.file_name.parts[-2:] == "tests/test_assert.py"
     assert val_result.func_name == "cool_func_name"
-    assert val_result.func_docs == "put docs here"
-    assert val_result.ids_names == ["ids_name"]
-    assert val_result.ids_occurences == ...
-    assert val_result.lineno == ...
+    assert val_result.wrapped == wrapped
+    if val_result.wrapped:
+        assert val_result.ids_names == ["core_profiles"]
+        assert val_result.ids_occurences == [0]
+        assert val_result.func_docs == "put docs here"
+    else:
+        assert val_result.ids_names == []
+        assert val_result.ids_occurences == []
+        assert val_result.func_docs == ""
+    assert val_result.lineno == 16
     assert val_result.bool_result == bool_result
 
 
 def test_all_attrs_filled_on_success(res_collector, call_func):
     call_func(IDSWrapper(True))
-    test_attrs(res_collector.results[0], True)
+    test_attrs(res_collector.results[0], True, True)
 
 
 def test_all_attrs_filled_on_fail(res_collector, call_func):
     call_func(IDSWrapper(False))
-    test_attrs(res_collector.results[0], False)
+    test_attrs(res_collector.results[0], False, True)
 
 
 def test_all_attrs_filled_on_non_wrapper_test_arg(res_collector, call_func):
     call_func(True)
-    test_attrs(res_collector.results[0], True)
+    test_attrs(res_collector.results[0], True, False)
 
 
 def test_appropriate_behavior_on_error(res_collector, call_func_error):

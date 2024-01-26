@@ -13,4 +13,4 @@ class ResultCollector:
         self.results: List[IDSValidationResult] = []
 
     def assert_(self, test, msg=""):
-        self.results.append(IDSValidationResult())
+        self.results.append(IDSValidationResult(test, msg))
