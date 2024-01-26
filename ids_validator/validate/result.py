@@ -2,7 +2,7 @@
 This file describes the data class for successes and failures of the
 validation tool
 """
-from typing import List
+from typing import List, Callable
 import inspect
 from pathlib import Path
 
@@ -10,7 +10,7 @@ from pathlib import Path
 class IDSValidationResult:
     """"""
 
-    def __init__(self, func: function, ids_names: List[str], bool_result: bool):
+    def __init__(self, func: Callable, ids_names: List[str], bool_result: bool):
         self.file_name = Path(inspect.getfile(func)).parts[-3:]
         self.func_name = func.__name__
         self.func_docs = func.__doc__

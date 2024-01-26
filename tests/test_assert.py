@@ -12,31 +12,29 @@ def res_collector():
 
 @pytest.fixture()
 def call_func(res_collector):
-    def func(ids_name):
+    def func_fine(ids_name):
         res_collector.assert_(ids_name)
 
-    mock = unittest.mock.Mock(side_effect=func)
-    mock.filename = "myfilename"
-    mock.doc = "put docs here"
-    mock.name = "cool_func_name"
+    mock = unittest.mock.Mock(side_effect=func_fine)
+    mock.__doc__ = "put docs here"
+    mock.__name__ = "cool_func_name"
     return mock
 
 
 @pytest.fixture()
 def call_func_error(res_collector):
-    def func(ids_name):
+    def func_error(ids_name):
         a = ids_name / 0
         res_collector.assert_(a)
 
-    mock = unittest.mock.Mock(side_effect=func)
-    mock.filename = "myfilename"
-    mock.doc = "put docs here"
-    mock.name = "cool_func_name"
+    mock = unittest.mock.Mock(side_effect=func_error)
+    mock.__doc__ = "put docs here"
+    mock.__name__ = "cool_func_name"
     return mock
 
 
 def test_attrs(val_result, bool_result):
-    assert val_result.file_name == "myfilename"
+    assert val_result.file_name.parts[-2:] == "tests/test_assert.py"
     assert val_result.func_name == "cool_func_name"
     assert val_result.func_docs == "put docs here"
     assert val_result.ids_names == ["ids_name"]
