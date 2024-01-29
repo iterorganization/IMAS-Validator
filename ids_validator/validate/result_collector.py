@@ -2,6 +2,7 @@
 This file describes the data class for successes and failures of the
 validation tool
 """
+
 from typing import List
 from ids_validator.validate.result import IDSValidationResult
 

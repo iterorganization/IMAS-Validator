@@ -10,7 +10,7 @@ from ids_validator.rules.loading import (
     filter_rulesets,
     load_rules_from_path,
 )
-from ids_validator.rules.exceptions import (
+from ids_validator.exceptions import (
     InvalidRulesetPath,
     InvalidRulesetName,
     EmptyRuleFileWarning,

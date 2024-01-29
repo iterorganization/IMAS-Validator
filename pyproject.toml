@@ -51,7 +51,7 @@ dependencies = [
     "numpy>=1.15.4",
     "importlib_resources",
     "packaging",
-    "black",
+    "black>=24,<25",
     "flake8",
 ]
 

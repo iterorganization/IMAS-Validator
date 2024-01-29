@@ -1,11 +1,15 @@
 """
 This file describes the main function for the IMAS IDS validation tool
 """
+
 from typing import List
 from pathlib import Path
 
 from imaspy import DBEntry
+from imaspy.imas_interface import has_imas, ll_interface
+from packaging.version import Version
 
+from ids_validator.exceptions import IMASVersionError
 from .result import IDSValidationResult
 from .result_collector import ResultCollector
 from .apply_loop import apply_rules_to_data
@@ -25,10 +29,20 @@ def validate(
     Returns:
         List of IDSValidationResult objects
     """
-    dbentry = DBEntry(url=ids_url)
+    _check_imas_version()
+    dbentry = DBEntry(ids_url, "r")
     result_collector = ResultCollector()
     rules = load_rules(
         extra_rule_dirs, apply_generic=apply_generic, result_collector=result_collector
     )
     results = apply_rules_to_data(dbentry, rules)
     return results
+
+
+def _check_imas_version():
+    """Check if the installed IMAS version is sufficient."""
+    # TODO: check if this is the best level to test for the IMAS version
+    if not has_imas:
+        raise IMASVersionError()
+    if ll_interface._al_version < Version(5, 1):
+        raise IMASVersionError(ll_interface._al_version)
