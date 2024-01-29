@@ -3,9 +3,10 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
-from typing import List
+from typing import List, Tuple
 
-from imaspy import DBEntry, IDSToplevel
+from imaspy import DBEntry
+from imaspy.ids_toplevel import IDSToplevel
 
 # from .overload_class import OverloadClass
 from .result import IDSValidationResult
@@ -15,13 +16,33 @@ from ..rules.data import IDSValidationRule
 def apply_rules_to_data(
     db_entry: DBEntry, rules: List[IDSValidationRule]
 ) -> List[IDSValidationResult]:
-    """"""
+    """Apply set of rules to the Data Entry.
+
+    Args:
+        db_entry: An opened DBEntry.
+        rules: List of rules to apply to the data.
+    """
     # loop over ids_names
+    idss: List[Tuple[str, int]] = []  # (ids_name, occurrence)
+    for ids_name in db_entry.factory.ids_names():
+        occurrence_list = db_entry.list_all_occurrences(ids_name)
+        for occurrence in occurrence_list:
+            idss.append((ids_name, occurrence))
+
     # load necessary ids's into memory
+    # Note: need to rethink this when doing multi-IDS validation
+    for ids_name, occurrence in idss:
+        ids = db_entry.get(ids_name, occurrence)
+        # TODO: handle results
+        apply_rules(ids, rules)
+
+
+def apply_rules(ids: IDSToplevel, rules: List[IDSValidationRule]):
+    """"""
+    pass
     # find matching rules for given ids_names
     # loop over rules
     # apply rules
-    pass
 
 
 def find_matching_rules(ids_names: List[str], rules: List[IDSValidationRule]):

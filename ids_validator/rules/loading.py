@@ -7,7 +7,7 @@ from pathlib import Path
 from ids_validator.validate.result_collector import ResultCollector
 from .data import IDSValidationRule, ValidatorRegistry
 from ids_validator.rules.ast_rewrite import run_path
-from ids_validator.rules.exceptions import (
+from ids_validator.exceptions import (
     InvalidRulesetPath,
     InvalidRulesetName,
     EmptyRuleFileWarning,
