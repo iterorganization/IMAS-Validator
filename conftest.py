@@ -30,7 +30,7 @@ def test_data_core_profiles():
 
 
 @pytest.fixture
-def waves():
+def test_data_waves():
     wv = imaspy.IDSFactory("3.40.1").waves()
     # Fill some properties:
     wv.ids_properties.homogeneous_time = 0  # INT_0D
