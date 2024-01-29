@@ -2,7 +2,7 @@
 This file describes the overload class for the operators
 """
 
-from typing import Any, Iterable
+from typing import Any
 import operator
 
 import numpy as np
@@ -70,6 +70,7 @@ class IDSWrapper:
     def __getitem__(self, item: Any):
         return IDSWrapper(self._obj[item])
 
+    # comparison operators
     __eq__ = _binary_wrapper(operator.eq, "eq")
     __ne__ = _binary_wrapper(operator.ne, "ne")
     __lt__ = _binary_wrapper(operator.lt, "lt")
@@ -78,16 +79,19 @@ class IDSWrapper:
     __ge__ = _binary_wrapper(operator.ge, "ge")
     __contains__ = _binary_wrapper(operator.contains, "contains")
 
+    # numeric operators (others follow in different PR)
     __add__, __radd__ = _numeric_wrapper(operator.add, "add")
 
+    # unary operators (others follow in different PR)
     __neg__ = _unary_wrapper(operator.neg, "neg")
 
+    # len must always return int
     def __len__(self) -> int:
-        if not isinstance(self._obj, Iterable):
-            return 0
         return len(self._obj)
 
+    # __bool__ must always return bool
     def __bool__(self) -> bool:
+        # evaluate bool of np arrays as 'all'
         if isinstance(self._obj, np.ndarray):
             return bool(self._obj.all())
         return bool(self._obj)

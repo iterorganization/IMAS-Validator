@@ -3,6 +3,8 @@ import pytest
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
+import imaspy
+
 
 def check_test_result(test, expected):
     assert isinstance(test, IDSWrapper)
@@ -211,3 +213,10 @@ def test_validate_flt_3d(test_data_waves):
 
     test = pdnt[1] == [[2.0, 3.0, 4.0, 5.0]]
     check_test_result(test, False)
+
+
+def test_bool_non_numpy_array():
+    cp = imaspy.IDSFactory().core_profiles()
+    cp.time = [1, 2, 3]
+    wrapper = IDSWrapper(cp)
+    assert bool(wrapper.time) is True

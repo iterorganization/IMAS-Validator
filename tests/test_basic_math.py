@@ -85,11 +85,11 @@ def test_validate_str_1d(test_data_core_profiles):
     check_test_result(test, True)
 
 
-@pytest.mark.skip(reason="official DD has no CPX_0D nodes")
+@pytest.mark.skip()
 def test_validate_flt_2d(test_data_core_profiles):
     pass
 
 
-@pytest.mark.skip(reason="official DD has no CPX_0D nodes")
+@pytest.mark.skip()
 def test_validate_flt_3d(test_data_core_profiles):
     pass
