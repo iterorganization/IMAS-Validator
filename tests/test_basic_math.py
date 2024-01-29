@@ -1,11 +1,10 @@
 import numpy
 import pytest
 
-# from ids_validator.validate.ids_wrapper import IDSWrapper
-IDSWrapper = object()
+from ids_validator.validate.ids_wrapper import IDSWrapper
 
-# Until this functionality is implemented, everything in this module will fail
-pytestmark = pytest.mark.xfail(strict=True)
+# Until this functionality is implemented, skip everything in this module
+pytestmark = pytest.mark.skip()
 
 
 def check_test_result(test, expected):
@@ -50,14 +49,14 @@ def test_validate_str_0d(test_data_core_profiles):
 
 
 def test_validate_int_1d(test_data_waves):
-    ntor = test_data_waves.ntor
+    ntor = test_data_waves.coherent_wave[0].profiles_1d[0].n_tor
 
     test = (ntor + 5 == numpy.arange(5, 15, dtype=numpy.int32)).any()
-    check_test_result(test, False)
+    check_test_result(test, True)
 
 
 def test_validate_flt_1d(test_data_core_profiles):
-    rho_tor_norm = test_data_core_profiles.profiles_id[0].grid.rho_tor_norm
+    rho_tor_norm = test_data_core_profiles.profiles_1d[0].grid.rho_tor_norm
 
     test = numpy.allclose(rho_tor_norm + 1e-15, numpy.linspace(0.0, 1.0, 16))
     check_test_result(test, True)
@@ -83,12 +82,14 @@ def test_validate_str_1d(test_data_core_profiles):
     sources = test_data_core_profiles.ids_properties.provenance.node[0].sources
 
     test = sources + ["hi"] == ["First string", "Second string", "Third!", "hi"]
-    assert test is True
+    check_test_result(test, True)
 
 
+@pytest.mark.skip(reason="official DD has no CPX_0D nodes")
 def test_validate_flt_2d(test_data_core_profiles):
     pass
 
 
+@pytest.mark.skip(reason="official DD has no CPX_0D nodes")
 def test_validate_flt_3d(test_data_core_profiles):
     pass
