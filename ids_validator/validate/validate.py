@@ -1,6 +1,7 @@
 """
 This file describes the main function for the IMAS IDS validation tool
 """
+
 from typing import List
 from pathlib import Path
 

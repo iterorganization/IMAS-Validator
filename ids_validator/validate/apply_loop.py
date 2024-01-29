@@ -2,6 +2,7 @@
 This file describes the validation loop in which the rules are applied to the
 IDS data
 """
+
 from typing import List, Tuple
 
 from imaspy import DBEntry
