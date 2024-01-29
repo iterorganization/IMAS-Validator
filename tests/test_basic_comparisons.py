@@ -127,6 +127,9 @@ def test_validate_int_1d(test_data_waves):
     test = ntor == 1
     check_test_result(test, False)
 
+    test = bool(ntor == numpy.ones(10, dtype=numpy.int32))
+    assert test is True
+
     with pytest.raises(ValueError):
         ntor == numpy.arange(9)
 
