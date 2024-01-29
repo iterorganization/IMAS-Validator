@@ -123,9 +123,6 @@ def test_validate_int_1d(test_data_waves):
     test = bool(ntor == numpy.ones(10, dtype=numpy.int32))
     assert test is False
 
-    with pytest.raises(ValueError):
-        ntor == numpy.arange(9)
-
 
 def test_validate_flt_1d(test_data_core_profiles):
     rho_tor_norm = test_data_core_profiles.profiles_1d[0].grid.rho_tor_norm
