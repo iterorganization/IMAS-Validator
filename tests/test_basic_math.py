@@ -64,6 +64,9 @@ def test_validate_flt_1d(test_data_core_profiles):
     test = numpy.allclose(rho_tor_norm + 1e-15, numpy.linspace(0.0, 1.0, 16))
     check_test_result(test, True)
 
+    test = rho_tor_norm - 1e-15 > 0
+    check_test_result(test, False)
+
 
 def test_validate_cpx_1d(test_data_waves):
     e_field_plus = test_data_waves.coherent_wave[0].full_wave[0].e_field.plus[0].values
