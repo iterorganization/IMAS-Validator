@@ -1,6 +1,7 @@
 """
 This file describes the functions for ast rewriting
 """
+
 import ast
 from ids_validator.validate.result_collector import ResultCollector
 from .data import ValidatorRegistry

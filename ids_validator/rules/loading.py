@@ -1,4 +1,5 @@
 """This file describes the functionality for discovering and loading validation rules"""
+
 import os
 from typing import List
 from pathlib import Path
