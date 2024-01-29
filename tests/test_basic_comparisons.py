@@ -3,8 +3,6 @@ import pytest
 
 # from ids_validator.validate.ids_wrapper import IDSWrapper
 IDSWrapper = object()
-# from ids_validator.rules.exceptions import DoubleWrapError
-DoubleWrapError = ValueError
 
 # Until this functionality is implemented, everything in this module will fail
 pytestmark = pytest.mark.xfail(strict=True)
