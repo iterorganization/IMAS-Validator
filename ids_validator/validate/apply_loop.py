@@ -8,7 +8,7 @@ from typing import List, Tuple
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
-# from .overload_class import OverloadClass
+# from ids_validator.validate.ids_wrapper import IDSWrapper
 from .result import IDSValidationResult
 from ..rules.data import IDSValidationRule
 

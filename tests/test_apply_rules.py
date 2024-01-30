@@ -149,7 +149,7 @@ def test_apply_rules(dbentry, rules):
 @pytest.mark.xfail(reason="Not implemented yet", strict=True)
 def test_find_matching_rules(dbentry, rules):
     ids = dbentry.get("core_profiles", 0)
-    assert find_matching_rules(ids, rules) == rules[:1]
+    assert find_matching_rules(ids, rules) == rules[:2]
 
 
 @pytest.mark.xfail(reason="Not implemented yet", strict=True)
