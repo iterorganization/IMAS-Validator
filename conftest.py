@@ -2,7 +2,7 @@ import numpy
 import pytest
 import imaspy
 
-IDSWrapper = object()
+from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
 @pytest.fixture

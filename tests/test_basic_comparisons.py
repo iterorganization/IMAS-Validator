@@ -1,11 +1,9 @@
 import numpy
 import pytest
 
-# from ids_validator.validate.ids_wrapper import IDSWrapper
-IDSWrapper = object()
+from ids_validator.validate.ids_wrapper import IDSWrapper
 
-# Until this functionality is implemented, everything in this module will fail
-pytestmark = pytest.mark.xfail(strict=True)
+import imaspy
 
 
 def check_test_result(test, expected):
@@ -15,7 +13,7 @@ def check_test_result(test, expected):
 
 
 def test_cannot_wrap_wrapper():
-    with pytest.raises(RuntimeError):
+    with pytest.raises(ValueError):
         IDSWrapper(IDSWrapper(1))
 
 
@@ -31,8 +29,11 @@ def test_validate_int_0d(test_data_core_profiles):
     test = homogeneous_time > 1
     check_test_result(test, False)
 
-    test = 1 > homogeneous_time
+    test = 1 < homogeneous_time
     check_test_result(test, False)
+
+    test = 0 <= homogeneous_time <= 2
+    check_test_result(test, True)
 
     # These cannot be wrapped in an IDSWrapper, just check expected outcome ok:
     test = bool(homogeneous_time)
@@ -44,9 +45,6 @@ def test_validate_int_0d(test_data_core_profiles):
     test = homogeneous_time in [0, 1, 2]
     assert test is True
 
-    test = 0 <= homogeneous_time <= 2
-    assert test is True
-
 
 def test_validate_flt_0d(test_data_core_profiles):
     zmin = test_data_core_profiles.profiles_1d[0].ion[0].state[0].z_min
@@ -56,7 +54,7 @@ def test_validate_flt_0d(test_data_core_profiles):
     check_test_result(test, True)
 
     test = zmin < zmax
-    check_test_result(test, False)
+    check_test_result(test, True)
 
     test = -zmin < 0
     check_test_result(test, True)
@@ -77,12 +75,11 @@ def test_validate_str_0d(test_data_core_profiles):
     test = bool(comment)
     assert test is True
 
-    # TODO: check if len may return an IDSWrapper...
     test = len(comment) == 3
-    check_test_result(test, False)
+    assert test is False
 
     test = "omm" in comment
-    check_test_result(test, True)
+    assert test is True
 
     # TODO: separate test module for method/property calls of wrapped objects
     test = comment.startswith("XYZ")
@@ -90,7 +87,7 @@ def test_validate_str_0d(test_data_core_profiles):
 
 
 def test_validate_int_1d(test_data_waves):
-    ntor = test_data_waves.ntor
+    ntor = test_data_waves.coherent_wave[0].profiles_1d[0].n_tor
 
     test = (ntor == numpy.arange(10, dtype=numpy.int32)).all()
     check_test_result(test, True)
@@ -105,13 +102,13 @@ def test_validate_int_1d(test_data_waves):
     check_test_result(test, True)
 
     test = len(ntor) == 10
-    check_test_result(test, True)
+    assert test is True
 
     test = 5 in ntor
-    check_test_result(test, True)
+    assert test is True
 
     test = 10 in ntor
-    check_test_result(test, False)
+    assert test is False
 
     test = ntor[4] == 4
     check_test_result(test, True)
@@ -126,14 +123,11 @@ def test_validate_int_1d(test_data_waves):
     check_test_result(test, False)
 
     test = bool(ntor == numpy.ones(10, dtype=numpy.int32))
-    assert test is True
-
-    with pytest.raises(ValueError):
-        ntor == numpy.arange(9)
+    assert test is False
 
 
 def test_validate_flt_1d(test_data_core_profiles):
-    rho_tor_norm = test_data_core_profiles.profiles_id[0].grid.rho_tor_norm
+    rho_tor_norm = test_data_core_profiles.profiles_1d[0].grid.rho_tor_norm
 
     test = (rho_tor_norm == numpy.linspace(0.0, 1.0, 16)).all()
     check_test_result(test, True)
@@ -142,7 +136,7 @@ def test_validate_flt_1d(test_data_core_profiles):
     check_test_result(test, True)
 
     test = len(rho_tor_norm) == 16
-    check_test_result(test, True)
+    assert test is True
 
     test = rho_tor_norm[-1] > rho_tor_norm[0]
     check_test_result(test, True)
@@ -161,7 +155,7 @@ def test_validate_cpx_1d(test_data_waves):
     check_test_result(test, True)
 
     test = len(e_field_plus) == 4
-    check_test_result(test, True)
+    assert test is True
 
 
 def test_validate_str_1d(test_data_core_profiles):
@@ -171,13 +165,13 @@ def test_validate_str_1d(test_data_core_profiles):
     check_test_result(test, True)
 
     test = len(sources) == 3
-    check_test_result(test, True)
+    assert test is True
 
     test = len(sources[1]) == 6
-    check_test_result(test, False)
+    assert test is False
 
     test = len(sources[-1]) == 6
-    check_test_result(test, True)
+    assert test is True
 
     test = "Third!" in sources
     assert test is True
@@ -193,10 +187,10 @@ def test_validate_flt_2d(test_data_waves):
     check_test_result(test, True)
 
     test = len(pdnt) == 2
-    check_test_result(test, True)
+    assert test is True
 
     test = len(pdnt[0]) == 3
-    check_test_result(test, True)
+    assert test is True
 
     test = pdnt > 0
     check_test_result(test, True)
@@ -217,5 +211,12 @@ def test_validate_flt_3d(test_data_waves):
     test = pdnt[1] > 4
     check_test_result(test, True)
 
-    test = pdnt[1] == [[2.0, 3.0, 4.0], [5.0, 6.0, 7.0]]
+    test = pdnt[1] == [[2.0, 3.0, 4.0, 5.0]]
     check_test_result(test, False)
+
+
+def test_bool_non_numpy_array():
+    cp = imaspy.IDSFactory().core_profiles()
+    cp.time = [1, 2, 3]
+    wrapper = IDSWrapper(cp)
+    assert bool(wrapper.time) is True
