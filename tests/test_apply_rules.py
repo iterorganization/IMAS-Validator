@@ -11,10 +11,7 @@ from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.apply_loop import (
     apply_rules_to_data,
-    apply_rules,
     find_matching_rules,
-    apply_rule,
-    get_ids_instance_args,
 )
 
 
@@ -83,9 +80,7 @@ def test_dbentry_mock(dbentry):
     assert cp3.ids_properties.comment == "Test IDS: core_profiles/3"
 
 
-@pytest.mark.xfail(reason="Not implemented yet", strict=True)
 def test_apply_rules_to_data(dbentry, rules):
-    # TODO, but something like the following
     # Function to test:
     apply_rules_to_data(dbentry, rules)
 
@@ -119,69 +114,25 @@ def test_apply_rules_to_data(dbentry, rules):
     dbentry.get.assert_has_calls(get_calls, any_order=True)
 
 
-@pytest.mark.xfail(reason="Not implemented yet", strict=True)
-def test_apply_rules(dbentry, rules):
-    ids = dbentry.get("core_profiles", 0)
-
-    apply_rules(ids, rules)
-
-    # Check that rule functions were called with expected arguments:
-    expected_calls = {
-        "core_profiles": [
-            # Note: this works because `get` is cached:
-            call(get("core_profiles", 0))
-        ]
-    }
-    # First rule applies to all IDSs
-    assert rules[0].func.called_once()
-    assert rules[0].func.assert_has_calls(
-        expected_calls["core_profiles"], any_order=True
-    )
-    # Second rule applies to all occurrences of core_profiles:
-    assert rules[1].func.called_once()
-    assert rules[1].func.assert_has_calls(
-        expected_calls["core_profiles"], any_order=True
-    )
-    # Third rule applies to nothing in this DBEntry
-    assert rules[2].func.call_count == 0
-
-
-@pytest.mark.xfail(reason="Not implemented yet", strict=True)
 def test_find_matching_rules(dbentry, rules):
-    ids = dbentry.get("core_profiles", 0)
-    assert find_matching_rules(ids, rules) == rules[:2]
+    expected_result = []
+    for ids_name in _occurrence_dict:
+        expected_result += [
+            (get(ids_name, occurence), rules[0])
+            for occurence in _occurrence_dict[ids_name]
+        ]  # every occurrence once for '*'
+    expected_result += [
+        (get(ids_name, occurence), rules[1])
+        for occurence in _occurrence_dict["core_profiles"]
+    ]  # all occurrences for 'core_profiles'
+    result = find_matching_rules(dbentry, rules)
+    assert len(set(result) - set(expected_result)) == 0
 
 
-@pytest.mark.xfail(reason="Not implemented yet", strict=True)
-def test_apply_rule(dbentry, rules):
+def test_apply_func(dbentry, rules):
     ids = dbentry.get("core_profiles", 0)
     rule = rules[0]
-    apply_rule(ids, rule)
+    rule.apply_func(ids, rule)
     rule.func.assert_called_once()
     assert isinstance(rule.func.call_arg_list[0], IDSWrapper)
     assert rule.func.call_arg_list[0]._obj == ids
-
-
-@pytest.mark.xfail(reason="Not implemented yet", strict=True)
-def test_apply_rule_arg_error(rules):
-    with pytest.raises(ValueError):
-        apply_rule([], rules[0])
-
-
-# implement for multi-IDS apply
-@pytest.mark.skip(reason="Not implemented yet")
-def test_get_ids_instance_args(dbentry, rules):
-    rule = rules[4]
-    ids1 = dbentry.get("core_profiles", 0)
-    ids2 = dbentry.get("equilibrium", 0)
-    idss = [ids1, ids2]
-    ids_args = get_ids_instance_args(idss, rule)
-    assert [arg.name for arg in ids_args] == rule.ids_names
-    ids_args = get_ids_instance_args(reversed(idss), rule)
-    assert [arg.name for arg in ids_args] == rule.ids_names
-
-    rule.ids_names = reversed(rule.ids_names)
-    ids_args = get_ids_instance_args(idss, rule)
-    assert [arg.name for arg in ids_args] == rule.ids_names
-    ids_args = get_ids_instance_args(reversed(idss), rule)
-    assert [arg.name for arg in ids_args] == rule.ids_names

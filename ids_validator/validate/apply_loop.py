@@ -3,67 +3,64 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Generator
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
-# from ids_validator.validate.ids_wrapper import IDSWrapper
-from .result import IDSValidationResult
-from ..rules.data import IDSValidationRule
+from ids_validator.rules.data import IDSValidationRule
 
 
-def apply_rules_to_data(
-    db_entry: DBEntry, rules: List[IDSValidationRule]
-) -> List[IDSValidationResult]:
+def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
     """Apply set of rules to the Data Entry.
 
     Args:
         db_entry: An opened DBEntry.
         rules: List of rules to apply to the data.
     """
-    # loop over ids_names
+    for ids_instances, rule in find_matching_rules(db_entry, rules):
+        rule.apply_func(ids_instances)
+
+
+def find_matching_rules(
+    db_entry: DBEntry, rules: List[IDSValidationRule]
+) -> Generator(Tuple(List[IDSToplevel], IDSValidationRule)):
+    """Find combinations of rules and their relevant ids instances
+
+    Args:
+        db_entry: An opened DBEntry.
+        rules: List of rules to apply to the data.
+
+    Returns:
+        Generator yielding tuple of ids instances with corresponding rule
+    """
+    idss = _get_ids_list(db_entry)
+    for ids_name, occurrence in idss:
+        ids = db_entry.get(ids_name, occurrence)
+        filtered_rules = [
+            rule
+            for rule in rules
+            if (
+                len(rule.ids_names) == 1
+                and (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
+            )
+        ]
+        for rule in filtered_rules:
+            yield ids, rule
+
+
+def _get_ids_list(db_entry: DBEntry) -> List[Tuple[str, int]]:
+    """Get list of all ids occurrences combined with their corresponding names
+
+    Args:
+        db_entry: An opened DBEntry.
+
+    Returns:
+        List of tuples with ids names and occurrences
+    """
     idss: List[Tuple[str, int]] = []  # (ids_name, occurrence)
     for ids_name in db_entry.factory.ids_names():
         occurrence_list = db_entry.list_all_occurrences(ids_name)
         for occurrence in occurrence_list:
             idss.append((ids_name, occurrence))
-
-    # load necessary ids's into memory
-    # Note: need to rethink this when doing multi-IDS validation
-    for ids_name, occurrence in idss:
-        ids = db_entry.get(ids_name, occurrence)
-        # TODO: handle results
-        apply_rules(ids, rules)
-
-
-def apply_rules(ids: IDSToplevel, rules: List[IDSValidationRule]):
-    """"""
-    pass
-    # find matching rules for given ids_names
-    # loop over rules
-    # apply rules
-
-
-def find_matching_rules(ids_names: List[str], rules: List[IDSValidationRule]):
-    """"""
-    # find all rules that match the given ids names
-    # how to optimize ids combinations in memory?
-    pass
-
-
-def apply_rule(
-    ids_instances: List[IDSToplevel], rule: IDSValidationRule
-) -> IDSValidationResult:
-    """"""
-    # val_result = IDSValidationResult(rule_name)
-    # rule.apply(*map(lambda x: IDSWrapper(x, val_result), ids_instances), **kwargs)
-    # make overload for operators and checks to log successful and failed assertions
-    # generate IDSValidationResult based assertions
-    # return val_result
-    pass
-
-
-def get_ids_instance_args(ids_instances: List[IDSToplevel], rule: IDSValidationRule):
-    # return list of args in proper order (implementation for later PR)
-    pass
+    return idss
