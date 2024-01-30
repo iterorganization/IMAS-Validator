@@ -140,7 +140,7 @@ def test_load_rules_from_path(res_collector):
         rules += load_rules_from_path(path, res_collector)
     assert len(rules) == 1
     assert rules[0].name == "generic/core_profiles.py/core_profiles_rule"
-    assert rules[0].dd_types == ("core_profiles",)
+    assert rules[0].ids_names == ("core_profiles",)
     assert rules[0].kwfields == {}
 
 
