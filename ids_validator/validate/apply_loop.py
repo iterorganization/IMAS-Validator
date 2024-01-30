@@ -34,16 +34,15 @@ def find_matching_rules(
     Returns:
         Generator yielding tuple of ids instances with corresponding rule
     """
+    if any([len(rule.ids_names > 1) for rule in rules]):
+        raise NotImplementedError("Multi-IDS validation rules not implemented yet")
     idss = _get_ids_list(db_entry)
     for ids_name, occurrence in idss:
         ids = db_entry.get(ids_name, occurrence)
         filtered_rules = [
             rule
             for rule in rules
-            if (
-                len(rule.ids_names) == 1
-                and (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
-            )
+            if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
         ]
         for rule in filtered_rules:
             yield ids, rule
