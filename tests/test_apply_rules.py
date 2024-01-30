@@ -159,11 +159,11 @@ def test_apply_rule(dbentry, rules):
     apply_rule(ids, rule)
     rule.func.assert_called_once()
     assert isinstance(rule.func.call_arg_list[0], IDSWrapper)
-    assert rule.func.call_arg_list[0].obj == ids
+    assert rule.func.call_arg_list[0]._obj == ids
 
 
 @pytest.mark.xfail(reason="Not implemented yet", strict=True)
-def test_apply_rule_arg_error(dbentry, rules):
+def test_apply_rule_arg_error(rules):
     with pytest.raises(ValueError):
         apply_rule([], rules[0])
 

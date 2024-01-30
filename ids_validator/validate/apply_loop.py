@@ -57,7 +57,7 @@ def apply_rule(
 ) -> IDSValidationResult:
     """"""
     # val_result = IDSValidationResult(rule_name)
-    # rule.apply(*map(lambda x: OverloadClass(x, val_result), ids_instances), **kwargs)
+    # rule.apply(*map(lambda x: IDSWrapper(x, val_result), ids_instances), **kwargs)
     # make overload for operators and checks to log successful and failed assertions
     # generate IDSValidationResult based assertions
     # return val_result
@@ -65,5 +65,5 @@ def apply_rule(
 
 
 def get_ids_instance_args(ids_instances: List[IDSToplevel], rule: IDSValidationRule):
-    # return list of args in proper order
+    # return list of args in proper order (implementation for later PR)
     pass
