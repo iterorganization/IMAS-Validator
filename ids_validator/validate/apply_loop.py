@@ -24,7 +24,7 @@ def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
 
 def find_matching_rules(
     db_entry: DBEntry, rules: List[IDSValidationRule]
-) -> Generator(Tuple(List[IDSToplevel], IDSValidationRule)):
+) -> Generator[Tuple[List[IDSToplevel], IDSValidationRule]]:
     """Find combinations of rules and their relevant ids instances
 
     Args:
