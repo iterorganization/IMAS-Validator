@@ -11,7 +11,7 @@ import numpy as np
 def _binary_wrapper(op, name):
     def func(self, other):
         if isinstance(other, IDSWrapper):
-            other = other.obj
+            other = other._obj
         return IDSWrapper(op(self._obj, other))
 
     func.__name__ = f"__{name}__"
@@ -21,7 +21,7 @@ def _binary_wrapper(op, name):
 def _reflected_binary_wrapper(op, name):
     def func(self, other):
         if isinstance(other, IDSWrapper):
-            other = other.obj
+            other = other._obj
         return IDSWrapper(op(other, self._obj))
 
     func.__name__ = f"__r{name}__"
@@ -54,10 +54,6 @@ class IDSWrapper:
         if isinstance(obj, IDSWrapper):
             raise ValueError("Cannot wrap already wrapped object")
         self._obj = obj
-
-    @property
-    def obj(self):
-        return self._obj
 
     def __getattr__(self, attr: str):
         if not attr.startswith("_"):
