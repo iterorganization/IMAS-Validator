@@ -12,60 +12,75 @@ def res_collector():
 
 
 @pytest.fixture()
-def call_func(res_collector):
+def rule(res_collector):
     def cool_func_name(ids_name):
-        "put docs here"
+        """put docs here"""
         res_collector.assert_(ids_name)
 
-    return cool_func_name
-
-
-@pytest.fixture()
-def rule(call_func):
     mock = Mock()
-    mock.func = call_func
+    mock.func = cool_func_name
     return mock
 
 
 @pytest.fixture()
-def call_func_error(res_collector):
+def rule_error(res_collector):
     def func_error(ids_name):
+        """Error docs"""
         a = ids_name / 0
         res_collector.assert_(a)
 
-    return func_error
+    mock = Mock()
+    mock.func = func_error
+    return mock
 
 
 def check_attrs(val_result, bool_result):
     assert val_result.func_name == "cool_func_name"
     assert val_result.func_docs == "put docs here"
-    assert val_result.ids_names == ("core_profiles",)
-    assert val_result.ids_occurences == (0,)
+    assert val_result.idss == (("core_profiles", 0),)
     assert "/".join(val_result.file_name.parts[-2:]) == "tests/test_assert.py"
     assert val_result.lineno == 18
     assert val_result.code_context == "res_collector.assert_(ids_name)"
     assert val_result.bool_result == bool_result
+    assert val_result.error is False
+
+
+def check_attrs_error(val_result, bool_result):
+    assert val_result.func_name == "func_error"
+    assert val_result.func_docs == "Error docs"
+    assert val_result.idss == (("core_profiles", 0),)
+    assert "/".join(val_result.file_name.parts[-2:]) == "tests/test_assert.py"
+    assert val_result.lineno == 29
+    assert val_result.code_context == "a = ids_name / 0"
+    assert val_result.bool_result is False
+    assert val_result.error is True
 
 
 def test_all_attrs_filled_on_success(res_collector, rule):
-    res_collector.set_context(rule, ("core_profiles",), (0,))
+    res_collector.set_context(rule, (("core_profiles", 0),))
     rule.func(IDSWrapper(True))
     check_attrs(res_collector.results[0], True)
 
 
 def test_all_attrs_filled_on_fail(res_collector, rule):
-    res_collector.set_context(rule, ("core_profiles",), (0,))
+    res_collector.set_context(rule, (("core_profiles", 0),))
     rule.func(IDSWrapper(False))
     check_attrs(res_collector.results[0], False)
 
 
 def test_all_attrs_filled_on_non_wrapper_test_arg(res_collector, rule):
-    res_collector.set_context(rule, ("core_profiles",), (0,))
+    res_collector.set_context(rule, (("core_profiles", 0),))
     rule.func(True)
     check_attrs(res_collector.results[0], True)
 
 
-def test_appropriate_behavior_on_error(res_collector, call_func_error):
-    # TODO: decide whether to raise error immediately or continue and log error in
-    # results
-    pass
+def test_appropriate_behavior_on_error(res_collector, rule, rule_error):
+    res_collector.set_context(rule, (("core_profiles", 0),))
+    rule.func(True)
+    check_attrs(res_collector.results[0], True)
+    try:
+        res_collector.set_context(rule_error, (("core_profiles", 0),))
+        rule_error.func(True)
+    except Exception as e:
+        res_collector.add_error_result(e)
+    check_attrs_error(res_collector.results[1], False)

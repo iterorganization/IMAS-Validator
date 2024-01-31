@@ -9,11 +9,9 @@ import numpy
 import pytest
 
 from ids_validator.rules.data import IDSValidationRule
+from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.ids_wrapper import IDSWrapper
-from ids_validator.validate.apply_loop import (
-    apply_rules_to_data,
-    find_matching_rules,
-)
+from ids_validator.validate.apply_loop import TestExecutor
 
 
 _occurrence_dict = {
@@ -79,6 +77,13 @@ def rules():
     return rules
 
 
+@pytest.fixture
+def test_executor(dbentry, rules):
+    result_collector = ResultCollector()
+    test_executor = TestExecutor(dbentry, rules, result_collector)
+    return test_executor
+
+
 def test_dbentry_mock(dbentry):
     assert dbentry.list_all_occurrences("summary") == []
     assert numpy.array_equal(dbentry.list_all_occurrences("equilibrium"), [0, 1])
@@ -93,9 +98,11 @@ def test_dbentry_mock(dbentry):
     assert cp3.ids_properties.comment == "Test IDS: core_profiles/3"
 
 
-def test_apply_rules_to_data(dbentry, rules):
+def test_apply_rules_to_data(test_executor):
+    rules = test_executor.rules
+    dbentry = test_executor.db_entry
     # Function to test:
-    apply_rules_to_data(dbentry, rules)
+    test_executor.apply_rules_to_data()
 
     # Check that rule functions were called with expected arguments:
     expected_calls = {
@@ -127,17 +134,21 @@ def test_apply_rules_to_data(dbentry, rules):
     dbentry.get.assert_has_calls(get_calls, any_order=True)
 
 
-def test_find_matching_rules(dbentry, rules):
+def test_find_matching_rules(test_executor):
+    rules = test_executor.rules
     expected_result = []
     for ids_name in _occurrence_dict:
-        for occurence in _occurrence_dict[ids_name]:
+        for occurrence in _occurrence_dict[ids_name]:
             # every occurrence once for '*'
-            ids = (get(ids_name, occurence),)
-            expected_result.append((ids, rules[0]))
+            ids = (get(ids_name, occurrence),)
+            expected_result.append((ids, ((ids_name, occurrence),), rules[0]))
             # all occurrences for 'core_profiles'
             if ids_name == "core_profiles":
-                expected_result.append((ids, rules[1]))
-    result = [(ids, rule) for ids, rule in find_matching_rules(dbentry, rules)]
+                expected_result.append((ids, ((ids_name, occurrence),), rules[1]))
+    result = [
+        (ids, occurence, rule)
+        for ids, occurence, rule in test_executor.find_matching_rules()
+    ]
     assert len(result) == len(expected_result) == 12
     diff = set(result) - set(expected_result)
     assert len(diff) == 0

@@ -30,10 +30,12 @@ class TestExecutor:
             db_entry: An opened DBEntry.
             rules: List of rules to apply to the data.
         """
-        for ids_instances, ids_occurrences, rule in self.find_matching_rules():
-            ids_names = [ids.metadata.name for ids in ids_instances]
-            self.result_collector.set_context(rule, ids_names, ids_occurrences)
-            rule.apply_func(ids_instances)
+        for ids_instances, idss, rule in self.find_matching_rules():
+            self.result_collector.set_context(rule, idss)
+            try:
+                rule.apply_func(ids_instances)
+            except Exception as e:
+                self.result_collector.add_error_result(e)
 
     def find_matching_rules(
         self,
@@ -58,7 +60,7 @@ class TestExecutor:
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
             ]
             for rule in filtered_rules:
-                yield (ids,), (occurrence,), rule
+                yield (ids,), ((ids_name, occurrence),), rule
 
     def _get_ids_list(self) -> List[Tuple[str, int]]:
         """Get list of all ids occurrences combined with their corresponding names

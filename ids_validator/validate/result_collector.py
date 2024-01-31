@@ -13,17 +13,25 @@ class ResultCollector:
     def __init__(self):
         self.results: List[IDSValidationResult] = []
 
-    def set_context(self, rule, ids_names, ids_occurrences):
+    def set_context(self, rule, idss):
         self._current_rule = rule
-        self._current_ids_names = ids_names
-        self._current_ids_occurrences = ids_occurrences
+        self._current_idss = idss
+
+    def add_error_result(self, error):
+        result = IDSValidationResult(
+            False,
+            "",
+            self._current_rule,
+            self._current_idss,
+            error=error,
+        )
+        self.results.append(result)
 
     def assert_(self, test, msg=""):
         result = IDSValidationResult(
             test,
             msg,
             self._current_rule,
-            self._current_ids_names,
-            self._current_ids_occurrences,
+            self._current_idss,
         )
         self.results.append(result)
