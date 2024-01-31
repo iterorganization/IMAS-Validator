@@ -34,7 +34,7 @@ class IDSValidationRule:
         self.func = func
         # name: ruleset/file/func_name
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
-        self.ids_names = list(ids_names)
+        self.ids_names = tuple(ids_names)
         self.kwfields = kwfields
         # kwfields explicitly parsed
 
