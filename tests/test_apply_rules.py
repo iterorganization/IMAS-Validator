@@ -1,8 +1,9 @@
-from functools import lru_cache
+from functools import lru_cache, reduce
 from pathlib import Path
 from unittest.mock import Mock, call
 
 from imaspy import IDSFactory
+
 from imaspy.exception import DataEntryException
 import numpy
 import pytest
@@ -21,6 +22,18 @@ _occurrence_dict = {
     "pf_active": numpy.array([0]),
     "magnetics": numpy.array([1]),
 }
+
+
+def check_expected_calls(func, expected_call_list):
+    actual_idss = []
+    for args in func.call_args_list:
+        assert len(args.args) == 1
+        assert not args.kwargs
+        assert isinstance(args.args[0], IDSWrapper)
+        actual_idss.append(args.args[0]._obj)
+    actual_idss.sort(key=id)
+    expected_idss = sorted(expected_call_list, key=id)
+    assert expected_idss == actual_idss
 
 
 @lru_cache
@@ -88,19 +101,19 @@ def test_apply_rules_to_data(dbentry, rules):
     expected_calls = {
         ids_name: [
             # Note: this works because `get` is cached:
-            call(get(ids_name, occurrence))
+            get(ids_name, occurrence)
             for occurrence in _occurrence_dict[ids_name]
         ]
         for ids_name in _occurrence_dict
     }
+
     # First rule applies to all IDSs
     assert rules[0].func.call_count == 8  # 4x cp, 2x eq, 1x pf_active, 1x magnetics
-    assert rules[0].func.assert_has_calls(sum(expected_calls.values()), any_order=True)
     # Second rule applies to all occurrences of core_profiles:
+    expected_call_list = reduce(lambda a, b: a + b, expected_calls.values())
+    check_expected_calls(rules[0].func, expected_call_list)
     assert rules[1].func.call_count == 4
-    assert rules[1].func.assert_has_calls(
-        expected_calls["core_profiles"], any_order=True
-    )
+    check_expected_calls(rules[1].func, expected_calls["core_profiles"])
     # Third rule applies to nothing in this DBEntry
     assert rules[2].func.call_count == 0
 
