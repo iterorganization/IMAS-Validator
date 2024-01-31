@@ -47,7 +47,7 @@ class IDSValidationRule:
         if len(ids_instances) > 1:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         args = [IDSWrapper(ids) for ids in ids_instances]
-        self.func(*args, **self.kwfields)
+        self.func(*args)
 
 
 class ValidatorRegistry:
