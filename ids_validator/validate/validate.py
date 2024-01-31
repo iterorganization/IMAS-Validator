@@ -35,7 +35,8 @@ def validate(
     rules = load_rules(
         extra_rule_dirs, apply_generic=apply_generic, result_collector=result_collector
     )
-    results = apply_rules_to_data(dbentry, rules)
+    apply_rules_to_data(dbentry, rules)
+    results = result_collector.results
     return results
 
 
