@@ -1,7 +1,9 @@
 import difflib
 import logging
-from typing import List
+from typing import List, Optional
 from pathlib import Path
+
+from packaging.version import Version
 
 logger = logging.getLogger(__name__)
 
@@ -38,3 +40,18 @@ class WrongFileExtensionError(ValueError):
 
     def __init__(self, file: Path) -> None:
         super().__init__(f"Ruleset file {str(file)!r} is not a python file")
+
+
+class IMASVersionError(RuntimeError):
+    """Error raised when IMAS is not available, or of the wrong version."""
+
+    def __init__(self, version_found: Optional[Version] = None) -> None:
+        if version_found is None:
+            version_msg = "No IMAS install could be found."
+        else:
+            version_msg = f"Found IMAS install with version {version_found}."
+
+        super().__init__(
+            "IDS Validation requires an IMAS installation of version 5.1 or newer."
+            f" {version_msg}. See the README for more details."
+        )

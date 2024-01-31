@@ -1,0 +1,2 @@
+[run]
+omit = ids_validator/_version.py
