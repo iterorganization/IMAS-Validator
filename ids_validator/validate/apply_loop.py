@@ -3,7 +3,7 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
-from typing import List, Tuple, Generator
+from typing import List, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
@@ -24,7 +24,7 @@ def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
 
 def find_matching_rules(
     db_entry: DBEntry, rules: List[IDSValidationRule]
-) -> Generator[Tuple[List[IDSToplevel], IDSValidationRule]]:
+) -> Tuple[List[IDSToplevel], IDSValidationRule]:
     """Find combinations of rules and their relevant ids instances
 
     Args:
@@ -34,7 +34,7 @@ def find_matching_rules(
     Returns:
         Generator yielding tuple of ids instances with corresponding rule
     """
-    if any([len(rule.ids_names > 1) for rule in rules]):
+    if any([len(rule.ids_names) > 1 for rule in rules]):
         raise NotImplementedError("Multi-IDS validation rules not implemented yet")
     idss = _get_ids_list(db_entry)
     for ids_name, occurrence in idss:
@@ -45,7 +45,7 @@ def find_matching_rules(
             if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
         ]
         for rule in filtered_rules:
-            yield ids, rule
+            yield (ids,), rule
 
 
 def _get_ids_list(db_entry: DBEntry) -> List[Tuple[str, int]]:

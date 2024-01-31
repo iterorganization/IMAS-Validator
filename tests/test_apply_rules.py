@@ -117,22 +117,23 @@ def test_apply_rules_to_data(dbentry, rules):
 def test_find_matching_rules(dbentry, rules):
     expected_result = []
     for ids_name in _occurrence_dict:
-        expected_result += [
-            (get(ids_name, occurence), rules[0])
-            for occurence in _occurrence_dict[ids_name]
-        ]  # every occurrence once for '*'
-    expected_result += [
-        (get(ids_name, occurence), rules[1])
-        for occurence in _occurrence_dict["core_profiles"]
-    ]  # all occurrences for 'core_profiles'
-    result = find_matching_rules(dbentry, rules)
-    assert len(set(result) - set(expected_result)) == 0
+        for occurence in _occurrence_dict[ids_name]:
+            # every occurrence once for '*'
+            ids = (get(ids_name, occurence),)
+            expected_result.append((ids, rules[0]))
+            # all occurrences for 'core_profiles'
+            if ids_name == "core_profiles":
+                expected_result.append((ids, rules[1]))
+    result = [(ids, rule) for ids, rule in find_matching_rules(dbentry, rules)]
+    assert len(result) == len(expected_result) == 12
+    diff = set(result) - set(expected_result)
+    assert len(diff) == 0
 
 
 def test_apply_func(dbentry, rules):
     ids = dbentry.get("core_profiles", 0)
     rule = rules[0]
-    rule.apply_func(ids, rule)
+    rule.apply_func([ids])
     rule.func.assert_called_once()
-    assert isinstance(rule.func.call_arg_list[0], IDSWrapper)
-    assert rule.func.call_arg_list[0]._obj == ids
+    assert isinstance(rule.func.call_args_list[0][0][0], IDSWrapper)
+    assert rule.func.call_args_list[0][0][0]._obj == ids
