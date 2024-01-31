@@ -15,7 +15,7 @@ def call_func(res_collector):
     def func_fine(ids_name):
         res_collector.assert_(ids_name)
 
-    mock = unittest.mock.Mock(side_effect=func_fine)
+    mock = unittest.mock.Mock(wraps=func_fine)
     mock.__doc__ = "put docs here"
     mock.__name__ = "cool_func_name"
     return mock
@@ -27,15 +27,17 @@ def call_func_error(res_collector):
         a = ids_name / 0
         res_collector.assert_(a)
 
-    mock = unittest.mock.Mock(side_effect=func_error)
+    mock = unittest.mock.Mock(wraps=func_error)
     mock.__doc__ = "put docs here"
     mock.__name__ = "cool_func_name"
     return mock
 
 
-def test_attrs(val_result, bool_result, wrapped):
+def check_attrs(val_result, bool_result, wrapped):
     assert val_result.file_name.parts[-2:] == "tests/test_assert.py"
     assert val_result.func_name == "cool_func_name"
+    assert val_result.lineno == 16
+    assert val_result.bool_result == bool_result
     assert val_result.wrapped == wrapped
     if val_result.wrapped:
         assert val_result.ids_names == ["core_profiles"]
@@ -45,23 +47,21 @@ def test_attrs(val_result, bool_result, wrapped):
         assert val_result.ids_names == []
         assert val_result.ids_occurences == []
         assert val_result.func_docs == ""
-    assert val_result.lineno == 16
-    assert val_result.bool_result == bool_result
 
 
 def test_all_attrs_filled_on_success(res_collector, call_func):
     call_func(IDSWrapper(True))
-    test_attrs(res_collector.results[0], True, True)
+    check_attrs(res_collector.results[0], True, True)
 
 
 def test_all_attrs_filled_on_fail(res_collector, call_func):
     call_func(IDSWrapper(False))
-    test_attrs(res_collector.results[0], False, True)
+    check_attrs(res_collector.results[0], False, True)
 
 
 def test_all_attrs_filled_on_non_wrapper_test_arg(res_collector, call_func):
     call_func(True)
-    test_attrs(res_collector.results[0], True, False)
+    check_attrs(res_collector.results[0], True, False)
 
 
 def test_appropriate_behavior_on_error(res_collector, call_func_error):

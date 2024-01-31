@@ -46,8 +46,6 @@ class IDSValidationRule:
         """
         if len(ids_instances) > 1:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
-        if len(set(ids.name for ids in ids_instances) - set(self.ids_names)):
-            raise ValueError("Input IDSs do not correspond with expected IDSs")
         args = [IDSWrapper(ids) for ids in ids_instances]
         self.func(*args)
 

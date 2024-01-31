@@ -30,7 +30,8 @@ class IDSValidationResult:
         info = traceback.extract_stack()
         idx = -3
         assert info[idx + 1].name == "assert_"
-        self.file_name = Path(info[idx].filename).parts[-3:]
+        file_path = Path(info[idx].filename)
+        self.file_name = file_path.relative_to(file_path.parents[2])
         self.func_name = info[idx].name
         self.lineno: int = info[idx].lineno
         self.code_context = info[idx].line
