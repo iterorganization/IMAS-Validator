@@ -4,7 +4,6 @@ validation tool
 """
 
 from typing import List, Union
-import inspect
 from pathlib import Path
 import traceback
 
@@ -14,25 +13,21 @@ from ids_validator.validate.ids_wrapper import IDSWrapper
 class IDSValidationResult:
     """"""
 
-    def __init__(self, test: Union[IDSWrapper, bool], msg: str):
-        if isinstance(test, IDSWrapper):
-            func = test.func
-            self.wrapped = True
-            self.func_docs = func.__doc__
-            self.ids_names: list[str] = list(inspect.signature(func).parameters.keys())
-            self.ids_occurences: List[int] = test.ids_occurences
-        else:
-            self.wrapped = False
-            self.func_docs = ""
-            self.ids_names: list[str] = []
-            self.ids_occurences: List[int] = []
+    def __init__(
+        self, test: Union[IDSWrapper, bool], msg: str, rule, ids_names, ids_occurrences
+    ):
+        func = rule.func
+        self.func_name = func.__name__
+        self.func_docs = func.__doc__
+        self.ids_names: list[str] = ids_names
+        self.ids_occurences: List[int] = ids_occurrences
 
         info = traceback.extract_stack()
         idx = -3
         assert info[idx + 1].name == "assert_"
+        assert info[idx].name == self.func_name
         file_path = Path(info[idx].filename)
         self.file_name = file_path.relative_to(file_path.parents[2])
-        self.func_name = info[idx].name
         self.lineno: int = info[idx].lineno
         self.code_context = info[idx].line
         self.bool_result: bool = bool(test)

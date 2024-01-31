@@ -9,57 +9,69 @@ from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.rules.data import IDSValidationRule
+from ids_validator.validate.result_collector import ResultCollector
 
 
-def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
-    """Apply set of rules to the Data Entry.
+class TestExecutor:
+    def __init__(
+        self,
+        db_entry: DBEntry,
+        rules: List[IDSValidationRule],
+        result_collector: ResultCollector,
+    ):
+        self.db_entry = db_entry
+        self.rules = rules
+        self.result_collector = result_collector
 
-    Args:
-        db_entry: An opened DBEntry.
-        rules: List of rules to apply to the data.
-    """
-    for ids_instances, rule in find_matching_rules(db_entry, rules):
-        rule.apply_func(ids_instances)
+    def apply_rules_to_data(self):
+        """Apply set of rules to the Data Entry.
 
+        Args:
+            db_entry: An opened DBEntry.
+            rules: List of rules to apply to the data.
+        """
+        for ids_instances, ids_occurrences, rule in self.find_matching_rules():
+            ids_names = [ids.metadata.name for ids in ids_instances]
+            self.result_collector.set_context(rule, ids_names, ids_occurrences)
+            rule.apply_func(ids_instances)
 
-def find_matching_rules(
-    db_entry: DBEntry, rules: List[IDSValidationRule]
-) -> Tuple[Tuple[IDSToplevel], IDSValidationRule]:
-    """Find combinations of rules and their relevant ids instances
+    def find_matching_rules(
+        self,
+    ) -> Tuple[Tuple[IDSToplevel], Tuple[int], IDSValidationRule]:
+        """Find combinations of rules and their relevant ids instances
 
-    Args:
-        db_entry: An opened DBEntry.
-        rules: List of rules to apply to the data.
+        Args:
+            db_entry: An opened DBEntry.
+            rules: List of rules to apply to the data.
 
-    Returns:
-        Generator yielding tuple of ids instances with corresponding rule
-    """
-    if any([len(rule.ids_names) > 1 for rule in rules]):
-        raise NotImplementedError("Multi-IDS validation rules not implemented yet")
-    idss = _get_ids_list(db_entry)
-    for ids_name, occurrence in idss:
-        ids = db_entry.get(ids_name, occurrence)
-        filtered_rules = [
-            rule
-            for rule in rules
-            if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
-        ]
-        for rule in filtered_rules:
-            yield (ids,), rule
+        Returns:
+            Generator yielding tuple of ids instances with corresponding rule
+        """
+        if any([len(rule.ids_names) > 1 for rule in self.rules]):
+            raise NotImplementedError("Multi-IDS validation rules not implemented yet")
+        idss = self._get_ids_list()
+        for ids_name, occurrence in idss:
+            ids = self.db_entry.get(ids_name, occurrence)
+            filtered_rules = [
+                rule
+                for rule in self.rules
+                if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
+            ]
+            for rule in filtered_rules:
+                yield (ids,), (occurrence,), rule
 
+    def _get_ids_list(self) -> List[Tuple[str, int]]:
+        """Get list of all ids occurrences combined with their corresponding names
 
-def _get_ids_list(db_entry: DBEntry) -> List[Tuple[str, int]]:
-    """Get list of all ids occurrences combined with their corresponding names
+        Args:
+            db_entry: An opened DBEntry.
 
-    Args:
-        db_entry: An opened DBEntry.
-
-    Returns:
-        List of tuples with ids names and occurrences
-    """
-    idss: List[Tuple[str, int]] = []  # (ids_name, occurrence)
-    for ids_name in db_entry.factory.ids_names():
-        occurrence_list = db_entry.list_all_occurrences(ids_name)
-        for occurrence in occurrence_list:
-            idss.append((ids_name, occurrence))
-    return idss
+        Returns:
+            List of tuples with ids names and occurrences
+        """
+        idss: List[Tuple[str, int]] = []  # (ids_name, occurrence)
+        for ids_name in self.db_entry.factory.ids_names():
+            occurrence_list = self.db_entry.list_all_occurrences(ids_name)
+            for occurrence in occurrence_list:
+                idss.append((ids_name, occurrence))
+        return idss
