@@ -3,9 +3,9 @@ This file describes the data class for successes and failures of the
 validation tool
 """
 
-from typing import Tuple, Optional
 import traceback
 from dataclasses import dataclass
+from typing import Optional, Tuple
 
 from ids_validator.rules.data import IDSValidationRule
 

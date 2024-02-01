@@ -3,8 +3,8 @@ This file describes the data class for rules that are saved and generated for
 the validation tool
 """
 
-from typing import List, Any, Dict, Callable
 from pathlib import Path
+from typing import Any, Callable, Dict, List
 
 from imaspy.ids_toplevel import IDSToplevel
 
@@ -38,7 +38,7 @@ class IDSValidationRule:
         self.kwfields = kwfields
         # kwfields explicitly parsed
 
-    def apply_func(self, ids_instances: List[IDSToplevel]):
+    def apply_func(self, ids_instances: List[IDSToplevel]) -> None:
         """Run the validation function with wrapped input arguments
 
         Args:
@@ -58,13 +58,13 @@ class ValidatorRegistry:
       cp != None
     """
 
-    def __init__(self, rule_path: Path):
+    def __init__(self, rule_path: Path) -> None:
         self.validators: List[IDSValidationRule] = []
         self.rule_path: Path = rule_path
 
-    def ids_validator(self, *ids_names: str):
+    def ids_validator(self, *ids_names: str) -> Callable:
         # explicit kwfields
-        def decorator(func: Callable):
+        def decorator(func: Callable) -> Callable:
             self.validators.append(IDSValidationRule(self.rule_path, func, *ids_names))
             return func
 

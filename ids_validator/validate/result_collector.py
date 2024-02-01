@@ -3,18 +3,17 @@ This file describes the data class for successes and failures of the
 validation tool
 """
 
-from typing import List, Tuple, Union
 import traceback
+from typing import Any, List, Tuple
 
-from ids_validator.validate.result import IDSValidationResult
 from ids_validator.rules.data import IDSValidationRule
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from ids_validator.validate.result import IDSValidationResult
 
 
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize ResultCollector"""
         self.results: List[IDSValidationResult] = []
 
@@ -28,7 +27,7 @@ class ResultCollector:
         self._current_rule = rule
         self._current_idss = idss
 
-    def add_error_result(self, exc: Exception):
+    def add_error_result(self, exc: Exception) -> None:
         """Add result after an exception was encountered in the rule
 
         Args:
@@ -48,7 +47,7 @@ class ResultCollector:
         )
         self.results.append(result)
 
-    def assert_(self, test: Union[IDSWrapper, bool], msg: str = ""):
+    def assert_(self, test: Any, msg: str = "") -> None:
         """
         Custom assert function with which to overwrite assert statements in IDS
         validation tests

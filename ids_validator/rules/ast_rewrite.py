@@ -3,13 +3,15 @@ This file describes the functions for ast rewriting
 """
 
 import ast
-from ids_validator.validate.result_collector import ResultCollector
-from .data import ValidatorRegistry
-
 from pathlib import Path
+from types import CodeType
+from typing import Any
+
+from ids_validator.rules.data import ValidatorRegistry
+from ids_validator.validate.result_collector import ResultCollector
 
 
-def rewrite_assert(code: str, filename: str):
+def rewrite_assert(code: str, filename: str) -> CodeType:
     """
     Rewrite block of code to swap assert statement with given assert function
 
@@ -37,7 +39,7 @@ class AssertTransformer(ast.NodeTransformer):
     Node transformer that swaps assert statement with given assert function
     """
 
-    def visit_Assert(self, node: ast.AST):
+    def visit_Assert(self, node: Any) -> ast.Expr:
         if node.msg is None:
             args = [node.test]
         else:
@@ -56,7 +58,7 @@ def run_path(
     rule_path: Path,
     val_registry: ValidatorRegistry,
     result_collector: ResultCollector,
-):
+) -> None:
     """
     Run the file corresponding to the given path with rewritten assert statements.
     Any found validator tests will be added to the given ValidatorRegistry
