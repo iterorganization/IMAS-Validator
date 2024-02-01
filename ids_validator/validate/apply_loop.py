@@ -34,12 +34,7 @@ class TestExecutor:
         self.result_collector = result_collector
 
     def apply_rules_to_data(self):
-        """Apply set of rules to the Data Entry.
-
-        Args:
-            db_entry: An opened DBEntry.
-            rules: List of rules to apply to the data.
-        """
+        """Apply set of rules to the Data Entry."""
         for ids_instances, idss, rule in self.find_matching_rules():
             self.result_collector.set_context(rule, idss)
             try:
@@ -51,10 +46,6 @@ class TestExecutor:
         self,
     ) -> Tuple[Tuple[IDSToplevel], Tuple[Tuple[str, int]], IDSValidationRule]:
         """Find combinations of rules and their relevant ids instances
-
-        Args:
-            db_entry: An opened DBEntry.
-            rules: List of rules to apply to the data.
 
         Returns:
             Generator yielding tuple of ids instances with corresponding rule
@@ -75,9 +66,6 @@ class TestExecutor:
 
     def _get_ids_list(self) -> List[Tuple[str, int]]:
         """Get list of all ids occurrences combined with their corresponding names
-
-        Args:
-            db_entry: An opened DBEntry.
 
         Returns:
             List of tuples with ids names and occurrences
