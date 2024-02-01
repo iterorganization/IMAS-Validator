@@ -6,7 +6,6 @@ IDS data
 from typing import List, Tuple
 
 from imaspy import DBEntry
-from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.rules.data import IDSValidationRule
 
@@ -22,14 +21,15 @@ def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
         rule.apply_func(ids_instances)
 
 
-def find_matching_rules(
-    db_entry: DBEntry, rules: List[IDSValidationRule]
-) -> Tuple[Tuple[IDSToplevel], IDSValidationRule]:
+def find_matching_rules(db_entry: DBEntry, rules: List[IDSValidationRule]):
     """Find combinations of rules and their relevant ids instances
 
     Args:
         db_entry: An opened DBEntry.
         rules: List of rules to apply to the data.
+
+    Yields:
+        Tuple[Tuple[IDSToplevel], IDSValidationRule]: idss
 
     Returns:
         Generator yielding tuple of ids instances with corresponding rule

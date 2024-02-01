@@ -163,7 +163,7 @@ def handle_env_var_rule_dirs() -> List[Path]:
     return env_var_dirs
 
 
-def handle_entrypoints() -> List[IDSValidationRule]:
+def handle_entrypoints() -> List[Path]:
     """
     TODO: enable locating rulesets through entrypoints
     """

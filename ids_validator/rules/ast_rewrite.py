@@ -37,7 +37,7 @@ class AssertTransformer(ast.NodeTransformer):
     Node transformer that swaps assert statement with given assert function
     """
 
-    def visit_Assert(self, node: ast.AST):
+    def visit_Assert(self, node):
         if node.msg is None:
             args = [node.test]
         else:

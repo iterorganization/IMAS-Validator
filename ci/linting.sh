@@ -23,7 +23,8 @@ python -m venv venv
 . venv/bin/activate
 
 # Install and run linters
-pip install --upgrade black flake8
+pip install --upgrade black flake8 mypy
 
 black --check ids_validator
 flake8 ids_validator
+mypy ids_validator

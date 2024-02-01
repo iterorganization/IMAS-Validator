@@ -17,7 +17,10 @@ from ..rules.loading import load_rules
 
 
 def validate(
-    ids_url: str, extra_rule_dirs: List[Path] = [], apply_generic: bool = True
+    rulesets: List[str],
+    ids_url: str,
+    extra_rule_dirs: List[Path] = [],
+    apply_generic: bool = True,
 ) -> List[IDSValidationResult]:
     """
     Main function
@@ -29,11 +32,15 @@ def validate(
     Returns:
         List of IDSValidationResult objects
     """
+
     _check_imas_version()
     dbentry = DBEntry(ids_url, "r")
     result_collector = ResultCollector()
     rules = load_rules(
-        extra_rule_dirs, apply_generic=apply_generic, result_collector=result_collector
+        rulesets=rulesets,
+        extra_rule_dirs=extra_rule_dirs,
+        apply_generic=apply_generic,
+        result_collector=result_collector,
     )
     apply_rules_to_data(dbentry, rules)
     results = result_collector.results

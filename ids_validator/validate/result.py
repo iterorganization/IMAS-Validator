@@ -13,7 +13,7 @@ class IDSValidationResult:
         # List[IDSValidationLineResult]
         pass
 
-    def save_line_result():
+    def save_line_result(self):
         # save IDSValidationLineResult
         pass
 

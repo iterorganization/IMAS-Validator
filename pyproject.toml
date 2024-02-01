@@ -53,6 +53,7 @@ dependencies = [
     "packaging",
     "black>=24,<25",
     "flake8",
+    'mypy',
 ]
 
 [project.optional-dependencies]
@@ -95,3 +96,18 @@ parentdir_prefix = ""
 [tool.black]
 # Exclude versioneer-generated file
 force-exclude = "ids_validator/_version.py"
+
+[tool.mypy]
+packages = "ids_validator"
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.*",
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "imaspy.*",
+]
+ignore_missing_imports = true
