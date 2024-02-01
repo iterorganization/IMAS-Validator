@@ -48,7 +48,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "numpy>=1.20",
+    "numpy>=1.25.0",
     "importlib_resources",
     "packaging",
     "black>=24,<25",
