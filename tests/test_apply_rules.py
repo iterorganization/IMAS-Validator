@@ -140,14 +140,15 @@ def test_find_matching_rules(test_executor):
     for ids_name in _occurrence_dict:
         for occurrence in _occurrence_dict[ids_name]:
             # every occurrence once for '*'
-            ids = (get(ids_name, occurrence),)
-            expected_result.append((ids, ((ids_name, occurrence),), rules[0]))
+            ids_instances = (get(ids_name, occurrence),)
+            idss = ((ids_name, occurrence),)
+            expected_result.append((ids_instances, idss, rules[0]))
             # all occurrences for 'core_profiles'
             if ids_name == "core_profiles":
-                expected_result.append((ids, ((ids_name, occurrence),), rules[1]))
+                expected_result.append((ids_instances, idss, rules[1]))
     result = [
-        (ids, occurence, rule)
-        for ids, occurence, rule in test_executor.find_matching_rules()
+        (ids_instances, idss, rule)
+        for ids_instances, idss, rule in test_executor.find_matching_rules()
     ]
     assert len(result) == len(expected_result) == 12
     diff = set(result) - set(expected_result)

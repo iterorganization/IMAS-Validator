@@ -63,14 +63,15 @@ class TestExecutor:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         idss = self._get_ids_list()
         for ids_name, occurrence in idss:
-            ids = self.db_entry.get(ids_name, occurrence)
+            ids_instances = (self.db_entry.get(ids_name, occurrence),)
+            idss = ((ids_name, occurrence),)
             filtered_rules = [
                 rule
                 for rule in self.rules
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
             ]
             for rule in filtered_rules:
-                yield (ids,), ((ids_name, occurrence),), rule
+                yield ids_instances, idss, rule
 
     def _get_ids_list(self) -> List[Tuple[str, int]]:
         """Get list of all ids occurrences combined with their corresponding names
