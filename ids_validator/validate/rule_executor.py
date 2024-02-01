@@ -11,7 +11,7 @@ from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
 
 
-class TestExecutor:
+class RuleExecutor:
     """Class for matching rules and idss and executing rules"""
 
     def __init__(
@@ -20,7 +20,7 @@ class TestExecutor:
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
     ):
-        """Initialize TestExecutor
+        """Initialize RuleExecutor
 
         Args:
             db_entry: An opened DBEntry.
