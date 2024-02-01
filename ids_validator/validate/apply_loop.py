@@ -13,12 +13,22 @@ from ids_validator.validate.result_collector import ResultCollector
 
 
 class TestExecutor:
+    """Class for matching rules and idss and executing rules"""
+
     def __init__(
         self,
         db_entry: DBEntry,
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
     ):
+        """Initialize TestExecutor
+
+        Args:
+            db_entry: An opened DBEntry.
+            rules: List of rules to apply to the data.
+            result_collector: ResultCollector object that stores the results after
+                execution
+        """
         self.db_entry = db_entry
         self.rules = rules
         self.result_collector = result_collector

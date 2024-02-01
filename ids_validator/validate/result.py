@@ -3,37 +3,47 @@ This file describes the data class for successes and failures of the
 validation tool
 """
 
-from typing import Union
+from typing import Union, Tuple
 from pathlib import Path
 import traceback
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
+from ids_validator.rules.data import IDSValidationRule
 
 
 class IDSValidationResult:
-    """"""
+    """Class for storing data regarding IDS validation test results"""
 
     def __init__(
         self,
         test: Union[IDSWrapper, bool],
         msg: str,
-        rule,
-        idss,
-        error=None,
+        rule: IDSValidationRule,
+        idss: Tuple[Tuple[str, int]],
+        exc: Union[None, Exception] = None,
     ):
+        """Initialize IDSValidationResult
+
+        Args:
+            test: Expression to evaluate in test
+            msg: Given message for failed assertion
+            rule: Rule to apply to IDS data
+            idss: Tuple of ids_names and occurrences
+            exc: Exception that was encountered while running validation test
+        """
         self.rule = rule
         self.idss = idss
         self.bool_result: bool = bool(test)
         self.msg = msg
 
-        if error is None:
+        if exc is None:
             info = traceback.extract_stack()
             idx = -3
             assert info[idx + 1].name == "assert_"
             assert info[idx].name == self.func_name
             self.error = False
         else:
-            info = traceback.extract_tb(error.__traceback__)
+            info = traceback.extract_tb(exc.__traceback__)
             idx = 1
             assert info[idx].name == self.func_name
             self.error = True
