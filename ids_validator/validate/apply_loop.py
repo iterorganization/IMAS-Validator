@@ -30,9 +30,6 @@ def find_matching_rules(db_entry: DBEntry, rules: List[IDSValidationRule]) -> Ge
 
     Yields:
         Tuple[Tuple[IDSToplevel], IDSValidationRule]: idss
-
-    Returns:
-        Generator yielding tuple of ids instances with corresponding rule
     """
     if any([len(rule.ids_names) > 1 for rule in rules]):
         raise NotImplementedError("Multi-IDS validation rules not implemented yet")

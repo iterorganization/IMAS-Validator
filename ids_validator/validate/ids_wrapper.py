@@ -60,7 +60,7 @@ class IDSWrapper:
             return IDSWrapper(getattr(self._obj, attr))
         raise AttributeError(f"{self.__class__} object has no attribute {attr}")
 
-    def __call__(self, *args: List, **kwargs: Dict) -> "IDSWrapper":
+    def __call__(self, *args: Any, **kwargs: Any) -> "IDSWrapper":
         return IDSWrapper(self._obj(*args, **kwargs))
 
     def __getitem__(self, item: Any) -> "IDSWrapper":
