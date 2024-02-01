@@ -35,21 +35,21 @@ def rule_error(res_collector):
     return mock
 
 
-def check_attrs(val_result, bool_result):
-    assert val_result.bool_result == bool_result
+def check_attrs(val_result, success):
+    assert val_result.success == success
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == "cool_func_name"
     assert val_result.idss == (("core_profiles", 0),)
-    assert val_result.tb[val_result.frame_idx].lineno == 19
+    assert val_result.tb[-1].lineno == 19
     assert val_result.exc is None
 
 
-def check_attrs_error(val_result, bool_result):
-    assert val_result.bool_result is False
+def check_attrs_error(val_result, success):
+    assert val_result.success is False
     assert val_result.msg == ""
-    assert val_result.rule.func.__name__ == "func_error"
+    assert val_result.rule.func.__name__ == val_result.tb[-1].name == "func_error"
     assert val_result.idss == (("core_profiles", 0),)
-    assert val_result.tb[val_result.frame_idx].lineno == 30
+    assert val_result.tb[-1].lineno == 30
     assert isinstance(val_result.exc, ZeroDivisionError)
 
 

@@ -14,10 +14,15 @@ from ids_validator.rules.data import IDSValidationRule
 class IDSValidationResult:
     """Class for storing data regarding IDS validation test results"""
 
-    bool_result: bool
+    success: bool
+    """Whether or not the validation test was successful"""
     msg: str
+    """Given message for failed assertion"""
     rule: IDSValidationRule
-    idss: Tuple[Tuple[str, int]]
+    """Rule to apply to IDS data"""
+    idss: Tuple[Tuple[str, int], ...]
+    """Tuple of ids_names and occurrences"""
     tb: traceback.StackSummary
-    frame_idx: int
+    """A stack of traceback frames"""
     exc: Optional[Exception] = None
+    """Exception that was encountered while running validation test"""

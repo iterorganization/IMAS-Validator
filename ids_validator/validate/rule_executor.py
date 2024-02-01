@@ -3,12 +3,15 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
-from typing import Generator, List, Tuple
+from typing import Iterator, List, Tuple
 
 from imaspy import DBEntry
+from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
+
+IDSInstance = Tuple[IDSToplevel, str, int]
 
 
 class RuleExecutor:
@@ -34,19 +37,22 @@ class RuleExecutor:
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""
-        for idss, rule in self.find_matching_rules():
+        for ids_instances, rule in self.find_matching_rules():
+            ids_toplevels = [ids[0] for ids in ids_instances]
+            idss = tuple([(ids[1], ids[2]) for ids in ids_instances])
             self.result_collector.set_context(rule, idss)
-            ids_instances = [ids[0] for ids in idss]
             try:
-                rule.apply_func(ids_instances)
+                rule.apply_func(ids_toplevels)
             except Exception as e:
                 self.result_collector.add_error_result(e)
 
-    def find_matching_rules(self) -> Generator:
+    def find_matching_rules(
+        self,
+    ) -> Iterator[Tuple[Tuple[IDSInstance], IDSValidationRule]]:
         """Find combinations of rules and their relevant ids instances
 
         Yields:
-            Tuple[Tuple[IDSToplevel, str, int]], IDSValidationRule]:
+            Tuple[Tuple[IDSInstance], IDSValidationRule]:
                 tuple of ids_instances, ids_names, ids_occurrences, validation rule
         """
 

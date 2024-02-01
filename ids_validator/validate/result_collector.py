@@ -18,7 +18,7 @@ class ResultCollector:
         self.results: List[IDSValidationResult] = []
 
     def set_context(
-        self, rule: IDSValidationRule, idss: Tuple[Tuple[str, int]]
+        self, rule: IDSValidationRule, idss: Tuple[Tuple[str, int], ...]
     ) -> None:
         """Set which rule and IDSs should be stored in results
 
@@ -36,15 +36,13 @@ class ResultCollector:
             exc: Exception that was encountered while running validation test
         """
         tb = traceback.extract_tb(exc.__traceback__)
-        frame_idx = -1
-        assert tb[frame_idx].name == self._current_rule.func.__name__
+        assert tb[-1].name == self._current_rule.func.__name__
         result = IDSValidationResult(
             False,
             "",
             self._current_rule,
             self._current_idss,
             tb,
-            frame_idx,
             exc=exc,
         )
         self.results.append(result)
@@ -59,16 +57,13 @@ class ResultCollector:
             msg: Given message for failed assertion
         """
         tb = traceback.extract_stack()
-        frame_idx = -2
-        assert tb[frame_idx + 1].name == "assert_"
-        assert tb[frame_idx].name == self._current_rule.func.__name__
+        tb.pop()
         result = IDSValidationResult(
             bool(test),
             msg,
             self._current_rule,
             self._current_idss,
             tb,
-            frame_idx,
             exc=None,
         )
         self.results.append(result)
