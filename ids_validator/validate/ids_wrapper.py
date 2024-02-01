@@ -2,8 +2,8 @@
 This file describes the overload class for the operators
 """
 
-from typing import Any, Tuple, Callable
 import operator
+from typing import Any, Callable, Tuple
 
 import numpy as np
 

@@ -1,18 +1,18 @@
 """This file describes the functionality for discovering and loading validation rules"""
 
 import os
-from typing import List
 from pathlib import Path
+from typing import List
 
-from ids_validator.validate.result_collector import ResultCollector
-from .data import IDSValidationRule, ValidatorRegistry
-from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.exceptions import (
-    InvalidRulesetPath,
-    InvalidRulesetName,
     EmptyRuleFileWarning,
+    InvalidRulesetName,
+    InvalidRulesetPath,
     WrongFileExtensionError,
 )
+from ids_validator.rules.ast_rewrite import run_path
+from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
+from ids_validator.validate.result_collector import ResultCollector
 
 
 def load_rules(

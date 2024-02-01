@@ -28,3 +28,4 @@ pip install --upgrade .[linting]
 black --check ids_validator
 flake8 ids_validator
 mypy ids_validator
+isort --check-only ids_validator

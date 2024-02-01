@@ -1,7 +1,7 @@
 import difflib
 import logging
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
 from packaging.version import Version
 

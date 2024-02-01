@@ -3,8 +3,8 @@ This file describes the data class for rules that are saved and generated for
 the validation tool
 """
 
-from typing import List, Any, Dict, Callable
 from pathlib import Path
+from typing import Any, Callable, Dict, List
 
 from imaspy.ids_toplevel import IDSToplevel
 

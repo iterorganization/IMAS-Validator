@@ -2,18 +2,18 @@
 This file describes the main function for the IMAS IDS validation tool
 """
 
-from typing import List
 from pathlib import Path
+from typing import List
 
 from imaspy import DBEntry
 from imaspy.imas_interface import has_imas, ll_interface
 from packaging.version import Version
 
 from ids_validator.exceptions import IMASVersionError
-from .result import IDSValidationResult
-from .result_collector import ResultCollector
-from .apply_loop import apply_rules_to_data
-from ..rules.loading import load_rules
+from ids_validator.rules.loading import load_rules
+from ids_validator.validate.apply_loop import apply_rules_to_data
+from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result_collector import ResultCollector
 
 
 def validate(
