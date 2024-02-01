@@ -48,12 +48,13 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "numpy>=1.25.0",
+    "numpy>=1.15.4,
     "importlib_resources",
     "packaging",
     "black>=24,<25",
     "flake8",
     'mypy',
+    'numpy-stubs',
 ]
 
 [project.optional-dependencies]
