@@ -47,10 +47,10 @@ def validate(
     return results
 
 
-def _check_imas_version():
+def _check_imas_version() -> None:
     """Check if the installed IMAS version is sufficient."""
     # TODO: check if this is the best level to test for the IMAS version
     if not has_imas:
         raise IMASVersionError()
-    if ll_interface._al_version < Version(5, 1):
+    if ll_interface._al_version < Version("5.1"):
         raise IMASVersionError(ll_interface._al_version)

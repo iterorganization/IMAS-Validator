@@ -2,14 +2,14 @@
 This file describes the overload class for the operators
 """
 
-from typing import Any
+from typing import Any, Tuple, Callable, List, Dict
 import operator
 
 import numpy as np
 
 
-def _binary_wrapper(op, name):
-    def func(self, other):
+def _binary_wrapper(op: Callable, name: str) -> Callable:
+    def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
             other = other._obj
         return IDSWrapper(op(self._obj, other))
@@ -18,8 +18,8 @@ def _binary_wrapper(op, name):
     return func
 
 
-def _reflected_binary_wrapper(op, name):
-    def func(self, other):
+def _reflected_binary_wrapper(op: Callable, name: str) -> Callable:
+    def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
             other = other._obj
         return IDSWrapper(op(other, self._obj))
@@ -28,12 +28,12 @@ def _reflected_binary_wrapper(op, name):
     return func
 
 
-def _numeric_wrapper(op, name):
+def _numeric_wrapper(op: Callable, name: str) -> Tuple[Callable, Callable]:
     return (_binary_wrapper(op, name), _reflected_binary_wrapper(op, name))
 
 
-def _unary_wrapper(op, name):
-    def func(self):
+def _unary_wrapper(op: Callable, name: str) -> Callable:
+    def func(self: "IDSWrapper") -> "IDSWrapper":
         return IDSWrapper(op(self._obj))
 
     func.__name__ = f"__{name}__"
@@ -45,7 +45,7 @@ class IDSWrapper:
     Wrapper objects with operator overloads for reporting validation test results
     """
 
-    def __init__(self, obj: Any):
+    def __init__(self, obj: Any) -> None:
         """Initialize IDSWrapper
 
         Args:
@@ -55,15 +55,15 @@ class IDSWrapper:
             raise ValueError("Cannot wrap already wrapped object")
         self._obj = obj
 
-    def __getattr__(self, attr: str):
+    def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
             return IDSWrapper(getattr(self._obj, attr))
         raise AttributeError(f"{self.__class__} object has no attribute {attr}")
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: List, **kwargs: Dict) -> "IDSWrapper":
         return IDSWrapper(self._obj(*args, **kwargs))
 
-    def __getitem__(self, item: Any):
+    def __getitem__(self, item: Any) -> "IDSWrapper":
         return IDSWrapper(self._obj[item])
 
     # comparison operators

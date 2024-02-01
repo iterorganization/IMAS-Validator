@@ -3,14 +3,14 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Generator
 
 from imaspy import DBEntry
 
 from ids_validator.rules.data import IDSValidationRule
 
 
-def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
+def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]) -> None:
     """Apply set of rules to the Data Entry.
 
     Args:
@@ -21,7 +21,7 @@ def apply_rules_to_data(db_entry: DBEntry, rules: List[IDSValidationRule]):
         rule.apply_func(ids_instances)
 
 
-def find_matching_rules(db_entry: DBEntry, rules: List[IDSValidationRule]):
+def find_matching_rules(db_entry: DBEntry, rules: List[IDSValidationRule]) -> Generator:
     """Find combinations of rules and their relevant ids instances
 
     Args:

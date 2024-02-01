@@ -3,21 +3,21 @@ This file describes the helper functions for the validation rules
 """
 
 
-def Increasing(self):
+def Increasing() -> None:
     """"""
     pass
 
 
-def Decreasing(self):
+def Decreasing() -> None:
     """"""
     pass
 
 
-def Match(self):
+def Match() -> None:
     """"""
     pass
 
 
-def Exists(self):
+def Exists() -> None:
     """"""
     pass

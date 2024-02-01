@@ -51,15 +51,12 @@ dependencies = [
     "numpy>=1.15.4",
     "importlib_resources",
     "packaging",
-    "black>=24,<25",
-    "flake8",
-    'mypy',
 ]
 
 [project.optional-dependencies]
 # these self-dependencies are available since pip 21.2
 all = [
-    "ids-validator[test,docs]"
+    "ids-validator[docs,test,linting]"
 ]
 docs = [
     "sphinx>=6.0.0,<7.0.0",
@@ -71,6 +68,11 @@ test = [
     "pytest-cov>=0.6",
     "pytest-xdist",
     "pytest-randomly",
+]
+linting = [
+    "black>=24,<25",
+    "flake8",
+    "mypy",
 ]
 
 [project.urls]
@@ -99,6 +101,9 @@ force-exclude = "ids_validator/_version.py"
 
 [tool.mypy]
 packages = "ids_validator"
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_untyped_decorators = true
 
 [[tool.mypy.overrides]]
 module = [

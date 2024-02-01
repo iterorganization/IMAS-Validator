@@ -7,19 +7,19 @@ validation tool
 class IDSValidationResult:
     """"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # file
         # rule_name
         # List[IDSValidationLineResult]
         pass
 
-    def save_line_result(self):
+    def save_line_result(self) -> None:
         # save IDSValidationLineResult
         pass
 
 
 class IDSValidationLineResult:
-    def __init__(self):
+    def __init__(self) -> None:
         # line_num
         # vars
         # rule/line (var1 + var2 == var3)
