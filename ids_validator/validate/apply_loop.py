@@ -49,7 +49,7 @@ class TestExecutor:
 
     def find_matching_rules(
         self,
-    ) -> Tuple[Tuple[IDSToplevel], Tuple[int], IDSValidationRule]:
+    ) -> Tuple[Tuple[IDSToplevel], Tuple[Tuple[str, int]], IDSValidationRule]:
         """Find combinations of rules and their relevant ids instances
 
         Args:

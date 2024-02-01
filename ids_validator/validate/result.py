@@ -31,10 +31,10 @@ class IDSValidationResult:
             idss: Tuple of ids_names and occurrences
             exc: Exception that was encountered while running validation test
         """
-        self.rule = rule
-        self.idss = idss
         self.bool_result: bool = bool(test)
         self.msg = msg
+        self.rule = rule
+        self.idss = idss
 
         if exc is None:
             info = traceback.extract_stack()
