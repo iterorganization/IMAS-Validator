@@ -1,9 +1,8 @@
+import imaspy
 import numpy
 import pytest
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
-
-import imaspy
 
 
 def check_test_result(test, expected):

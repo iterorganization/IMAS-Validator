@@ -17,7 +17,9 @@ class ResultCollector:
         """Initialize ResultCollector"""
         self.results: List[IDSValidationResult] = []
 
-    def set_context(self, rule: IDSValidationRule, idss: Tuple[Tuple[str, int]]):
+    def set_context(
+        self, rule: IDSValidationRule, idss: Tuple[Tuple[str, int]]
+    ) -> None:
         """Set which rule and IDSs should be stored in results
 
         Args:

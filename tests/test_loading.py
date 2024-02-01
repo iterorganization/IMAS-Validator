@@ -1,8 +1,16 @@
-import pytest
-from pathlib import Path
-from collections import Counter
 import unittest.mock
+from collections import Counter
+from pathlib import Path
 
+import pytest
+
+from ids_validator.exceptions import (
+    EmptyRuleFileWarning,
+    InvalidRulesetName,
+    InvalidRulesetPath,
+    WrongFileExtensionError,
+)
+from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.loading import (
     discover_rule_modules,
@@ -10,13 +18,6 @@ from ids_validator.rules.loading import (
     filter_rulesets,
     load_rules_from_path,
 )
-from ids_validator.exceptions import (
-    InvalidRulesetPath,
-    InvalidRulesetName,
-    EmptyRuleFileWarning,
-    WrongFileExtensionError,
-)
-from ids_validator.rules.ast_rewrite import run_path
 
 
 @pytest.fixture(scope="function")

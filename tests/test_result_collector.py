@@ -1,8 +1,9 @@
-import pytest
 from unittest.mock import Mock
 
-from ids_validator.validate.result_collector import ResultCollector
+import pytest
+
 from ids_validator.validate.ids_wrapper import IDSWrapper
+from ids_validator.validate.result_collector import ResultCollector
 
 
 @pytest.fixture(scope="function")
@@ -39,7 +40,7 @@ def check_attrs(val_result, bool_result):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == "cool_func_name"
     assert val_result.idss == (("core_profiles", 0),)
-    assert val_result.tb[val_result.frame_idx].lineno == 18
+    assert val_result.tb[val_result.frame_idx].lineno == 19
     assert val_result.exc is None
 
 
@@ -48,7 +49,7 @@ def check_attrs_error(val_result, bool_result):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == "func_error"
     assert val_result.idss == (("core_profiles", 0),)
-    assert val_result.tb[val_result.frame_idx].lineno == 29
+    assert val_result.tb[val_result.frame_idx].lineno == 30
     assert isinstance(val_result.exc, ZeroDivisionError)
 
 

@@ -11,9 +11,9 @@ from packaging.version import Version
 
 from ids_validator.exceptions import IMASVersionError
 from ids_validator.rules.loading import load_rules
-from ids_validator.validate.apply_loop import apply_rules_to_data
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.result_collector import ResultCollector
+from ids_validator.validate.test_executor import TestExecutor
 
 
 def validate(
@@ -43,7 +43,8 @@ def validate(
         apply_generic=apply_generic,
         result_collector=result_collector,
     )
-    apply_rules_to_data(dbentry, rules)
+    test_executor = TestExecutor(dbentry, rules, result_collector)
+    test_executor.apply_rules_to_data()
     results = result_collector.results
     return results
 

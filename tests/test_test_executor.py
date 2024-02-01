@@ -2,17 +2,15 @@ from functools import lru_cache, reduce
 from pathlib import Path
 from unittest.mock import Mock, call
 
-from imaspy import IDSFactory
-
-from imaspy.exception import DataEntryException
 import numpy
 import pytest
+from imaspy import IDSFactory
+from imaspy.exception import DataEntryException
 
 from ids_validator.rules.data import IDSValidationRule
-from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.ids_wrapper import IDSWrapper
-from ids_validator.validate.apply_loop import TestExecutor
-
+from ids_validator.validate.result_collector import ResultCollector
+from ids_validator.validate.test_executor import TestExecutor
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0, 1, 3, 5]),
