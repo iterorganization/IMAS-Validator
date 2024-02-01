@@ -5,7 +5,6 @@ validation tool
 
 from typing import List, Any
 from ids_validator.validate.result import IDSValidationResult
-from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
 class ResultCollector:

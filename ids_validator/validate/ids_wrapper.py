@@ -2,7 +2,7 @@
 This file describes the overload class for the operators
 """
 
-from typing import Any, Tuple, Callable, List, Dict
+from typing import Any, Tuple, Callable
 import operator
 
 import numpy as np
