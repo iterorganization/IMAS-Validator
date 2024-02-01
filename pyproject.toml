@@ -54,7 +54,6 @@ dependencies = [
     "black>=24,<25",
     "flake8",
     'mypy',
-    'numpy-stubs',
 ]
 
 [project.optional-dependencies]
@@ -110,5 +109,6 @@ ignore_errors = true
 [[tool.mypy.overrides]]
 module = [
     "imaspy.*",
+    "numpy.*",
 ]
 ignore_missing_imports = true
