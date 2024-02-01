@@ -35,25 +35,21 @@ def rule_error(res_collector):
 
 
 def check_attrs(val_result, bool_result):
-    assert val_result.func_name == "cool_func_name"
-    assert val_result.func_docs == "put docs here"
-    assert val_result.idss == (("core_profiles", 0),)
-    assert "/".join(val_result.file_name.parts[-2:]) == "tests/test_assert.py"
-    assert val_result.lineno == 18
-    assert val_result.code_context == "res_collector.assert_(ids_name)"
     assert val_result.bool_result == bool_result
-    assert val_result.error is False
+    assert val_result.msg == ""
+    assert val_result.rule.func.__name__ == "cool_func_name"
+    assert val_result.idss == (("core_profiles", 0),)
+    assert val_result.tb[val_result.frame_idx].lineno == 18
+    assert val_result.exc is None
 
 
 def check_attrs_error(val_result, bool_result):
-    assert val_result.func_name == "func_error"
-    assert val_result.func_docs == "Error docs"
-    assert val_result.idss == (("core_profiles", 0),)
-    assert "/".join(val_result.file_name.parts[-2:]) == "tests/test_assert.py"
-    assert val_result.lineno == 29
-    assert val_result.code_context == "a = ids_name / 0"
     assert val_result.bool_result is False
-    assert val_result.error is True
+    assert val_result.msg == ""
+    assert val_result.rule.func.__name__ == "func_error"
+    assert val_result.idss == (("core_profiles", 0),)
+    assert val_result.tb[val_result.frame_idx].lineno == 29
+    assert isinstance(val_result.exc, ZeroDivisionError)
 
 
 def test_all_attrs_filled_on_success(res_collector, rule):

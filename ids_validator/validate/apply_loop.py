@@ -6,7 +6,6 @@ IDS data
 from typing import List, Tuple
 
 from imaspy import DBEntry
-from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
@@ -35,17 +34,20 @@ class TestExecutor:
 
     def apply_rules_to_data(self):
         """Apply set of rules to the Data Entry."""
-        for ids_instances, idss, rule in self.find_matching_rules():
+        for idss, rule in self.find_matching_rules():
             self.result_collector.set_context(rule, idss)
+            ids_instances = [ids[0] for ids in idss]
             try:
                 rule.apply_func(ids_instances)
             except Exception as e:
                 self.result_collector.add_error_result(e)
 
-    def find_matching_rules(
-        self,
-    ) -> Tuple[Tuple[IDSToplevel], Tuple[Tuple[str, int]], IDSValidationRule]:
+    def find_matching_rules(self):
         """Find combinations of rules and their relevant ids instances
+
+        Yields:
+            Tuple[Tuple[IDSToplevel, str, int]], IDSValidationRule]:
+                tuple of ids_instances, ids_names, ids_occurrences, validation rule
 
         Returns:
             Generator yielding tuple of ids instances with corresponding rule
@@ -54,15 +56,14 @@ class TestExecutor:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         idss = self._get_ids_list()
         for ids_name, occurrence in idss:
-            ids_instances = (self.db_entry.get(ids_name, occurrence),)
-            idss = ((ids_name, occurrence),)
+            idss = ((self.db_entry.get(ids_name, occurrence), ids_name, occurrence),)
             filtered_rules = [
                 rule
                 for rule in self.rules
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
             ]
             for rule in filtered_rules:
-                yield ids_instances, idss, rule
+                yield idss, rule
 
     def _get_ids_list(self) -> List[Tuple[str, int]]:
         """Get list of all ids occurrences combined with their corresponding names

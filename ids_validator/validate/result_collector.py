@@ -4,6 +4,7 @@ validation tool
 """
 
 from typing import List, Tuple, Union
+import traceback
 
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.rules.data import IDSValidationRule
@@ -33,28 +34,40 @@ class ResultCollector:
         Args:
             exc: Exception that was encountered while running validation test
         """
+        tb = traceback.extract_tb(exc.__traceback__)
+        frame_idx = -1
+        assert tb[frame_idx].name == self._current_rule.func.__name__
         result = IDSValidationResult(
             False,
             "",
             self._current_rule,
             self._current_idss,
+            tb,
+            frame_idx,
             exc=exc,
         )
         self.results.append(result)
 
     def assert_(self, test: Union[IDSWrapper, bool], msg: str = ""):
         """
-        Custom assert function with which to overwrite assert statetements in IDS
+        Custom assert function with which to overwrite assert statements in IDS
         validation tests
 
         Args:
             test: Expression to evaluate in test
             msg: Given message for failed assertion
         """
+        tb = traceback.extract_stack()
+        frame_idx = -2
+        assert tb[frame_idx + 1].name == "assert_"
+        assert tb[frame_idx].name == self._current_rule.func.__name__
         result = IDSValidationResult(
-            test,
+            bool(test),
             msg,
             self._current_rule,
             self._current_idss,
+            tb,
+            frame_idx,
+            exc=None,
         )
         self.results.append(result)
