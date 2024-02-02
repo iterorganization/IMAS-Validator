@@ -33,13 +33,15 @@ def get(ids_name: str, occurrence: int = 0):
 
 
 def test_validate():
+    module = "ids_validator.validate.validate"
+    # patch _check_imas_version for now
     with patch(
-        "ids_validator.validate.validate.DBEntry",
+        f"{module}.DBEntry",
         spec=True,
         list_all_occurrences=list_all_occurrences,
         get=get,
         factory=IDSFactory("3.40.1"),
-    ):
+    ), patch(f"{module}._check_imas_version"):
         rulesets = ["ITER-MD"]
         ids_url = ""
         extra_rule_dirs = [Path("tests/rulesets/integration-test")]
