@@ -5,14 +5,12 @@ from unittest.mock import Mock, call
 import numpy
 import pytest
 from imaspy import IDSFactory
+from imaspy.exception import DataEntryException
 
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
-
-from imaspy.exception import DataEntryException
-
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0, 1, 3, 5]),
