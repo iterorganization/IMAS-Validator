@@ -1,9 +1,8 @@
 from functools import lru_cache
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import numpy
-import pytest
 from imaspy import IDSFactory
 from imaspy.exception import DataEntryException
 
@@ -33,18 +32,7 @@ def get(ids_name: str, occurrence: int = 0):
     return ids
 
 
-@pytest.fixture
-def dbentry():
-    """Get a mocked imaspy.DBEntry."""
-    db = Mock()
-    db.list_all_occurrences = Mock(wraps=list_all_occurrences)
-    db.get = Mock(wraps=get)
-    db.factory = IDSFactory("3.40.1")
-    return db
-
-
-def test_validate(dbentry):
-    # switch dbentry functionality
+def test_validate():
     with patch(
         "ids_validator.validate.validate.DBEntry",
         spec=True,
