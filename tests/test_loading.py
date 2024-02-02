@@ -41,6 +41,7 @@ def test_discover_rulesets_explicit():
         Path("tests/rulesets/exceptions"),
         Path("tests/rulesets/base/generic"),
         Path("tests/rulesets/base/ITER-MD"),
+        Path("tests/rulesets/integration-test"),
     ]
     assert Counter(discover_rulesets(rulesets_dirs)) == Counter(unfiltered_rulesets)
 

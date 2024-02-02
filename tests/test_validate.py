@@ -1,0 +1,82 @@
+from functools import lru_cache
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import numpy
+import pytest
+from imaspy import IDSFactory
+
+from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.validate import validate
+
+from imaspy.exception import DataEntryException
+
+
+_occurrence_dict = {
+    "core_profiles": numpy.array([0]),
+    "equilibrium": numpy.array([0]),
+}
+
+
+def list_all_occurrences(ids_name: str):
+    return _occurrence_dict.get(ids_name, [])
+
+
+@lru_cache
+def get(ids_name: str, occurrence: int = 0):
+    # Trying to get an IDS that isn't filled is an error:
+    if occurrence not in list_all_occurrences(ids_name):
+        raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
+
+    ids = IDSFactory("3.40.1").new(ids_name)
+    ids.ids_properties.comment = f"Test IDS: {ids_name}/{occurrence}"
+    ids.ids_properties.homogeneous_time = 1
+    # TODO: if needed, we can fill IDSs with specific data
+    return ids
+
+
+@pytest.fixture
+def dbentry():
+    """Get a mocked imaspy.DBEntry."""
+    db = Mock()
+    db.list_all_occurrences = Mock(wraps=list_all_occurrences)
+    db.get = Mock(wraps=get)
+    db.factory = IDSFactory("3.40.1")
+    return db
+
+
+def test_validate(dbentry):
+    # switch dbentry functionality
+    with patch(
+        "ids_validator.validate.validate.DBEntry",
+        spec=True,
+        list_all_occurrences=list_all_occurrences,
+        get=get,
+        factory=IDSFactory("3.40.1"),
+    ):
+        rulesets = ["ITER-MD"]
+        ids_url = ""
+        extra_rule_dirs = [Path("tests/rulesets/integration-test")]
+        apply_generic = False
+        results = validate(
+            rulesets=rulesets,
+            ids_url=ids_url,
+            extra_rule_dirs=extra_rule_dirs,
+            apply_generic=apply_generic,
+        )
+        assert len(results) == 2
+        assert all(isinstance(res, IDSValidationResult) for res in results)
+        results = sorted(results, key=lambda x: not x.success)
+        assert results[0].success is True
+        assert results[0].msg == ""
+        assert results[0].rule.func.__name__ == "validate_test_rule_success"
+        assert results[0].idss == [("core_profiles", 0)]
+        assert results[0].tb[-1].name == "validate_test_rule_success"
+        assert results[0].exc is None
+
+        assert results[1].success is False
+        assert results[1].msg == "Oh noes it didn't work"
+        assert results[1].rule.func.__name__ == "validate_test_rule_fail"
+        assert results[1].idss == [("equilibrium", 0)]
+        assert results[1].tb[-1].name == "validate_test_rule_fail"
+        assert results[1].exc is None
