@@ -133,7 +133,7 @@ def test_apply_rules_to_data(rule_executor):
 
 
 def test_find_matching_rules(rule_executor):
-    result = [(idss, rule) for idss, rule in rule_executor.find_matching_rules()]
+    result = list(rule_executor.find_matching_rules())
     rules = rule_executor.rules
     expected_result = []
     for ids_name in _occurrence_dict:
@@ -145,9 +145,10 @@ def test_find_matching_rules(rule_executor):
             if ids_name == "core_profiles":
                 expected_result.append((idss, rules[1]))
     assert len(result) == len(expected_result) == 12
-    s_result = sorted(result, key=lambda x: id(x[0][0][0]))
-    s_x_result = sorted(expected_result, key=lambda x: id(x[0][0][0]))
-    assert s_result == s_x_result
+    # sort results based on id of ids to be able to compare lists
+    sorted_result = sorted(result, key=lambda x: id(x[0][0][0]))
+    sorted_expected_result = sorted(expected_result, key=lambda x: id(x[0][0][0]))
+    assert sorted_result == sorted_expected_result
 
 
 def test_apply_func(dbentry, rules):

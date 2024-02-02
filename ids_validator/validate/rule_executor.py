@@ -52,8 +52,7 @@ class RuleExecutor:
         """Find combinations of rules and their relevant ids instances
 
         Yields:
-            Tuple[List[IDSInstance], IDSValidationRule]:
-                tuple of ids_instances, ids_names, ids_occurrences, validation rule
+            tuple of ids_instances, ids_names, ids_occurrences, validation rule
         """
 
         if any([len(rule.ids_names) > 1 for rule in self.rules]):
