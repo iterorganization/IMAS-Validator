@@ -34,7 +34,7 @@ def validate(
         List of IDSValidationResult objects
     """
 
-    # _check_imas_version()
+    _check_imas_version()
     dbentry = DBEntry(ids_url, "r")
     result_collector = ResultCollector()
     rules = load_rules(

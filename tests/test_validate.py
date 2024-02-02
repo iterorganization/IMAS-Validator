@@ -5,12 +5,10 @@ from unittest.mock import Mock, patch
 import numpy
 import pytest
 from imaspy import IDSFactory
+from imaspy.exception import DataEntryException
 
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.validate import validate
-
-from imaspy.exception import DataEntryException
-
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0]),
@@ -64,15 +62,16 @@ def test_validate(dbentry):
             extra_rule_dirs=extra_rule_dirs,
             apply_generic=apply_generic,
         )
-        assert len(results) == 2
+        assert len(results) == 3
         assert all(isinstance(res, IDSValidationResult) for res in results)
-        results = sorted(results, key=lambda x: not x.success)
-        assert results[0].success is True
+        results = sorted(results, key=lambda x: x.rule.func.__name__)
+
+        assert results[0].success is False
         assert results[0].msg == ""
-        assert results[0].rule.func.__name__ == "validate_test_rule_success"
+        assert results[0].rule.func.__name__ == "validate_test_rule_error"
         assert results[0].idss == [("core_profiles", 0)]
-        assert results[0].tb[-1].name == "validate_test_rule_success"
-        assert results[0].exc is None
+        assert results[0].tb[-1].name == "validate_test_rule_error"
+        assert isinstance(results[0].exc, ZeroDivisionError)
 
         assert results[1].success is False
         assert results[1].msg == "Oh noes it didn't work"
@@ -80,3 +79,10 @@ def test_validate(dbentry):
         assert results[1].idss == [("equilibrium", 0)]
         assert results[1].tb[-1].name == "validate_test_rule_fail"
         assert results[1].exc is None
+
+        assert results[2].success is True
+        assert results[2].msg == ""
+        assert results[2].rule.func.__name__ == "validate_test_rule_success"
+        assert results[2].idss == [("core_profiles", 0)]
+        assert results[2].tb[-1].name == "validate_test_rule_success"
+        assert results[2].exc is None
