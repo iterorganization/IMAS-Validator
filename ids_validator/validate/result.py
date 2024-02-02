@@ -5,7 +5,7 @@ validation tool
 
 import traceback
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from ids_validator.rules.data import IDSValidationRule
 
@@ -20,7 +20,7 @@ class IDSValidationResult:
     """Given message for failed assertion"""
     rule: IDSValidationRule
     """Rule to apply to IDS data"""
-    idss: Tuple[Tuple[str, int], ...]
+    idss: List[Tuple[str, int]]
     """Tuple of ids_names and occurrences"""
     tb: traceback.StackSummary
     """A stack of traceback frames"""

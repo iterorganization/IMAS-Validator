@@ -39,7 +39,7 @@ class RuleExecutor:
         """Apply set of rules to the Data Entry."""
         for ids_instances, rule in self.find_matching_rules():
             ids_toplevels = [ids[0] for ids in ids_instances]
-            idss = tuple([(ids[1], ids[2]) for ids in ids_instances])
+            idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
             try:
                 rule.apply_func(ids_toplevels)
@@ -48,11 +48,11 @@ class RuleExecutor:
 
     def find_matching_rules(
         self,
-    ) -> Iterator[Tuple[Tuple[IDSInstance], IDSValidationRule]]:
+    ) -> Iterator[Tuple[List[IDSInstance], IDSValidationRule]]:
         """Find combinations of rules and their relevant ids instances
 
         Yields:
-            Tuple[Tuple[IDSInstance], IDSValidationRule]:
+            Tuple[List[IDSInstance], IDSValidationRule]:
                 tuple of ids_instances, ids_names, ids_occurrences, validation rule
         """
 
@@ -60,7 +60,7 @@ class RuleExecutor:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         ids_list = self._get_ids_list()
         for ids_name, occurrence in ids_list:
-            idss = ((self.db_entry.get(ids_name, occurrence), ids_name, occurrence),)
+            idss = [(self.db_entry.get(ids_name, occurrence), ids_name, occurrence)]
             filtered_rules = [
                 rule
                 for rule in self.rules
