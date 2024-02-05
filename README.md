@@ -29,7 +29,7 @@ If on ITER cluster and Eurousion gateway:
 module load IMAS IMASPy
 ```
 
-If local see `IMASPy installation docs <https://git.iter.org/projects/IMAS/repos/imaspy/browse/docs/source/installing.rst>`_
+If local see [IMASPy installation docs](https://git.iter.org/projects/IMAS/repos/imaspy/browse/docs/source/installing.rst).
 
 Test the installation
 

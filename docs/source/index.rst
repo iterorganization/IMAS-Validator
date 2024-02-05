@@ -10,20 +10,31 @@ IMAS IDS Validator is a tool to validate IMAS IDS's through the use of general
 and case specific validation rules.
 
 
+README
+------
+
+The README is best read on :ids_validator:`#ids_validator`.
+
+Manual
+------
+
 .. toctree::
-   :hidden:
    :caption: Getting Started
    :maxdepth: 2
 
    self
    installing
+   defining_rules
    usage
 
 
-README
-------
+.. toctree::
+   :caption: API docs
+   :maxdepth: 1
 
-The README is best read on :ids_validator:`#ids_validator`.
+   api
+   api-hidden
+
 
 LICENSE
 -------
