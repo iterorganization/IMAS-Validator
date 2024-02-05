@@ -13,7 +13,7 @@ and case specific validation rules.
 README
 ------
 
-The README is best read on :ids_validator:`#ids_validator`.
+The README is best read on the `git page <https://git.iter.org/projects/IMEX/repos/ids-validator/browse>`_.
 
 Manual
 ------

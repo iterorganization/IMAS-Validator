@@ -43,9 +43,3 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
     extra_rule_dirs=extra_rule_dirs,
     result_collector=result_collector
   )
-
-You can also set the environment variable `RULESET_PATH` to show the loading tool where to look for rule sets.
-
-.. code-block:: bash
-
-  export RULESET_PATH=path/to/my/custom/rule/dirs/rulesets:another/path/rulesets_custom
