@@ -87,7 +87,7 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
 
   from ids_validator.validate.validate import validate
 
-  rulesets = ['ITER-MD', 'MyCustomRules’]
+  rulesets = ['ITER-MD', 'MyCustomRules']
   ids_url = "url/to/specific/ids"
   extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
   apply_generic = True

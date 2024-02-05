@@ -11,6 +11,7 @@ and case specific validation rules.
 
 
 .. toctree::
+   :hidden:
    :caption: Getting Started
    :maxdepth: 2
 
