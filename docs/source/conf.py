@@ -23,9 +23,9 @@ print("sys.path:", sys.path)
 
 # -- Project information -----------------------------------------------------
 # The documented project’s name
-project = src_project = PROJECT = "IDS Validator"
-PACKAGE = "ids-validator"
-src_group = GROUP = "IMAS Extra"
+project = src_project = PROJECT = "ids-validator"
+PACKAGE = "ids_validator"
+src_group = GROUP = "IMEX"
 
 # A copyright statement in the style '2008, Author Name'.
 copyright = f"2020-{datetime.datetime.now().year}, ITER Organization"
