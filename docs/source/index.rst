@@ -33,7 +33,6 @@ Manual
    :maxdepth: 1
 
    api
-   api-hidden
 
 
 LICENSE

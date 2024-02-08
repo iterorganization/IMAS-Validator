@@ -22,12 +22,8 @@ python -m venv --system-site-packages venv
 source venv/bin/activate
 
 # Create sdist and wheel
-pip install --upgrade pip setuptools wheel build
-rm -rf dist
-python -m build .
-
-# Install ids-validator and documentation dependencies from the just-built wheel
-pip install --upgrade .[all]
+pip install --upgrade pip setuptools wheel
+pip install --upgrade .[docs]
 
 # Debugging:
 pip freeze

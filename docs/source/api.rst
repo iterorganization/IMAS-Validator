@@ -13,14 +13,11 @@ IDS validator
 .. currentmodule:: ids_validator
 
 .. autosummary::
+   :toctree: generated/
+   :recursive:
+   :template: custom-module-template.rst
 
-   rules.ast_rewrite
-   rules.data
-   rules.helpers
-   rules.loading
-   validate.ids_wrapper
-   validate.result_collector
-   validate.result
-   validate.rule_executor
-   validate.validate
+   ids_validator.rules
+   ids_validator.validate
+   ids_validator.exceptions
    

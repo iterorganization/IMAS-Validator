@@ -55,7 +55,7 @@ class ValidatorRegistry:
     EXAMPLE:
     @val_registry.ids_validator('core_profiles')
     def ids_rule(cp):
-      cp != None
+        assert cp != None
     """
 
     def __init__(self, rule_path: Path) -> None:
@@ -63,6 +63,11 @@ class ValidatorRegistry:
         self.rule_path: Path = rule_path
 
     def ids_validator(self, *ids_names: str) -> Callable:
+        """Decorator for validation test functions
+
+        Args:
+            ids_names: Names of ids instances to be validated
+        """
         # explicit kwfields
         def decorator(func: Callable) -> Callable:
             self.validators.append(IDSValidationRule(self.rule_path, func, *ids_names))

@@ -1,8 +1,53 @@
 Installing IMAS IDS Validation
 ==============================
 
-Minimal installation
---------------------
+SDCC setup
+----------
+
+.. note::
+  A module will become available on SDCC after the first release of IDS validator.
+  Use the following instructions to work with the latest development version.
+
+.. 
+  Update SDCC setup on first release
+
+* Setup a project folder and clone git repository
+
+  .. code-block:: bash
+
+    mkdir projects
+    cd projects
+    git clone ssh://git@git.iter.org/imex/ids-validator.git
+    cd ids-validator
+
+* Setup a python virtual environment and install python dependencies
+
+  .. code-block:: bash
+
+    python3 -m venv ./venv
+    . venv/bin/activate
+    pip install --upgrade pip
+    pip install --upgrade wheel setuptools
+    pip install .
+    # For development an installation in editable mode may be more convenient
+    # pip install -e .[all]
+
+* Load IMAS and IMASPy.
+
+  .. code-block:: bash
+
+    module load IMAS IMASPy
+
+* Test the installation
+
+  .. code-block:: bash
+
+    python3 -c "import imaspy; print(imaspy.__version__)"
+    pytest
+
+
+Ubuntu installation
+-------------------
 
 * Install system packages
 
@@ -35,13 +80,7 @@ Minimal installation
 
 * Install IMASPy.
 
-  If on ITER cluster and Eurousion gateway:
-
-  .. code-block:: bash
-
-    module load IMAS IMASPy
-
-  If local see `IMASPy installation docs <https://git.iter.org/projects/IMAS/repos/imaspy/browse/docs/source/installing.rst>`_
+  Follow the instructions from `IMASPy installation docs <https://git.iter.org/projects/IMAS/repos/imaspy/browse/docs/source/installing.rst>`_
 
 * Test the installation
 

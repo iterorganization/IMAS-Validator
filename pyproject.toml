@@ -60,7 +60,6 @@ all = [
 ]
 docs = [
     "sphinx>=6.0.0,<7.0.0",
-    "sphinx-autosummary-accessors>=0.1.2",
     "sphinx_immaterial",
     "recommonmark>=0.6",
 ]
