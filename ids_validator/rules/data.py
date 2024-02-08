@@ -68,6 +68,7 @@ class ValidatorRegistry:
         Args:
             ids_names: Names of ids instances to be validated
         """
+
         # explicit kwfields
         def decorator(func: Callable) -> Callable:
             self.validators.append(IDSValidationRule(self.rule_path, func, *ids_names))
