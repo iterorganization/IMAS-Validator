@@ -1,4 +1,4 @@
-Defining IDSValidationRules
+Defining validation rules
 ===========================
 
 Ruleset folder structure
@@ -11,20 +11,20 @@ The folder structure is as follows:
 
 .. code-block:: text
 
-  |-- rulesets
-  |   |-- generic
-  |   |   |-- common_ids.py
-  |   |   └-- core_profiles.py
-  |   └-- ITER-MD
-  |       |-- common_ids.py
-  |       └-- core_profiles.py
-  └-- rulesets_custom
-      |-- ITER-MD
-      |   |-- common_ids.py
-      |   └-- core_profiles.py
-      └-- MyCustomRules
-          |-- common_ids.py
-          └-- equilibrium.py
+  ├── rulesets
+  |   ├── generic
+  |   |   ├── common_ids.py
+  |   |   └── core_profiles.py
+  |   └── ITER-MD
+  |       ├── common_ids.py
+  |       └── core_profiles.py
+  └── rulesets_custom
+      ├── ITER-MD
+      |   ├── common_ids.py
+      |   └── core_profiles.py
+      └── MyCustomRules
+          ├── common_ids.py
+          └── equilibrium.py
 
 
 Rule definition

@@ -52,11 +52,12 @@ class IDSValidationRule:
 
 class ValidatorRegistry:
     """
-    EXAMPLE::
+    Example:
+        .. code-block:: python
 
-        @val_registry.ids_validator('core_profiles')
-        def ids_rule(cp):
-            assert cp != None
+            @val_registry.ids_validator('core_profiles')
+            def ids_rule(cp):
+                assert cp != None
     """
 
     def __init__(self, rule_path: Path) -> None:

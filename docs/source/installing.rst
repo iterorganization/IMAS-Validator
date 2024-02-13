@@ -1,4 +1,4 @@
-Installing IMAS IDS Validation
+Installing the IMAS IDS validator
 ==============================
 
 SDCC setup
@@ -42,7 +42,7 @@ SDCC setup
 
   .. code-block:: bash
 
-    python3 -c "import imaspy; print(imaspy.__version__)"
+    python3 -c "import ids_validator; print(ids_validator.__version__)"
     pytest
 
 
@@ -86,7 +86,7 @@ Ubuntu installation
 
   .. code-block:: bash
 
-    python3 -c "import imaspy; print(imaspy.__version__)"
+    python3 -c "import ids_validator; print(ids_validator.__version__)"
     pytest
 
 * To build the ids-validator documentation, execute:

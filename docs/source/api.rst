@@ -1,5 +1,3 @@
-.. currentmodule:: ids_validator
-
 API reference
 =============
 
@@ -10,14 +8,10 @@ documentation.
 IDS validator
 -------------
 
-.. currentmodule:: ids_validator
-
 .. autosummary::
    :toctree: generated/
    :recursive:
    :template: custom-module-template.rst
 
-   ids_validator.rules
-   ids_validator.validate
-   ids_validator.exceptions
+   ids_validator
    
