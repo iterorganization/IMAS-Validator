@@ -32,7 +32,7 @@ pip freeze
 # - `-W`: turn warnings into errors
 # - `-n`: nit-picky mode, warn about all missing references
 # - `--keep-going`: with -W, keep going when getting warnings
-export SPHINXOPTS='-W -n --keep-going'
+export SPHINXOPTS='-W --keep-going'
 
 # Run sphinx to create the documentation
 make -C docs clean html

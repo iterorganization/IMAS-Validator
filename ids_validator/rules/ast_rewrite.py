@@ -11,21 +11,21 @@ from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
 
 
-def rewrite_assert(code: str, filename: str) -> CodeType:
+def rewrite_assert(old_code: str, filename: str) -> CodeType:
     """
     Rewrite block of code to swap assert statement with given assert function
 
     Args:
-        code: Block of code, most of the time entire file
+        old_code: Block of code, most of the time entire file
         filename: Should give the file from which the code was read; pass some
-            recognizable value if it wasn’t read from a file ('<string>' is commonly
+            recognizable value if it was not read from a file ('<string>' is commonly
             used).
 
     Returns:
         Rewritten block of code
     """
     # Parse the code into an AST
-    tree = ast.parse(code)
+    tree = ast.parse(old_code)
     # Apply the transformation
     transformed_tree = AssertTransformer().visit(tree)
     transformed_tree = ast.fix_missing_locations(transformed_tree)
@@ -40,6 +40,16 @@ class AssertTransformer(ast.NodeTransformer):
     """
 
     def visit_Assert(self, node: Any) -> ast.Expr:
+        """
+        Swap assert statement with given assert function
+
+        Args:
+            node: AST Node for assert statement
+
+        Returns:
+            AST expression node for assert function
+        """
+
         if node.msg is None:
             args = [node.test]
         else:
