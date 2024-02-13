@@ -1,5 +1,5 @@
 Using the IMAS IDS validator
-=========================
+============================
 
 .. note::
   This is the API mostly for developers,  documentation for CLI usage will be added when it becomes available.

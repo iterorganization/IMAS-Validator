@@ -1,5 +1,5 @@
 Installing the IMAS IDS validator
-==============================
+=================================
 
 SDCC setup
 ----------
