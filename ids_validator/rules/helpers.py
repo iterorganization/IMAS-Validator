@@ -44,7 +44,6 @@ class Select:
             leaf_only: When True, only leaf data nodes are included in the selection.
                 Set to False to also iterate over Structures and Arrays of Structures.
         """
-        self._wrapped = wrapped
         self._query = query
         self._has_value = has_value
         self._leaf_only = leaf_only
