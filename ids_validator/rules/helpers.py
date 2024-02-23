@@ -48,7 +48,7 @@ class Select:
         self._has_value = has_value
         self._leaf_only = leaf_only
 
-        if not isinstance(self._wrapped, IDSWrapper):
+        if not isinstance(wrapped, IDSWrapper):
             raise TypeError("First argument of Select must be an IDS node")
         self._node: IDSBase = wrapped._obj
         if not isinstance(self._node, IDSBase):
