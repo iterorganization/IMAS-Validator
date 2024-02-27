@@ -5,7 +5,7 @@ import pytest
 from imaspy.ids_base import IDSBase
 from imaspy.ids_toplevel import IDSToplevel
 
-from ids_validator.rules.helpers import Select
+from ids_validator.rules.helpers import Decreasing, Increasing, Select
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
@@ -112,3 +112,34 @@ def test_select_empty_nodes(select_ids):
             select_ids.time,
         ],
     )
+
+
+@pytest.mark.parametrize("func", (Increasing, Decreasing))
+def test_increasing_decreasing_errors(select_ids, func):
+    with pytest.raises(TypeError):  # IDS must be wrapped
+        func(select_ids)
+    with pytest.raises(TypeError):  # Wrapped object must be an IDS
+        func(IDSWrapper(False))
+    with pytest.raises(ValueError):  # Wrapped object must be 1d
+        func(IDSWrapper(select_ids.ids_properties.homogeneous_time))
+    with pytest.raises(ValueError):  # len(object) > 1
+        select_ids.time = [0]
+        func(IDSWrapper(select_ids.time))
+
+
+@pytest.mark.parametrize(
+    "func, res, arr",
+    (
+        [Increasing, True, [1, 2, 3]],
+        [Increasing, False, [1, 3, 2]],
+        [Increasing, False, [1, 2, 2]],
+        [Increasing, False, [3, 2, 1]],
+        [Decreasing, False, [1, 2, 3]],
+        [Decreasing, False, [1, 3, 2]],
+        [Decreasing, False, [2, 2, 1]],
+        [Decreasing, True, [3, 2, 1]],
+    ),
+)
+def test_increasing_decreasing(select_ids, func, res, arr):
+    select_ids.time = arr
+    assert func(IDSWrapper(select_ids.time)) == res
