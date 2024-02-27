@@ -5,7 +5,7 @@ import pytest
 from imaspy.ids_base import IDSBase
 from imaspy.ids_toplevel import IDSToplevel
 
-from ids_validator.rules.helpers import Select
+from ids_validator.rules.helpers import Exists, Select
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
@@ -112,3 +112,34 @@ def test_select_empty_nodes(select_ids):
             select_ids.time,
         ],
     )
+
+
+def test_exists(select_ids):
+    ids = imaspy.IDSFactory("3.40.1").new("core_profiles")
+
+    # test 0d number
+    assert not Exists(IDSWrapper(ids).ids_properties.homogeneous_time)
+    ids.ids_properties.homogeneous_time = 2
+    assert Exists(IDSWrapper(ids).ids_properties.homogeneous_time)
+    ids.ids_properties.homogeneous_time = 0
+    assert Exists(IDSWrapper(ids).ids_properties.homogeneous_time)
+
+    # test multi arg
+    assert not Exists(
+        IDSWrapper(ids).ids_properties.homogeneous_time,
+        IDSWrapper(ids).ids_properties.comment,
+    )
+
+    # test 0d string
+    assert not Exists(IDSWrapper(ids).ids_properties.comment)
+    ids.ids_properties.comment = "Test comment"
+    assert Exists(IDSWrapper(ids).ids_properties.comment)
+    ids.ids_properties.comment = ""
+    assert not Exists(IDSWrapper(ids).ids_properties.comment)
+
+    # test 1+d number
+    assert not Exists(IDSWrapper(ids).time)
+    ids.time = [0.0, 1.1, 2.2]
+    assert Exists(IDSWrapper(ids).time)
+    ids.time = []
+    assert not Exists(IDSWrapper(ids).time)

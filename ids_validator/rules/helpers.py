@@ -5,6 +5,7 @@ This file describes the helper functions for the validation rules
 from typing import Iterator, List
 
 from imaspy.ids_base import IDSBase
+from imaspy.ids_primitive import IDSPrimitive
 from imaspy.util import find_paths, visit_children
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
@@ -85,6 +86,23 @@ def Decreasing() -> None:
     pass
 
 
-def Exists() -> None:
-    """"""
-    pass
+def Exists(*wrappeds: IDSWrapper) -> bool:
+    """Check whether fields are filled
+
+    Args:
+        wrapped: IDS toplevel or structure element
+
+    Returns:
+        boolean describing whether all requested fields exist
+    """
+
+    for wrapped in wrappeds:
+        if not isinstance(wrapped, IDSWrapper):
+            raise TypeError("First argument of Exists must be an IDS node")
+        node: IDSBase = wrapped._obj
+        if not isinstance(node, IDSPrimitive):
+            raise TypeError("First argument of Exists must be an IDS node")
+
+        if not node.has_value:
+            return False
+    return True
