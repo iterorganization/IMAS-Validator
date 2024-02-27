@@ -90,7 +90,7 @@ def Exists(*wrappeds: IDSWrapper) -> bool:
     """Check whether fields are filled
 
     Args:
-        wrapped: IDS toplevel or structure element
+        wrappeds: IDS toplevel or structure element
 
     Returns:
         boolean describing whether all requested fields exist
