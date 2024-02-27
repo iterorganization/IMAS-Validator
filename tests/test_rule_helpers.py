@@ -114,6 +114,13 @@ def test_select_empty_nodes(select_ids):
     )
 
 
+def test_exists_errors(select_ids):
+    with pytest.raises(TypeError):  # IDS must be wrapped
+        Exists(select_ids)
+    with pytest.raises(TypeError):  # Wrapped object must be an IDS
+        Exists(IDSWrapper(False))
+
+
 def test_exists(select_ids):
     ids = imaspy.IDSFactory("3.40.1").new("core_profiles")
 
