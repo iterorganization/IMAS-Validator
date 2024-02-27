@@ -3,9 +3,6 @@ import pytest
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
-# Until this functionality is implemented, skip everything in this module
-# pytestmark = pytest.mark.skip()
-
 
 def check_test_result(test, expected):
     assert isinstance(test, IDSWrapper)
@@ -30,6 +27,18 @@ def test_validate_flt_0d(test_data_core_profiles):
     check_test_result(test, True)
 
     test = zmax - zmin > 0
+    check_test_result(test, True)
+
+    test = zmax // 1 == 1
+    check_test_result(test, True)
+
+    test = zmax % 1 == 0.5
+    check_test_result(test, True)
+
+    test = -zmin == -1
+    check_test_result(test, True)
+
+    test = abs(-zmin) == 1
     check_test_result(test, True)
 
 
@@ -85,11 +94,18 @@ def test_validate_str_1d(test_data_core_profiles):
     check_test_result(test, True)
 
 
-@pytest.mark.skip()
-def test_validate_flt_2d(test_data_core_profiles):
-    pass
+def test_validate_flt_2d(test_data_waves):
+    pdnt = test_data_waves.coherent_wave[0].profiles_1d[0].power_density_n_tor
+
+    test = pdnt - numpy.array([1, 2, 3]) == numpy.array([[0, 0, 0], [3, 3, 3]])
+    check_test_result(test, True)
 
 
-@pytest.mark.skip()
-def test_validate_flt_3d(test_data_core_profiles):
-    pass
+def test_validate_flt_3d(test_data_waves):
+    pdnt = test_data_waves.coherent_wave[0].profiles_2d[0].power_density_n_tor
+
+    test = numpy.dot(pdnt[0, 0, :], pdnt[0, 1, :]) == 38
+    check_test_result(test, True)
+
+    test = pdnt[0, 0:2, :] @ pdnt[0, 1, :] == numpy.array([38, 126])
+    check_test_result(test, True)
