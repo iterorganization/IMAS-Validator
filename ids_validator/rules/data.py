@@ -55,7 +55,7 @@ class ValidatorRegistry:
     Example:
         .. code-block:: python
 
-            @val_registry.ids_validator('core_profiles')
+            @val_registry.validator('core_profiles')
             def ids_rule(cp):
                 assert cp != None
     """
