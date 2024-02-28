@@ -64,7 +64,7 @@ class ValidatorRegistry:
         self.validators: List[IDSValidationRule] = []
         self.rule_path: Path = rule_path
 
-    def ids_validator(self, *ids_names: str) -> Callable:
+    def validator(self, *ids_names: str) -> Callable:
         """Decorator for validation test functions
 
         Args:
