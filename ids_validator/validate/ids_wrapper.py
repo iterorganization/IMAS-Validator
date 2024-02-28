@@ -6,13 +6,15 @@ import operator
 from typing import Any, Callable, Tuple
 
 import numpy as np
+from imaspy.ids_primitive import IDSPrimitive
 
 
 def _binary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
+            self._nodes_list = self._nodes_list + other._nodes_list
             other = other._obj
-        return IDSWrapper(op(self._obj, other))
+        return IDSWrapper(op(self._obj, other), self._nodes_list)
 
     func.__name__ = f"__{name}__"
     return func
@@ -21,8 +23,9 @@ def _binary_wrapper(op: Callable, name: str) -> Callable:
 def _reflected_binary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
+            self._nodes_list = self._nodes_list + other._nodes_list
             other = other._obj
-        return IDSWrapper(op(other, self._obj))
+        return IDSWrapper(op(other, self._obj), self._nodes_list)
 
     func.__name__ = f"__r{name}__"
     return func
@@ -34,7 +37,7 @@ def _numeric_wrapper(op: Callable, name: str) -> Tuple[Callable, Callable]:
 
 def _unary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper") -> "IDSWrapper":
-        return IDSWrapper(op(self._obj))
+        return IDSWrapper(op(self._obj), self._nodes_list)
 
     func.__name__ = f"__{name}__"
     return func
@@ -45,7 +48,7 @@ class IDSWrapper:
     Wrapper objects with operator overloads for reporting validation test results
     """
 
-    def __init__(self, obj: Any) -> None:
+    def __init__(self, obj: Any, nodes_list: list = []) -> None:
         """Initialize IDSWrapper
 
         Args:
@@ -54,17 +57,20 @@ class IDSWrapper:
         if isinstance(obj, IDSWrapper):
             raise ValueError("Cannot wrap already wrapped object")
         self._obj = obj
+        self._nodes_list = nodes_list
 
     def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
-            return IDSWrapper(getattr(self._obj, attr))
+            if isinstance(self._obj, IDSPrimitive):
+                self._nodes_list.append(self._obj)
+            return IDSWrapper(getattr(self._obj, attr), self._nodes_list)
         raise AttributeError(f"{self.__class__} object has no attribute {attr}")
 
     def __call__(self, *args: Any, **kwargs: Any) -> "IDSWrapper":
-        return IDSWrapper(self._obj(*args, **kwargs))
+        return IDSWrapper(self._obj(*args, **kwargs), self._nodes_list)
 
     def __getitem__(self, item: Any) -> "IDSWrapper":
-        return IDSWrapper(self._obj[item])
+        return IDSWrapper(self._obj[item], self._nodes_list)
 
     # comparison operators
     __eq__ = _binary_wrapper(operator.eq, "eq")

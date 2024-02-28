@@ -7,6 +7,8 @@ import traceback
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
+from imaspy.ids_base import IDSBase
+
 from ids_validator.rules.data import IDSValidationRule
 
 
@@ -24,5 +26,7 @@ class IDSValidationResult:
     """Tuple of ids_names and occurrences"""
     tb: traceback.StackSummary
     """A stack of traceback frames"""
+    nodes_list: List[IDSBase]
+    """Set of nodes that have contributed in this result"""
     exc: Optional[Exception] = None
     """Exception that was encountered while running validation test"""

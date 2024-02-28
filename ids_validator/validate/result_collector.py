@@ -7,6 +7,7 @@ import traceback
 from typing import Any, List, Tuple
 
 from ids_validator.rules.data import IDSValidationRule
+from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
 
 
@@ -34,12 +35,14 @@ class ResultCollector:
             exc: Exception that was encountered while running validation test
         """
         tb = traceback.extract_tb(exc.__traceback__)
+        nodes_list = []
         result = IDSValidationResult(
             False,
             "",
             self._current_rule,
             self._current_idss,
             tb,
+            nodes_list,
             exc=exc,
         )
         self.results.append(result)
@@ -54,6 +57,10 @@ class ResultCollector:
             msg: Given message for failed assertion
         """
         tb = traceback.extract_stack()
+        if isinstance(test, IDSWrapper):
+            nodes_list = test._nodes_list
+        else:
+            nodes_list = []
         # pop last stack frame so that new last frame is inside validation test
         tb.pop()
         result = IDSValidationResult(
@@ -62,6 +69,7 @@ class ResultCollector:
             self._current_rule,
             self._current_idss,
             tb,
+            nodes_list,
             exc=None,
         )
         self.results.append(result)
