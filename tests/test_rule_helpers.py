@@ -1,6 +1,7 @@
 from typing import List
 
 import imaspy
+import numpy as np
 import pytest
 from imaspy.ids_base import IDSBase
 from imaspy.ids_toplevel import IDSToplevel
@@ -118,13 +119,13 @@ def test_select_empty_nodes(select_ids):
 def test_increasing_decreasing_errors(select_ids, func):
     with pytest.raises(TypeError):  # IDS must be wrapped
         func(select_ids)
-    with pytest.raises(TypeError):  # Wrapped object must be an IDS
+    with pytest.raises(ValueError):  # Wrapped object must be an IDS
         func(IDSWrapper(False))
     with pytest.raises(ValueError):  # Wrapped object must be 1d
         func(IDSWrapper(select_ids.ids_properties.homogeneous_time))
-    with pytest.raises(ValueError):  # len(object) > 1
-        select_ids.time = [0]
-        func(IDSWrapper(select_ids.time))
+    with pytest.raises(ValueError):  # Wrapped object must be 1d
+        func(IDSWrapper(np.arange(6).reshape([2, 3])))
+    assert Increasing(IDSWrapper(np.arange(6)))
 
 
 @pytest.mark.parametrize(
@@ -134,10 +135,14 @@ def test_increasing_decreasing_errors(select_ids, func):
         [Increasing, False, [1, 3, 2]],
         [Increasing, False, [1, 2, 2]],
         [Increasing, False, [3, 2, 1]],
+        [Increasing, True, []],
+        [Increasing, True, [1]],
         [Decreasing, False, [1, 2, 3]],
         [Decreasing, False, [1, 3, 2]],
         [Decreasing, False, [2, 2, 1]],
         [Decreasing, True, [3, 2, 1]],
+        [Decreasing, True, []],
+        [Decreasing, True, [1]],
     ),
 )
 def test_increasing_decreasing(select_ids, func, res, arr):

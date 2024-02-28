@@ -5,8 +5,8 @@ This file describes the helper functions for the validation rules
 import operator
 from typing import Callable, Iterator, List
 
+import numpy as np
 from imaspy.ids_base import IDSBase
-from imaspy.ids_primitive import IDSPrimitive
 from imaspy.util import find_paths, visit_children
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
@@ -78,25 +78,19 @@ class Select:
 
 
 def Increasing(wrapped: IDSWrapper) -> IDSWrapper:
-    """Return whether a given array is increasing
+    """Return whether a given array is strictly increasing
 
     Args:
         wrapped: IDS toplevel or structure element
-
-    Returns:
-        boolean describing whether the array is increasing
     """
     return IDSWrapper(_check_order(wrapped, operator.gt))
 
 
 def Decreasing(wrapped: IDSWrapper) -> IDSWrapper:
-    """Return whether a given array is decreasing
+    """Return whether a given array is strictly decreasing
 
     Args:
         wrapped: IDS toplevel or structure element
-
-    Returns:
-        boolean describing whether the array is decreasing
     """
     return IDSWrapper(_check_order(wrapped, operator.lt))
 
@@ -105,15 +99,12 @@ def _check_order(wrapped: IDSWrapper, op: Callable) -> bool:
     if not isinstance(wrapped, IDSWrapper):
         raise TypeError("First argument must be an IDS node")
     node = wrapped._obj
-    if not (isinstance(node, IDSPrimitive)):
-        raise TypeError("Object must be IDS node")
-    if not (node.metadata.ndim == 1 and len(node) > 1):
-        raise ValueError("Object must be 1d with len > 1")
+    if np.asarray(node).ndim != 1:
+        raise ValueError("Object must be 1d")
 
-    for i in range(len(node) - 1):
-        if not op(node[i + 1], node[i]):
-            return False
-    return True
+    arr = np.asarray(node)
+    diff = np.diff(arr)
+    return bool(np.all(op(diff, 0)))
 
 
 def Exists() -> None:
