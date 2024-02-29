@@ -6,13 +6,13 @@ from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result_collector import ResultCollector
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def res_collector():
     res_col = ResultCollector()
     return res_col
 
 
-@pytest.fixture()
+@pytest.fixture
 def rule(res_collector):
     def cool_func_name(ids_name):
         """put docs here"""
@@ -23,7 +23,7 @@ def rule(res_collector):
     return mock
 
 
-@pytest.fixture()
+@pytest.fixture
 def rule_error(res_collector):
     def func_error(ids_name):
         """Error docs"""
@@ -55,7 +55,8 @@ def check_attrs_error(val_result):
 
 def test_all_attrs_filled_on_success(res_collector, rule):
     res_collector.set_context(rule, [("core_profiles", 0)])
-    rule.func(IDSWrapper(True))
+    a = IDSWrapper(True)
+    rule.func(a)
     check_attrs(res_collector.results[0], True)
 
 
@@ -63,6 +64,17 @@ def test_all_attrs_filled_on_fail(res_collector, rule):
     res_collector.set_context(rule, [("core_profiles", 0)])
     rule.func(IDSWrapper(False))
     check_attrs(res_collector.results[0], False)
+
+
+def test_list_nodes(res_collector, rule, test_data_core_profiles, test_data_waves):
+    res_collector.set_context(rule, [("core_profiles", 0), ("waves", 1)])
+    cp_time = test_data_core_profiles.ids_properties.homogeneous_time
+    waves_time = test_data_waves.ids_properties.homogeneous_time
+    rule.func(cp_time == waves_time)
+    assert res_collector.results[0].nodes_dict == {
+        ("core_profiles", 0): ["ids_properties/homogeneous_time"],
+        ("waves", 1): ["ids_properties/homogeneous_time"],
+    }
 
 
 def test_all_attrs_filled_on_non_wrapper_test_arg(res_collector, rule):
@@ -81,3 +93,8 @@ def test_appropriate_behavior_on_error(res_collector, rule, rule_error):
     except Exception as e:
         res_collector.add_error_result(e)
     check_attrs_error(res_collector.results[1])
+
+
+def test_double_occurrence_not_implemented(res_collector, rule):
+    with pytest.raises(NotImplementedError):
+        res_collector.set_context(rule, [("core_profiles", 0), ("core_profiles", 1)])
