@@ -81,7 +81,7 @@ def Increasing(wrapped: IDSWrapper) -> IDSWrapper:
     """Return whether a given array is strictly increasing
 
     Args:
-        wrapped: IDS toplevel or structure element
+        wrapped: 1D IDSPrimitive or numpy array
     """
     return _check_order(wrapped, operator.gt)
 
@@ -90,7 +90,7 @@ def Decreasing(wrapped: IDSWrapper) -> IDSWrapper:
     """Return whether a given array is strictly decreasing
 
     Args:
-        wrapped: IDS toplevel or structure element
+        wrapped: 1D IDSPrimitive or numpy array
     """
     return _check_order(wrapped, operator.lt)
 
