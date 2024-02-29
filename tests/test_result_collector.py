@@ -56,11 +56,7 @@ def check_attrs_error(val_result):
 def test_all_attrs_filled_on_success(res_collector, rule):
     res_collector.set_context(rule, [("core_profiles", 0)])
     a = IDSWrapper(True)
-    print("hi")
-    print(a._nodes_list)
-    print("ho")
     rule.func(a)
-    print(a._nodes_list)
     check_attrs(res_collector.results[0], True)
 
 

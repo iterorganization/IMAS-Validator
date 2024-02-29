@@ -68,7 +68,7 @@ class Select:
     def _visitor(self, node: IDSBase) -> None:
         """Visitor function used in imaspy.util.visit_children."""
         if node.metadata.path_string in self._matching_paths:
-            self._matches.append(IDSWrapper(node, nodes_list=[node]))
+            self._matches.append(IDSWrapper(node, ids_nodes=[node]))
 
     def __iter__(self) -> Iterator[IDSWrapper]:
         """Iterate over all children matching the criteria of this Select class."""

@@ -12,9 +12,9 @@ from imaspy.ids_primitive import IDSPrimitive
 def _binary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
-            self._nodes_list = self._nodes_list + other._nodes_list
+            self._ids_nodes = self._ids_nodes + other._ids_nodes
             other = other._obj
-        return IDSWrapper(op(self._obj, other), nodes_list=self._nodes_list)
+        return IDSWrapper(op(self._obj, other), ids_nodes=self._ids_nodes)
 
     func.__name__ = f"__{name}__"
     return func
@@ -23,9 +23,9 @@ def _binary_wrapper(op: Callable, name: str) -> Callable:
 def _reflected_binary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
-            self._nodes_list = self._nodes_list + other._nodes_list
+            self._ids_nodes = self._ids_nodes + other._ids_nodes
             other = other._obj
-        return IDSWrapper(op(other, self._obj), nodes_list=self._nodes_list)
+        return IDSWrapper(op(other, self._obj), ids_nodes=self._ids_nodes)
 
     func.__name__ = f"__r{name}__"
     return func
@@ -37,7 +37,7 @@ def _numeric_wrapper(op: Callable, name: str) -> Tuple[Callable, Callable]:
 
 def _unary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper") -> "IDSWrapper":
-        return IDSWrapper(op(self._obj), nodes_list=self._nodes_list)
+        return IDSWrapper(op(self._obj), ids_nodes=self._ids_nodes)
 
     func.__name__ = f"__{name}__"
     return func
@@ -49,34 +49,37 @@ class IDSWrapper:
     """
 
     def __init__(
-        self, obj: Any, *, nodes_list: Optional[List[IDSPrimitive]] = None
+        self, obj: Any, *, ids_nodes: Optional[List[IDSPrimitive]] = None
     ) -> None:
         """Initialize IDSWrapper
 
         Args:
             obj: Object to be wrapped
+
+        Kwargs:
+            ids_nodes: List of ids nodes the IDSWrapper has touched
         """
         if isinstance(obj, IDSWrapper):
             raise ValueError("Cannot wrap already wrapped object")
         self._obj = obj
-        if nodes_list is None:
-            self._nodes_list = []
+        if ids_nodes is None:
+            self._ids_nodes = []
         else:
-            self._nodes_list = nodes_list
+            self._ids_nodes = ids_nodes
 
     def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
             res = getattr(self._obj, attr)
             if isinstance(res, IDSPrimitive):
-                self._nodes_list.append(res)
-            return IDSWrapper(res, nodes_list=self._nodes_list)
+                self._ids_nodes.append(res)
+            return IDSWrapper(res, ids_nodes=self._ids_nodes)
         raise AttributeError(f"{self.__class__} object has no attribute {attr}")
 
     def __call__(self, *args: Any, **kwargs: Any) -> "IDSWrapper":
-        return IDSWrapper(self._obj(*args, **kwargs), nodes_list=self._nodes_list)
+        return IDSWrapper(self._obj(*args, **kwargs), ids_nodes=self._ids_nodes)
 
     def __getitem__(self, item: Any) -> "IDSWrapper":
-        return IDSWrapper(self._obj[item], nodes_list=self._nodes_list)
+        return IDSWrapper(self._obj[item], ids_nodes=self._ids_nodes)
 
     # comparison operators
     __eq__ = _binary_wrapper(operator.eq, "eq")

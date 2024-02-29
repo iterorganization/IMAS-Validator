@@ -60,7 +60,7 @@ class ResultCollector:
         """
         tb = traceback.extract_stack()
         if isinstance(test, IDSWrapper):
-            nodes_dict = self.create_nodes_dict(test._nodes_list)
+            nodes_dict = self.create_nodes_dict(test._ids_nodes)
         else:
             nodes_dict = {}
         # pop last stack frame so that new last frame is inside validation test
@@ -77,15 +77,13 @@ class ResultCollector:
         self.results.append(result)
 
     def create_nodes_dict(
-        self, nodes_list: List[IDSPrimitive]
+        self, ids_nodes: List[IDSPrimitive]
     ) -> Dict[Tuple[str, int], List[str]]:
         result: Dict[Tuple[str, int], List[str]] = {
             key: [] for key in self._current_idss
         }
         occ_dict = {key[0]: key for key in self._current_idss}
-        print(occ_dict)
-        print(nodes_list)
-        for node in nodes_list:
+        for node in ids_nodes:
             ids_name = node._toplevel.metadata.name
             if node._path not in result[occ_dict[ids_name]]:
                 result[occ_dict[ids_name]].append(node._path)
