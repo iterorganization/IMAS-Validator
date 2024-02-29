@@ -93,3 +93,8 @@ def test_appropriate_behavior_on_error(res_collector, rule, rule_error):
     except Exception as e:
         res_collector.add_error_result(e)
     check_attrs_error(res_collector.results[1])
+
+
+def test_double_occurrence_not_implemented(res_collector, rule):
+    with pytest.raises(NotImplementedError):
+        res_collector.set_context(rule, [("core_profiles", 0), ("core_profiles", 1)])

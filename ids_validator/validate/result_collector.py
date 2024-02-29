@@ -27,6 +27,11 @@ class ResultCollector:
             rule: Rule to apply to IDS data
             idss: Tuple of ids_names and occurrences
         """
+        unique_ids_names = set(ids[0] for ids in idss)
+        if len(unique_ids_names) != len(idss):
+            raise NotImplementedError(
+                "Two occurrence of one IDS in a single validation rule is not supported"
+            )
         self._current_rule = rule
         self._current_idss = idss
 
@@ -37,14 +42,13 @@ class ResultCollector:
             exc: Exception that was encountered while running validation test
         """
         tb = traceback.extract_tb(exc.__traceback__)
-        nodes_dict: Dict = {}
         result = IDSValidationResult(
             False,
             "",
             self._current_rule,
             self._current_idss,
             tb,
-            nodes_dict,
+            {},
             exc=exc,
         )
         self.results.append(result)
@@ -79,12 +83,20 @@ class ResultCollector:
     def create_nodes_dict(
         self, ids_nodes: List[IDSPrimitive]
     ) -> Dict[Tuple[str, int], List[str]]:
+        """
+        Create dict with list of touched nodes for the IDSValidationResult object
+
+        Args:
+            ids_nodes: List of IDSPrimitive nodes that have been touched in this test
+        """
         result: Dict[Tuple[str, int], List[str]] = {
             key: [] for key in self._current_idss
         }
         occ_dict = {key[0]: key for key in self._current_idss}
         for node in ids_nodes:
             ids_name = node._toplevel.metadata.name
-            if node._path not in result[occ_dict[ids_name]]:
-                result[occ_dict[ids_name]].append(node._path)
+            ids_result = result[occ_dict[ids_name]]
+            path = node._path
+            if path not in ids_result:
+                ids_result.append(path)
         return result

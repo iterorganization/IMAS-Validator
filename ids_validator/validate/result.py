@@ -25,6 +25,9 @@ class IDSValidationResult:
     tb: traceback.StackSummary
     """A stack of traceback frames"""
     nodes_dict: Dict[Tuple[str, int], List[str]]
-    """Set of nodes that have contributed in this result"""
+    """
+    Set of nodes that have contributed in this result, identified by a combination of
+    the ids name and occurence
+    """
     exc: Optional[Exception] = None
     """Exception that was encountered while running validation test"""

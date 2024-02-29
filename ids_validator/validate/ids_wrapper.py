@@ -62,12 +62,9 @@ class IDSWrapper:
         if isinstance(obj, IDSWrapper):
             raise ValueError("Cannot wrap already wrapped object")
         self._obj = obj
-        if ids_nodes is None:
-            self._ids_nodes = []
-        else:
-            self._ids_nodes = ids_nodes
+        self._ids_nodes = ids_nodes or []
         if isinstance(obj, IDSPrimitive):
-            self._ids_nodes.append(obj)
+            self._ids_nodes = self._ids_nodes + [obj]
 
     def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
