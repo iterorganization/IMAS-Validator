@@ -12,9 +12,11 @@ from imaspy.ids_primitive import IDSPrimitive
 def _binary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
-            self._ids_nodes = self._ids_nodes + other._ids_nodes
+            new_nodes = other._ids_nodes
             other = other._obj
-        return IDSWrapper(op(self._obj, other), ids_nodes=self._ids_nodes)
+        else:
+            new_nodes = []
+        return IDSWrapper(op(self._obj, other), ids_nodes=self._ids_nodes + [new_nodes])
 
     func.__name__ = f"__{name}__"
     return func
@@ -23,9 +25,11 @@ def _binary_wrapper(op: Callable, name: str) -> Callable:
 def _reflected_binary_wrapper(op: Callable, name: str) -> Callable:
     def func(self: "IDSWrapper", other: Any) -> "IDSWrapper":
         if isinstance(other, IDSWrapper):
-            self._ids_nodes = self._ids_nodes + other._ids_nodes
+            new_nodes = other._ids_nodes
             other = other._obj
-        return IDSWrapper(op(other, self._obj), ids_nodes=self._ids_nodes)
+        else:
+            new_nodes = []
+        return IDSWrapper(op(other, self._obj), ids_nodes=self._ids_nodes + [new_nodes])
 
     func.__name__ = f"__r{name}__"
     return func
@@ -56,7 +60,7 @@ class IDSWrapper:
         Args:
             obj: Object to be wrapped
 
-        Kwargs:
+        Keyward Args:
             ids_nodes: List of ids nodes the IDSWrapper has touched
         """
         if isinstance(obj, IDSWrapper):
