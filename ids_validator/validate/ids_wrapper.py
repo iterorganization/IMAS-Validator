@@ -16,7 +16,7 @@ def _binary_wrapper(op: Callable, name: str) -> Callable:
             other = other._obj
         else:
             new_nodes = []
-        return IDSWrapper(op(self._obj, other), ids_nodes=self._ids_nodes + [new_nodes])
+        return IDSWrapper(op(self._obj, other), ids_nodes=self._ids_nodes + new_nodes)
 
     func.__name__ = f"__{name}__"
     return func
@@ -29,7 +29,7 @@ def _reflected_binary_wrapper(op: Callable, name: str) -> Callable:
             other = other._obj
         else:
             new_nodes = []
-        return IDSWrapper(op(other, self._obj), ids_nodes=self._ids_nodes + [new_nodes])
+        return IDSWrapper(op(other, self._obj), ids_nodes=self._ids_nodes + new_nodes)
 
     func.__name__ = f"__r{name}__"
     return func
