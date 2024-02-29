@@ -3,7 +3,7 @@ This file describes the overload class for the operators
 """
 
 import operator
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, List, Tuple
 
 import numpy as np
 from imaspy.ids_primitive import IDSPrimitive
@@ -48,7 +48,7 @@ class IDSWrapper:
     Wrapper objects with operator overloads for reporting validation test results
     """
 
-    def __init__(self, obj: Any, nodes_list: list = []) -> None:
+    def __init__(self, obj: Any, nodes_list: List[IDSPrimitive] = []) -> None:
         """Initialize IDSWrapper
 
         Args:
@@ -61,9 +61,10 @@ class IDSWrapper:
 
     def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
-            if isinstance(self._obj, IDSPrimitive):
-                self._nodes_list.append(self._obj)
-            return IDSWrapper(getattr(self._obj, attr), self._nodes_list)
+            res = getattr(self._obj, attr)
+            if isinstance(res, IDSPrimitive):
+                self._nodes_list.append(res)
+            return IDSWrapper(res, self._nodes_list)
         raise AttributeError(f"{self.__class__} object has no attribute {attr}")
 
     def __call__(self, *args: Any, **kwargs: Any) -> "IDSWrapper":
