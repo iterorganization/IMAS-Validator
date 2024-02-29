@@ -98,12 +98,13 @@ def Decreasing(wrapped: IDSWrapper) -> IDSWrapper:
 def _check_order(wrapped: IDSWrapper, op: Callable) -> bool:
     if not isinstance(wrapped, IDSWrapper):
         raise TypeError("First argument must be an IDS node")
-    node = wrapped._obj
-    if np.asarray(node).ndim != 1:
-        raise ValueError("Object must be 1d")
+    node_arr = np.asarray(wrapped._obj)
+    if node_arr.ndim != 1:
+        raise ValueError(
+            f"Expected a 1D array, but {wrapped._obj!r} has {node_arr.ndim} dimensions"
+        )
 
-    arr = np.asarray(node)
-    diff = np.diff(arr)
+    diff = np.diff(node_arr)
     return bool(np.all(op(diff, 0)))
 
 

@@ -128,23 +128,31 @@ def test_increasing_decreasing_errors(select_ids, func):
     assert Increasing(IDSWrapper(np.arange(6)))
 
 
-@pytest.mark.parametrize(
-    "func, res, arr",
-    (
-        [Increasing, True, [1, 2, 3]],
-        [Increasing, False, [1, 3, 2]],
-        [Increasing, False, [1, 2, 2]],
-        [Increasing, False, [3, 2, 1]],
-        [Increasing, True, []],
-        [Increasing, True, [1]],
-        [Decreasing, False, [1, 2, 3]],
-        [Decreasing, False, [1, 3, 2]],
-        [Decreasing, False, [2, 2, 1]],
-        [Decreasing, True, [3, 2, 1]],
-        [Decreasing, True, []],
-        [Decreasing, True, [1]],
-    ),
-)
-def test_increasing_decreasing(select_ids, func, res, arr):
-    select_ids.time = arr
-    assert func(IDSWrapper(select_ids.time)) == res
+def test_increasing():
+    assert Increasing(IDSWrapper([1, 2, 3]))
+    assert not Increasing(IDSWrapper([1, 3, 2]))
+    assert not Increasing(IDSWrapper([1, 2, 2]))
+    assert not Increasing(IDSWrapper([3, 2, 1]))
+    assert Increasing(IDSWrapper([]))
+    assert Increasing(IDSWrapper([1]))
+
+
+def test_decreasing():
+    assert not Decreasing(IDSWrapper([1, 2, 3]))
+    assert not Decreasing(IDSWrapper([1, 3, 2]))
+    assert not Decreasing(IDSWrapper([2, 2, 1]))
+    assert Decreasing(IDSWrapper([3, 2, 1]))
+    assert Decreasing(IDSWrapper([]))
+    assert Decreasing(IDSWrapper([1]))
+
+
+def test_increasing_works_on_ids(select_ids):
+    select_ids.time = [1, 2, 3]
+    assert Increasing(IDSWrapper(select_ids).time)
+    select_ids.time = [3, 2, 1]
+    assert not Increasing(IDSWrapper(select_ids).time)
+
+
+def test_increasing_works_on_list(select_ids):
+    assert Increasing(IDSWrapper([1, 2, 3]))
+    assert not Increasing(IDSWrapper([3, 2, 1]))
