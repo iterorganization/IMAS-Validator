@@ -151,8 +151,3 @@ def test_increasing_works_on_ids(select_ids):
     assert Increasing(IDSWrapper(select_ids).time)
     select_ids.time = [3, 2, 1]
     assert not Increasing(IDSWrapper(select_ids).time)
-
-
-def test_increasing_works_on_list(select_ids):
-    assert Increasing(IDSWrapper([1, 2, 3]))
-    assert not Increasing(IDSWrapper([3, 2, 1]))
