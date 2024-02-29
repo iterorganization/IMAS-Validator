@@ -60,7 +60,7 @@ class IDSWrapper:
         Args:
             obj: Object to be wrapped
 
-        Keyward Args:
+        Keyword Args:
             ids_nodes: List of ids nodes the IDSWrapper has touched
         """
         if isinstance(obj, IDSWrapper):
