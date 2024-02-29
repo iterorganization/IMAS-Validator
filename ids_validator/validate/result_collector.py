@@ -83,6 +83,8 @@ class ResultCollector:
             key: [] for key in self._current_idss
         }
         occ_dict = {key[0]: key for key in self._current_idss}
+        print(occ_dict)
+        print(nodes_list)
         for node in nodes_list:
             ids_name = node._toplevel.metadata.name
             if node._path not in result[occ_dict[ids_name]]:

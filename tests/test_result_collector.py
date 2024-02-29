@@ -6,13 +6,13 @@ from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result_collector import ResultCollector
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def res_collector():
     res_col = ResultCollector()
     return res_col
 
 
-@pytest.fixture()
+@pytest.fixture
 def rule(res_collector):
     def cool_func_name(ids_name):
         """put docs here"""
@@ -23,7 +23,7 @@ def rule(res_collector):
     return mock
 
 
-@pytest.fixture()
+@pytest.fixture
 def rule_error(res_collector):
     def func_error(ids_name):
         """Error docs"""
@@ -55,7 +55,12 @@ def check_attrs_error(val_result):
 
 def test_all_attrs_filled_on_success(res_collector, rule):
     res_collector.set_context(rule, [("core_profiles", 0)])
-    rule.func(IDSWrapper(True))
+    a = IDSWrapper(True)
+    print("hi")
+    print(a._nodes_list)
+    print("ho")
+    rule.func(a)
+    print(a._nodes_list)
     check_attrs(res_collector.results[0], True)
 
 
