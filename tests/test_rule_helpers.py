@@ -151,3 +151,11 @@ def test_increasing_works_on_ids(select_ids):
     assert Increasing(IDSWrapper(select_ids).time)
     select_ids.time = [3, 2, 1]
     assert not Increasing(IDSWrapper(select_ids).time)
+
+
+def test_increasing_ids_nodes():
+    a = IDSWrapper([1, 2, 3], ids_nodes=[("a", 0)])
+    b = IDSWrapper([4, 5, 6], ids_nodes=[("b", 1)])
+    c = Increasing(a + b)
+    assert c
+    assert c._ids_nodes == [("a", 0), ("b", 1)]
