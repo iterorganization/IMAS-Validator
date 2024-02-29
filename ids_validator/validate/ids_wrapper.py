@@ -66,13 +66,12 @@ class IDSWrapper:
             self._ids_nodes = []
         else:
             self._ids_nodes = ids_nodes
+        if isinstance(obj, IDSPrimitive):
+            self._ids_nodes.append(obj)
 
     def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
-            res = getattr(self._obj, attr)
-            if isinstance(res, IDSPrimitive):
-                self._ids_nodes.append(res)
-            return IDSWrapper(res, ids_nodes=self._ids_nodes)
+            return IDSWrapper(getattr(self._obj, attr), ids_nodes=self._ids_nodes)
         raise AttributeError(f"{self.__class__} object has no attribute {attr}")
 
     def __call__(self, *args: Any, **kwargs: Any) -> "IDSWrapper":
