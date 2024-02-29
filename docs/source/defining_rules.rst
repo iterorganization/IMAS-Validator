@@ -54,13 +54,9 @@ The rules are defined inside the python files as follows:
     else:
       error("No electron species found", gk.species)
 
-  # use ids.attr.has_value to check whether a value is set
-  @ids_validator("core_profiles")  # noqa: F821
-  def validate_core_profiles_filled_in(cp):
-    # Unset float 0D:
-    assert cp.profiles_1d[0].ion[0].z_ion.has_value  # False, no value set
-    assert cp.profiles_1d[0].ion[0].z_ion  # True! Default value is -9e40
-    # float 0D equal to 0.0
-    cp.profiles_1d[0].ion[0].z_ion = 0.0
-    assert cp.profiles_1d[0].ion[0].z_ion.has_value  # True, value set (0.0)
-    assert cp.profiles_1d[0].ion[0].z_ion  # False! bool(0.0) is False
+  @validator("core_profiles")  # noqa: F821
+  def validate_ion_charge(cp):
+    """Validate that profiles_1d/ion/z_ion is defined"""
+    for p1d in cp.profiles_1d:
+      for ion in p1d.ion:
+        assert ion.z_ion.has_value
