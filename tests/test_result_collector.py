@@ -65,12 +65,14 @@ def test_all_attrs_filled_on_fail(res_collector, rule):
     check_attrs(res_collector.results[0], False)
 
 
-def test_list_nodes(res_collector, rule, test_data_core_profiles):
-    res_collector.set_context(rule, [("core_profiles", 0)])
-    test = test_data_core_profiles.ids_properties.homogeneous_time == 0
-    rule.func(test)
+def test_list_nodes(res_collector, rule, test_data_core_profiles, test_data_waves):
+    res_collector.set_context(rule, [("core_profiles", 0), ("waves", 1)])
+    cp_time = test_data_core_profiles.ids_properties.homogeneous_time
+    waves_time = test_data_waves.ids_properties.homogeneous_time
+    rule.func(cp_time == waves_time)
     assert res_collector.results[0].nodes_dict == {
         ("core_profiles", 0): ["ids_properties/homogeneous_time"],
+        ("waves", 1): ["ids_properties/homogeneous_time"],
     }
 
 
