@@ -83,7 +83,7 @@ def Increasing(wrapped: IDSWrapper) -> IDSWrapper:
     Args:
         wrapped: IDS toplevel or structure element
     """
-    return IDSWrapper(_check_order(wrapped, operator.gt))
+    return _check_order(wrapped, operator.gt)
 
 
 def Decreasing(wrapped: IDSWrapper) -> IDSWrapper:
@@ -92,10 +92,10 @@ def Decreasing(wrapped: IDSWrapper) -> IDSWrapper:
     Args:
         wrapped: IDS toplevel or structure element
     """
-    return IDSWrapper(_check_order(wrapped, operator.lt))
+    return _check_order(wrapped, operator.lt)
 
 
-def _check_order(wrapped: IDSWrapper, op: Callable) -> bool:
+def _check_order(wrapped: IDSWrapper, op: Callable) -> IDSWrapper:
     if not isinstance(wrapped, IDSWrapper):
         raise TypeError("First argument must be an IDS node")
     node_arr = np.asarray(wrapped._obj)
@@ -105,4 +105,5 @@ def _check_order(wrapped: IDSWrapper, op: Callable) -> bool:
         )
 
     diff = np.diff(node_arr)
-    return bool(np.all(op(diff, 0)))
+    res = bool(np.all(op(diff, 0)))
+    return IDSWrapper(res, ids_nodes=wrapped._ids_nodes.copy())
