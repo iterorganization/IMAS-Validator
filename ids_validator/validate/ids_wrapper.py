@@ -75,11 +75,21 @@ class IDSWrapper:
     __ge__ = _binary_wrapper(operator.ge, "ge")
     __contains__ = _binary_wrapper(operator.contains, "contains")
 
-    # numeric operators (others follow in different PR)
+    # numeric operators
     __add__, __radd__ = _numeric_wrapper(operator.add, "add")
+    __sub__, __rsub__ = _numeric_wrapper(operator.sub, "sub")
+    __mul__, __rmul__ = _numeric_wrapper(operator.mul, "mul")
+    __matmul__, __rmatmul__ = _numeric_wrapper(operator.matmul, "matmul")
+    __truediv__, __rtruediv__ = _numeric_wrapper(operator.truediv, "truediv")
+    __floordiv__, __rfloordiv__ = _numeric_wrapper(operator.floordiv, "floordiv")
+    __mod__, __rmod__ = _numeric_wrapper(operator.mod, "mod")
+    __divmod__, __rdivmod__ = _numeric_wrapper(divmod, "divmod")
 
-    # unary operators (others follow in different PR)
+    # unary operators
     __neg__ = _unary_wrapper(operator.neg, "neg")
+    __pos__ = _unary_wrapper(operator.pos, "pos")
+    __abs__ = _unary_wrapper(operator.abs, "abs")
+    __invert__ = _unary_wrapper(operator.invert, "invert")
 
     # len must always return int
     def __len__(self) -> int:

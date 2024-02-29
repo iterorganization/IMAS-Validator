@@ -55,7 +55,7 @@ class ValidatorRegistry:
     Example:
         .. code-block:: python
 
-            @val_registry.ids_validator('core_profiles')
+            @val_registry.validator('core_profiles')
             def ids_rule(cp):
                 assert cp != None
     """
@@ -64,7 +64,7 @@ class ValidatorRegistry:
         self.validators: List[IDSValidationRule] = []
         self.rule_path: Path = rule_path
 
-    def ids_validator(self, *ids_names: str) -> Callable:
+    def validator(self, *ids_names: str) -> Callable:
         """Decorator for validation test functions
 
         Args:

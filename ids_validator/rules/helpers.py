@@ -106,8 +106,3 @@ def _check_order(wrapped: IDSWrapper, op: Callable) -> bool:
 
     diff = np.diff(node_arr)
     return bool(np.all(op(diff, 0)))
-
-
-def Exists() -> None:
-    """"""
-    pass
