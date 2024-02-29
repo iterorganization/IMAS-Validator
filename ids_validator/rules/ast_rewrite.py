@@ -82,7 +82,7 @@ def run_path(
     file_content = rule_path.read_text()
     new_code = rewrite_assert(file_content, str(rule_path))
     glob = {
-        "ids_validator": val_registry.ids_validator,
+        "validator": val_registry.validator,
         "assert": result_collector.assert_,
     }
     exec(new_code, glob)
