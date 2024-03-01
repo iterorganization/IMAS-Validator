@@ -1,9 +1,7 @@
 import logging
 import sys
 import argparse
-from ids_validator.validate.validate import validate
-from pathlib import Path
-
+from ids_validator.cli.command_parser import CommandParser
 
 def configure_argument_parser():
     # Management of input arguments
@@ -27,26 +25,26 @@ def main():
     parser = configure_argument_parser()
     args = parser.parse_args(sys.argv[1:])
 
-    uri = args.uri
-    ruleset = ['test_ruleset']
+    command_parser = CommandParser()
+    command_objects = command_parser.parse(args)
 
-    extra_rule_dirs = [Path(args.extra_rule_dirs)] if args.extra_rule_dirs else []
+    for command in command_objects:
+        command.execute()
 
-    apply_generic = args.generic
-    command = args.command
-
-    print(f'RULESET: {ruleset}')
-    print(f'EXTRA: {extra_rule_dirs}')
-    if command.lower() == 'validate':
-        results = validate(ruleset, uri, extra_rule_dirs, apply_generic)
-        print(type(results))
-        print(results)
+    # temporary, print command results:
+    for command in command_objects:
+        print('===========================')
+        print('### COMMAND SUMMARY:')
+        print(command)
+        print('### COMMAND RESULT:')
+        print(command.result)
+        print('===========================\n')
 
 
 if __name__ == '__main__':
     main()
 
 '''
+example:
 python main.py VALIDATE --uri "imas:mdsplus?user=/home/ITER/wasikj/public/imasdb;database=test;pulse=1;run=1;version=3" --ruleset "test_ruleset"
-
 '''
