@@ -11,9 +11,11 @@ class CommandParser:
     def parse(self, args):
         command = args.command
         command_objs = []
-
+        uri_list = args.uri[:]
         if command.lower() == 'validate':
-            command_objs.append(ValidateCommand(args))
+            for uri in uri_list:
+                args.uri = [uri]
+                command_objs.append(ValidateCommand(args))
         elif command.lower() == '<put new commands here>':
             ...
         else:
