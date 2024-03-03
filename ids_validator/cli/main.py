@@ -9,9 +9,9 @@ def configure_argument_parser():
 
     parser.add_argument('command', help='command to be executed')
     validator_group = parser.add_argument_group('Validator arguments')
-    validator_group.add_argument('-u', '--uri', type=str, required=True, help="uri, or uris")
+    validator_group.add_argument('-u', '--uri', type=str, required=True, action='append', help="uri, or uris")
 
-    validator_group.add_argument('-r', '--ruleset', type=str, required=True, help="path to custom ruleset")
+    validator_group.add_argument('-r', '--ruleset', type=str, required=True, action='append', help="path to custom ruleset")
 
     validator_group.add_argument('-e', '--extra-rule-dirs', type=str, default=[], help="path to custom ruleset")
 
