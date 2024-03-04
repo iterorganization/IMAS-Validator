@@ -87,6 +87,7 @@ class ResultCollector:
             exc=None,
         )
         self.results.append(result)
+        # raise exception for debugging traceback
         if self.debug and not res_bool:
             raise ValidateDebugException
 
