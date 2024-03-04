@@ -24,6 +24,7 @@ class RuleExecutor:
         db_entry: DBEntry,
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
+        debug: bool = False,
     ):
         """Initialize RuleExecutor
 
@@ -32,10 +33,12 @@ class RuleExecutor:
             rules: List of rules to apply to the data.
             result_collector: ResultCollector object that stores the results after
                 execution
+            debug: Whether or not to drop into debugger for failed tests
         """
         self.db_entry = db_entry
         self.rules = rules
         self.result_collector = result_collector
+        self.debug = debug
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""
@@ -46,8 +49,8 @@ class RuleExecutor:
             try:
                 rule.apply_func(ids_toplevels)
             except Exception as exc:
-                tb = exc.__traceback__
                 if isinstance(exc, BeepException):
+                    tb = exc.__traceback__
                     tbi = tb
                     while tbi.tb_next is not None:
                         if tbi.tb_next.tb_frame.f_code.co_name == "assert_":
@@ -56,7 +59,8 @@ class RuleExecutor:
                         tbi = tbi.tb_next
                 else:
                     self.result_collector.add_error_result(exc)
-                pdb.post_mortem(tb)
+                if self.debug:
+                    pdb.post_mortem(tb)
 
     def find_matching_rules(
         self,

@@ -21,6 +21,7 @@ def validate(
     ids_url: str,
     extra_rule_dirs: List[Path] = [],
     apply_generic: bool = True,
+    debug: bool = False,
 ) -> List[IDSValidationResult]:
     """
     Main function
@@ -29,6 +30,7 @@ def validate(
         ids_url: url for DBEntry object
         extra_rule_dirs: List of names for ruleset groups that should be applied
         apply_generic: Whether or not to apply the generic ruleset
+        debug: Whether or not to drop into debugger for failed tests
 
     Returns:
         List of IDSValidationResult objects
@@ -36,7 +38,7 @@ def validate(
 
     _check_imas_version()
     dbentry = DBEntry(ids_url, "r")
-    result_collector = ResultCollector()
+    result_collector = ResultCollector(debug=debug)
     rules = load_rules(
         rulesets=rulesets,
         extra_rule_dirs=extra_rule_dirs,

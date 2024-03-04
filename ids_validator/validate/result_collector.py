@@ -17,9 +17,15 @@ from ids_validator.validate.result import IDSValidationResult
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self) -> None:
-        """Initialize ResultCollector"""
+    def __init__(self, debug: bool = False) -> None:
+        """
+        Initialize ResultCollector
+
+        Args:
+            debug: Whether or not to drop into debugger for failed tests
+        """
         self.results: List[IDSValidationResult] = []
+        self.debug = debug
 
     def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
         """Set which rule and IDSs should be stored in results
@@ -81,7 +87,7 @@ class ResultCollector:
             exc=None,
         )
         self.results.append(result)
-        if not res_bool:
+        if not res_bool and self.debug:
             raise BeepException
 
     def create_nodes_dict(
