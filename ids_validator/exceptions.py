@@ -57,6 +57,6 @@ class IMASVersionError(RuntimeError):
         )
 
 
-class BeepException(BaseException):
+class BeepException(RuntimeError):
     def __init__(self) -> None:
         super().__init__("woops")

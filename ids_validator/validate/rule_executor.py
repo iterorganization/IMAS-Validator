@@ -46,21 +46,24 @@ class RuleExecutor:
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
-            try:
-                rule.apply_func(ids_toplevels)
-            except Exception as exc:
-                if isinstance(exc, BeepException):
-                    tb = exc.__traceback__
-                    tbi = tb
-                    while tbi.tb_next is not None:
-                        if tbi.tb_next.tb_frame.f_code.co_name == "assert_":
-                            tbi.tb_next = None
-                            break
-                        tbi = tbi.tb_next
-                else:
-                    self.result_collector.add_error_result(exc)
-                if self.debug:
-                    pdb.post_mortem(tb)
+            self.run(rule, ids_toplevels)
+
+    def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]):
+        try:
+            rule.apply_func(ids_toplevels)
+        except Exception as exc:
+            tb = exc.__traceback__
+            if isinstance(exc, BeepException):
+                tbi = tb
+                while tbi.tb_next is not None:
+                    if tbi.tb_next.tb_frame.f_code.co_name == "assert_":
+                        tbi.tb_next = None
+                        break
+                    tbi = tbi.tb_next
+            else:
+                self.result_collector.add_error_result(exc)
+            if self.debug:
+                pdb.post_mortem(tb)
 
     def find_matching_rules(
         self,

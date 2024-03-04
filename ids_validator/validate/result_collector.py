@@ -87,7 +87,7 @@ class ResultCollector:
             exc=None,
         )
         self.results.append(result)
-        if not res_bool and self.debug:
+        if self.debug and not res_bool:
             raise BeepException
 
     def create_nodes_dict(
