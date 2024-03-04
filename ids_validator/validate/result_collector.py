@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Tuple
 
 from imaspy.ids_primitive import IDSPrimitive
 
+from ids_validator.exceptions import BeepException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
@@ -63,14 +64,15 @@ class ResultCollector:
             msg: Given message for failed assertion
         """
         tb = traceback.extract_stack()
+        # pop last stack frame so that new last frame is inside validation test
+        tb.pop()
         if isinstance(test, IDSWrapper):
             nodes_dict = self.create_nodes_dict(test._ids_nodes)
         else:
             nodes_dict = {}
-        # pop last stack frame so that new last frame is inside validation test
-        tb.pop()
+        res_bool = bool(test)
         result = IDSValidationResult(
-            bool(test),
+            res_bool,
             msg,
             self._current_rule,
             self._current_idss,
@@ -79,6 +81,8 @@ class ResultCollector:
             exc=None,
         )
         self.results.append(result)
+        if not res_bool:
+            raise BeepException
 
     def create_nodes_dict(
         self, ids_nodes: List[IDSPrimitive]
