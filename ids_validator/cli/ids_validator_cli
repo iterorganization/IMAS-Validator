@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import logging
 import sys
 import argparse
@@ -34,9 +35,6 @@ def main():
     # temporary, print command results:
     for command in command_objects:
         print('===========================')
-        print('### COMMAND SUMMARY:')
-        print(command)
-        print('### COMMAND RESULT:')
         print(command.result)
         print('===========================\n')
 
