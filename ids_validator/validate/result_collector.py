@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Tuple
 
 from imaspy.ids_primitive import IDSPrimitive
 
-from ids_validator.exceptions import BeepException
+from ids_validator.exceptions import ValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
@@ -88,7 +88,7 @@ class ResultCollector:
         )
         self.results.append(result)
         if self.debug and not res_bool:
-            raise BeepException
+            raise ValidateDebugException
 
     def create_nodes_dict(
         self, ids_nodes: List[IDSPrimitive]

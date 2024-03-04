@@ -57,6 +57,8 @@ class IMASVersionError(RuntimeError):
         )
 
 
-class BeepException(RuntimeError):
+class ValidateDebugException(RuntimeError):
+    """Error raised specifically to open the debugger for failed validation tests"""
+
     def __init__(self) -> None:
-        super().__init__("woops")
+        super().__init__("Go to debugger")

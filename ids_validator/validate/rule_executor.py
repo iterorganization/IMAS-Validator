@@ -9,7 +9,7 @@ from typing import Iterator, List, Tuple
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
-from ids_validator.exceptions import BeepException
+from ids_validator.exceptions import ValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
 
@@ -48,14 +48,14 @@ class RuleExecutor:
             self.result_collector.set_context(rule, idss)
             self.run(rule, ids_toplevels)
 
-    def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]):
+    def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
         try:
             rule.apply_func(ids_toplevels)
         except Exception as exc:
             tb = exc.__traceback__
-            if isinstance(exc, BeepException):
+            if isinstance(exc, ValidateDebugException):
                 tbi = tb
-                while tbi.tb_next is not None:
+                while tbi is not None and tbi.tb_next is not None:
                     if tbi.tb_next.tb_frame.f_code.co_name == "assert_":
                         tbi.tb_next = None
                         break
