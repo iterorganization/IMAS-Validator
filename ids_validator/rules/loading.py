@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from ids_validator.exceptions import (
     EmptyRuleFileWarning,
@@ -20,6 +20,7 @@ def load_rules(
     apply_generic: bool,
     extra_rule_dirs: List[Path],
     result_collector: ResultCollector,
+    func_filter: Dict[str, List[str]],
 ) -> List[IDSValidationRule]:
     """
     Load IDSValidationRule objects from given rulesets and directories
@@ -44,6 +45,7 @@ def load_rules(
     rules = []
     for path in paths:
         rules += load_rules_from_path(path, result_collector)
+    rules = filter_rules(rules, func_filter)
     return rules
 
 
@@ -173,3 +175,24 @@ def handle_entrypoints() -> List[Path]:
 def get_child_dirs(dir: Path) -> List[Path]:
     child_dirs = [path for path in dir.iterdir() if path.is_dir()]
     return child_dirs
+
+
+def filter_rules(
+    rules: List[IDSValidationRule], func_filter: Dict[str, List[str]]
+) -> List[IDSValidationRule]:
+    filtered_rules = list(filter(lambda x: filter_rule_func(x, func_filter), rules))
+    return filtered_rules
+
+
+def filter_rule_func(
+    rule: IDSValidationRule, func_filter: Dict[str, List[str]]
+) -> bool:
+    if "name" in func_filter.keys() and not all(
+        x in rule.func.__name__ for x in func_filter["name"]
+    ):
+        return False
+    if "ids" in func_filter.keys() and not all(
+        x in rule.ids_names for x in func_filter["ids"]
+    ):
+        return False
+    return True

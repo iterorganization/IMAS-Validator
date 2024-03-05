@@ -3,7 +3,7 @@ This file describes the main function for the IMAS IDS validation tool
 """
 
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from imaspy import DBEntry
 from imaspy.imas_interface import has_imas, ll_interface
@@ -21,6 +21,7 @@ def validate(
     ids_url: str,
     extra_rule_dirs: List[Path] = [],
     apply_generic: bool = True,
+    func_filter: Dict[str, List[str]] = {},
 ) -> List[IDSValidationResult]:
     """
     Main function
@@ -42,6 +43,7 @@ def validate(
         extra_rule_dirs=extra_rule_dirs,
         apply_generic=apply_generic,
         result_collector=result_collector,
+        func_filter=func_filter,
     )
     rule_executor = RuleExecutor(dbentry, rules, result_collector)
     rule_executor.apply_rules_to_data()

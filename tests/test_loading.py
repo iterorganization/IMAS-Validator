@@ -15,6 +15,7 @@ from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.loading import (
     discover_rule_modules,
     discover_rulesets,
+    filter_rules,
     filter_rulesets,
     load_rules_from_path,
 )
@@ -42,6 +43,7 @@ def test_discover_rulesets_explicit():
         Path("tests/rulesets/base/generic"),
         Path("tests/rulesets/base/ITER-MD"),
         Path("tests/rulesets/validate-test"),
+        Path("tests/rulesets/filter_test"),
     ]
     assert Counter(discover_rulesets(rulesets_dirs)) == Counter(unfiltered_rulesets)
 
@@ -181,3 +183,19 @@ def test_run_path(res_collector):
     val_registry = ValidatorRegistry(rule_path)
     run_path(rule_path, val_registry, res_collector)
     assert len(val_registry.validators) == 1
+
+
+def test_filter_rules(res_collector):
+    path = Path("tests/rulesets/filter_test/ITER-MD/core_profiles.py")
+    rules = load_rules_from_path(path, res_collector)
+    path = Path("tests/rulesets/filter_test/ITER-MD/equilibrium.py")
+    rules += load_rules_from_path(path, res_collector)
+    assert 8 == len(filter_rules(rules, {}))
+    assert 8 == len(filter_rules(rules, {"name": [], "ids": []}))
+    assert 2 == len(filter_rules(rules, {"name": ["core_profiles"]}))
+    assert 2 == len(filter_rules(rules, {"name": ["equilibrium"]}))
+    assert 4 == len(filter_rules(rules, {"name": ["test"]}))
+    assert 4 == len(filter_rules(rules, {"ids": ["equilibrium"]}))
+    assert 4 == len(filter_rules(rules, {"ids": ["core_profiles"]}))
+    assert 2 == len(filter_rules(rules, {"name": ["test"], "ids": ["core_profiles"]}))
+    assert 2 == len(filter_rules(rules, {"name": ["test", "4"]}))
