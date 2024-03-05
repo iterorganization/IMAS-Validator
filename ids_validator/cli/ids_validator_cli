@@ -8,13 +8,13 @@ def configure_argument_parser():
     # Management of input arguments
     parser = argparse.ArgumentParser(description='IDS validator')
 
-    parser.add_argument('command', help='command to be executed')
+    parser.add_argument('command', help="execute command [VALIDATE] example: './ids_validator_cli validate --uri <your uri> --ruleset <your ruleset>'")
     validator_group = parser.add_argument_group('Validator arguments')
-    validator_group.add_argument('-u', '--uri', type=str, required=True, action='append', help="uri, or uris")
+    validator_group.add_argument('-u', '--uri', type=str, required=True, action='append', help="uri for database entree")
 
-    validator_group.add_argument('-r', '--ruleset', type=str, required=True, action='append', help="path to custom ruleset")
+    validator_group.add_argument('-r', '--ruleset', type=str, required=True, action='append', help="Specify name of generic ruleset available under RULESET_PATH variable")
 
-    validator_group.add_argument('-e', '--extra-rule-dirs', type=str, default=[], help="path to custom ruleset")
+    validator_group.add_argument('-e', '--extra-rule-dirs', type=str, default=[], help="Specify path to your custom ruleset")
 
     validator_group.add_argument('-g', '--generic', action='store_true')
     validator_group.add_argument('-d', '--debug', action='store_true')
