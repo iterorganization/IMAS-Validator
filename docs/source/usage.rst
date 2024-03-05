@@ -18,8 +18,9 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
   ids_url = "url/to/specific/ids"
   extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
   apply_generic = True
+  func_filter = {'name': ['time']}
 
-  results = validate(rulesets, ids_url, extra_rule_dirs, apply_generic)
+  results = validate(rulesets, ids_url, extra_rule_dirs, apply_generic, func_filter=func_filter)
 
 You can also set the environment variable `RULESET_PATH` to show the loading tool where to look for rule sets.
 
@@ -41,9 +42,11 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
   apply_generic = True
   extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
   result_collector = ResultCollector()
+  func_filter = {'name': ['time'], 'ids': ['core_profile']}
   rules_list = load_rules(
     rulesets=rulesets,
     apply_generic=apply_generic,
     extra_rule_dirs=extra_rule_dirs,
-    result_collector=result_collector
+    result_collector=result_collector,
+    func_filter=func_filter,
   )

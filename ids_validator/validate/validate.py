@@ -30,6 +30,7 @@ def validate(
         ids_url: url for DBEntry object
         extra_rule_dirs: List of names for ruleset groups that should be applied
         apply_generic: Whether or not to apply the generic ruleset
+        func_filter: Whether or not to apply the generic ruleset
 
     Returns:
         List of IDSValidationResult objects

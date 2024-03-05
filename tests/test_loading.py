@@ -199,3 +199,12 @@ def test_filter_rules(res_collector):
     assert 4 == len(filter_rules(rules, {"ids": ["core_profiles"]}))
     assert 2 == len(filter_rules(rules, {"name": ["test"], "ids": ["core_profiles"]}))
     assert 2 == len(filter_rules(rules, {"name": ["test", "4"]}))
+
+
+def test_filter_rules_input_errors(res_collector):
+    path = Path("tests/rulesets/filter_test/ITER-MD/core_profiles.py")
+    rules = load_rules_from_path(path, res_collector)
+    with pytest.raises(ValueError):
+        filter_rules(rules, {"disallowed_key": []})
+    with pytest.raises(TypeError):
+        filter_rules(rules, {"name": "not_a_list"})

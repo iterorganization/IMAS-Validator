@@ -33,6 +33,7 @@ def load_rules(
         extra_rule_dirs: List of directories in which to look for rulesets
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
+        func_filter: Dictionary of filter criteria
 
     Returns:
         Loaded validation rules.
@@ -64,7 +65,7 @@ def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
     for rule_dir in extra_rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        rule_dirs += get_child_dirs(rule_dir)
+        rule_dirs += _get_child_dirs(rule_dir)
     # ENV VARIABLE PARSING:
     env_var_dir_list = handle_env_var_rule_dirs()
     # OPTIONAL ENTRY POINT HANDLING
@@ -160,7 +161,7 @@ def handle_env_var_rule_dirs() -> List[Path]:
     for rule_dir in rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        env_var_dirs += get_child_dirs(rule_dir)
+        env_var_dirs += _get_child_dirs(rule_dir)
 
     return env_var_dirs
 
@@ -172,7 +173,7 @@ def handle_entrypoints() -> List[Path]:
     return []
 
 
-def get_child_dirs(dir: Path) -> List[Path]:
+def _get_child_dirs(dir: Path) -> List[Path]:
     child_dirs = [path for path in dir.iterdir() if path.is_dir()]
     return child_dirs
 
@@ -180,11 +181,28 @@ def get_child_dirs(dir: Path) -> List[Path]:
 def filter_rules(
     rules: List[IDSValidationRule], func_filter: Dict[str, List[str]]
 ) -> List[IDSValidationRule]:
-    filtered_rules = list(filter(lambda x: filter_rule_func(x, func_filter), rules))
+    """
+    Filter a list of rules based on a given dictionary of criteria
+
+    Args:
+        rules: List of loaded IDSValidationRule objects
+        func_filter: Dictionary of filter criteria
+
+    Returns:
+        List of directories corresponding to given rule sets
+    """
+    allowed_keys = ["name", "ids"]
+    for key in func_filter.keys():
+        if key not in allowed_keys:
+            raise ValueError(f"Key '{key}' not in allowed keys {allowed_keys}")
+    for key, val in func_filter.items():
+        if not isinstance(val, List):
+            raise TypeError(f"Value for {key} is not a list")
+    filtered_rules = list(filter(lambda x: _filter_rule_func(x, func_filter), rules))
     return filtered_rules
 
 
-def filter_rule_func(
+def _filter_rule_func(
     rule: IDSValidationRule, func_filter: Dict[str, List[str]]
 ) -> bool:
     if "name" in func_filter.keys() and not all(
