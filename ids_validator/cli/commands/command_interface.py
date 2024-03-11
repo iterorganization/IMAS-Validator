@@ -3,6 +3,9 @@ from abc import ABC, abstractmethod
 class CommandNotExecutedException(Exception):
     ...
 
+class RulesetNotImplementedException(Exception):
+    ...
+
 class CommandInterface(ABC):
 
     @property
