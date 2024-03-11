@@ -1,19 +1,21 @@
-from .command_interface import CommandInterface, CommandNotExecutedException
+from .command_interface import CommandInterface, CommandNotExecutedException, RulesetNotImplementedException
 from abc import abstractmethod
 
 class GenericCommand(CommandInterface):
 
     @property
     def result(self):
-        if self._result:
-            return self._result
-        else:
+        if not self._result and self.executed():
+            raise RulesetNotImplementedException(f'All rulesets are not implemented')
+
+        elif not self.executed():
             additional_info = str(self)
             raise CommandNotExecutedException(f'Cannot collect result of command that was not executed.\nAdditional info: {additional_info}')
 
-    @abstractmethod
+        return self._result
+
     def __init__(self, args):
-        ...
+        self._executed = False
 
     @abstractmethod
     def __str__(self):
@@ -24,10 +26,6 @@ class GenericCommand(CommandInterface):
         '''
 
     def executed(self):
-        try:
-            self.result
-            return True
-        except CommandNotExecutedException:
-            return False
-
-
+        return self._executed
+    def execute(self):
+        self._executed = True

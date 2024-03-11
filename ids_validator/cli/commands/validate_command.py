@@ -8,13 +8,14 @@ class ValidateCommand(GenericCommand):
     __logger = logging.getLogger(__name__ + "." + __qualname__)
 
     def __init__(self, args):
-
+        super(ValidateCommand, self).__init__(args)
         self.ruleset = args.ruleset
         self.uri = args.uri
         self.extra_rule_dirs = [Path(args.extra_rule_dirs)] if args.extra_rule_dirs else []
         self.apply_generic = args.generic
 
     def execute(self):
+        super().execute()
         self._result = validate(self.ruleset, self.uri[0], self.extra_rule_dirs, self.apply_generic)
         return self._result
 
