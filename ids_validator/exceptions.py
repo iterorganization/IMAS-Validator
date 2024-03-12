@@ -57,7 +57,7 @@ class IMASVersionError(RuntimeError):
         )
 
 
-class ValidateDebugException(RuntimeError):
+class InternalValidateDebugException(RuntimeError):
     """Error raised specifically to open the debugger for failed validation tests"""
 
     def __init__(self) -> None:

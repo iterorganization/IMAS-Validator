@@ -15,12 +15,12 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
   from ids_validator.validate.validate import validate
 
   rulesets = ['ITER-MD', 'MyCustomRules']
-  ids_url = "url/to/specific/ids"
+  imas_uri = "imas:hdf5?path=path/to/data/entry"
   extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
   apply_generic = True
   debug = False
 
-  results = validate(rulesets, ids_url, extra_rule_dirs=extra_rule_dirs, apply_generic=apply_generic, debug=debug)
+  results = validate(rulesets, imas_uri, extra_rule_dirs=extra_rule_dirs, apply_generic=apply_generic, debug=debug)
 
 You can also set the environment variable `RULESET_PATH` to show the loading tool where to look for rule sets.
 
