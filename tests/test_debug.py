@@ -8,7 +8,7 @@ from ids_validator.validate.rule_executor import RuleExecutor
 
 @pytest.fixture
 def res_collector():
-    res_col = ResultCollector(debug=True)
+    res_col = ResultCollector(use_pdb=True)
     return res_col
 
 
@@ -39,7 +39,7 @@ def rule_error(res_collector):
 def rule_executor(rule, rule_error, res_collector):
     dbentry = Mock()
     rules = [rule, rule_error]
-    rule_executor = RuleExecutor(dbentry, rules, res_collector, debug=True)
+    rule_executor = RuleExecutor(dbentry, rules, res_collector, use_pdb=True)
     return rule_executor
 
 
