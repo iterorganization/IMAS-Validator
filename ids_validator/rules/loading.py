@@ -13,7 +13,7 @@ from ids_validator.exceptions import (
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
-from ids_validator.validate_options import ValidateOptions, default_val_opts
+from ids_validator.validate_options import ValidateOptions
 
 
 def load_rules(
@@ -40,9 +40,7 @@ def load_rules(
     return rules
 
 
-def discover_rulesets(
-    validate_options: ValidateOptions = default_val_opts,
-) -> List[Path]:
+def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     """
     Make a list of directories and child directories which might contain rules.
 
@@ -69,7 +67,7 @@ def discover_rulesets(
 
 def filter_rulesets(
     ruleset_dirs: List[Path],
-    validate_options: ValidateOptions = default_val_opts,
+    validate_options: ValidateOptions,
 ) -> List[Path]:
     """
     filter list of directories to only those that contain rulesets which should be

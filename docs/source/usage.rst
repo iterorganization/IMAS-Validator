@@ -16,7 +16,7 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
   from ids_validator.validate.validate import validate
 
 
-  imas_uri = "imas:hdf5?path=path/to/data/entry",
+  imas_uri = "imas:hdf5?path=path/to/data/entry"
   validate_options = ValidateOptions(
     rulesets = ['ITER-MD', 'MyCustomRules'],
     extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],

@@ -4,12 +4,12 @@ import pytest
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result_collector import ResultCollector
-from ids_validator.validate_options import default_val_opts
+from ids_validator.validate_options import ValidateOptions
 
 
 @pytest.fixture
 def res_collector():
-    res_col = ResultCollector(validate_options=default_val_opts)
+    res_col = ResultCollector(validate_options=ValidateOptions())
     return res_col
 
 

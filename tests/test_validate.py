@@ -49,7 +49,7 @@ def test_validate():
             apply_generic=False,
         )
         results = validate(
-            imas_uri='',
+            imas_uri="",
             validate_options=validate_options,
         )
         assert len(results) == 3

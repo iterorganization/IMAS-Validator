@@ -13,7 +13,9 @@ from ids_validator.rules.loading import load_rules
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
-from ids_validator.validate_options import ValidateOptions, default_val_opts
+from ids_validator.validate_options import ValidateOptions
+
+default_val_opts = ValidateOptions()
 
 
 def validate(

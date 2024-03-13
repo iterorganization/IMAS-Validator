@@ -15,6 +15,3 @@ class ValidateOptions:
     """Whether or not to apply the generic ruleset"""
     use_pdb: bool = False
     """Whether or not to drop into debugger for failed tests"""
-
-
-default_val_opts = ValidateOptions()
