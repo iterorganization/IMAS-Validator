@@ -4,7 +4,7 @@ validation tool
 """
 
 import traceback
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from imaspy.ids_primitive import IDSPrimitive
 
@@ -18,17 +18,15 @@ from ids_validator.validate_options import ValidateOptions
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self, validate_options: Optional[ValidateOptions] = None) -> None:
+    def __init__(self, validate_options: ValidateOptions) -> None:
         """
         Initialize ResultCollector
 
         Args:
             validate_options: Dataclass for validate options
         """
-        if validate_options is None:
-            validate_options = ValidateOptions()
         self.results: List[IDSValidationResult] = []
-        self.use_pdb = validate_options.use_pdb
+        self.validate_options = validate_options
 
     def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
         """Set which rule and IDSs should be stored in results
@@ -91,7 +89,7 @@ class ResultCollector:
         )
         self.results.append(result)
         # raise exception for debugging traceback
-        if self.use_pdb and not res_bool:
+        if self.validate_options.use_pdb and not res_bool:
             raise InternalValidateDebugException()
 
     def create_nodes_dict(

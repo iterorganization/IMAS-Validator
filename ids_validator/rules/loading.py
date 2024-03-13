@@ -13,11 +13,10 @@ from ids_validator.exceptions import (
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
-from ids_validator.validate_options import ValidateOptions
+from ids_validator.validate_options import ValidateOptions, default_val_opts
 
 
 def load_rules(
-    rulesets: List[str],
     result_collector: ResultCollector,
     validate_options: ValidateOptions,
 ) -> List[IDSValidationRule]:
@@ -34,10 +33,8 @@ def load_rules(
     Returns:
         Loaded validation rules.
     """
-    ruleset_dirs = discover_rulesets(extra_rule_dirs=validate_options.extra_rule_dirs)
-    filtered_dirs = filter_rulesets(
-        ruleset_dirs, rulesets=rulesets, apply_generic=validate_options.apply_generic
-    )
+    ruleset_dirs = discover_rulesets(validate_options=validate_options)
+    filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
     paths = discover_rule_modules(filtered_dirs)
     rules = []
     for path in paths:
@@ -45,7 +42,9 @@ def load_rules(
     return rules
 
 
-def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
+def discover_rulesets(
+    validate_options: ValidateOptions = default_val_opts,
+) -> List[Path]:
     """
     Make a list of directories and child directories which might contain rules.
 
@@ -57,7 +56,7 @@ def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
     """
     # ARG PARSING
     rule_dirs = []
-    for rule_dir in extra_rule_dirs:
+    for rule_dir in validate_options.extra_rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
         rule_dirs += get_child_dirs(rule_dir)
@@ -71,7 +70,8 @@ def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
 
 
 def filter_rulesets(
-    ruleset_dirs: List[Path], rulesets: List[str], apply_generic: bool
+    ruleset_dirs: List[Path],
+    validate_options: ValidateOptions = default_val_opts,
 ) -> List[Path]:
     """
     filter list of directories to only those that contain rulesets which should be
@@ -88,12 +88,12 @@ def filter_rulesets(
     filtered_rulesets: List[Path] = []
     for ruleset_dir in ruleset_dirs:
         name = ruleset_dir.name
-        if apply_generic and name == "generic":
+        if validate_options.apply_generic and name == "generic":
             filtered_rulesets.append(ruleset_dir)
-        elif name in rulesets:
+        elif name in validate_options.rulesets:
             filtered_rulesets.append(ruleset_dir)
     filtered_ruleset_names = [p.name for p in filtered_rulesets]
-    for ruleset in rulesets:
+    for ruleset in validate_options.rulesets:
         if ruleset not in filtered_ruleset_names:
             raise InvalidRulesetName(ruleset, ruleset_dirs)
     return filtered_rulesets

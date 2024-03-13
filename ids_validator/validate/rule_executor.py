@@ -4,7 +4,7 @@ IDS data
 """
 
 import pdb
-from typing import Iterator, List, Optional, Tuple
+from typing import Iterator, List, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
@@ -25,7 +25,7 @@ class RuleExecutor:
         db_entry: DBEntry,
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
-        validate_options: Optional[ValidateOptions] = None,
+        validate_options: ValidateOptions,
     ):
         """Initialize RuleExecutor
 
@@ -41,7 +41,7 @@ class RuleExecutor:
         self.db_entry = db_entry
         self.rules = rules
         self.result_collector = result_collector
-        self.use_pdb = validate_options.use_pdb
+        self.validate_options = validate_options
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""
@@ -67,7 +67,7 @@ class RuleExecutor:
                     tbi = tbi.tb_next
             else:
                 self.result_collector.add_error_result(exc)
-            if self.use_pdb:
+            if self.validate_options.use_pdb:
                 pdb.post_mortem(tb)
 
     def find_matching_rules(

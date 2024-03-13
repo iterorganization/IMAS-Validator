@@ -13,19 +13,17 @@ from ids_validator.rules.loading import load_rules
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
-from ids_validator.validate_options import ValidateOptions
+from ids_validator.validate_options import ValidateOptions, default_val_opts
 
 
 def validate(
-    rulesets: List[str],
-    ids_url: str,
-    validate_options: ValidateOptions,
+    imas_uri: str,
+    validate_options: ValidateOptions = default_val_opts,
 ) -> List[IDSValidationResult]:
     """
     Main function
     Args:
-        rulesets: names of rulesets to be applied
-        ids_url: url for DBEntry object
+        imas_uri: url for DBEntry object
         validate_options: dataclass with options for validate function
 
     Returns:
@@ -33,10 +31,9 @@ def validate(
     """
 
     _check_imas_version()
-    dbentry = DBEntry(ids_url, "r")
+    dbentry = DBEntry(imas_uri, "r")
     result_collector = ResultCollector(validate_options=validate_options)
     rules = load_rules(
-        rulesets=rulesets,
         result_collector=result_collector,
         validate_options=validate_options,
     )

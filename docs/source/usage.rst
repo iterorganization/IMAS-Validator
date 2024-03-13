@@ -15,14 +15,15 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
   from ids_validator.validate_options import ValidateOptions
   from ids_validator.validate.validate import validate
 
-  rulesets = ['ITER-MD', 'MyCustomRules']
-  imas_uri = "imas:hdf5?path=path/to/data/entry"
-  extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
-  apply_generic = True
-  use_pdb = False
 
-  validate_options = ValidateOptions(extra_rule_dirs=extra_rule_dirs, apply_generic=apply_generic, use_pdb=use_pdb)
-  results = validate(rulesets, imas_uri, validate_options=validate_options)
+  imas_uri = "imas:hdf5?path=path/to/data/entry",
+  validate_options = ValidateOptions(
+    rulesets = ['ITER-MD', 'MyCustomRules'],
+    extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
+    apply_generic = True,
+    use_pdb = False,
+  )
+  results = validate(imas_uri=imas_uri, validate_options=validate_options)
 
 You can also set the environment variable `RULESET_PATH` to show the loading tool where to look for rule sets.
 
@@ -41,15 +42,12 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
   from ids_validator.rules.loading import load_rules
   from ids_validator.validate.result import ResultCollector
 
-  rulesets = ['ITER-MD', 'MyCustomRules']
-  extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
-  apply_generic = True
-  use_pdb = False
 
-  validate_options = ValidateOptions(extra_rule_dirs=extra_rule_dirs, apply_generic=apply_generic, use_pdb=use_pdb)
-  result_collector = ResultCollector(validate_options=validate_options)
-  rules_list = load_rules(
-    rulesets=rulesets,
-    result_collector=result_collector,
-    validate_options=validate_options,
+  validate_options = ValidateOptions(
+    rulesets = ['ITER-MD', 'MyCustomRules']
+    extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
+    apply_generic = True
+    use_pdb = False
   )
+  result_collector = ResultCollector(validate_options=validate_options)
+  rules_list = load_rules(validate_options=validate_options)

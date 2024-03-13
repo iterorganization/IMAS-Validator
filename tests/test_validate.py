@@ -45,11 +45,9 @@ def test_validate():
     ), patch(f"{module}._check_imas_version"):
         rulesets = ["ITER-MD"]
         ids_url = ""
-        extra_rule_dirs = [Path("tests/rulesets/validate-test")]
-        apply_generic = False
         validate_options = ValidateOptions(
-            extra_rule_dirs=extra_rule_dirs,
-            apply_generic=apply_generic,
+            extra_rule_dirs=[Path("tests/rulesets/validate-test")],
+            apply_generic=False,
         )
         results = validate(
             rulesets=rulesets,
