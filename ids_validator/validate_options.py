@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List
 
@@ -7,7 +7,7 @@ from typing import List
 class ValidateOptions:
     """Dataclass for validate options"""
 
-    extra_rule_dirs: List[Path] = []
+    extra_rule_dirs: List[Path] = field(default_factory=list)
     """List of names for ruleset groups that should be applied"""
     apply_generic: bool = True
     """Whether or not to apply the generic ruleset"""
