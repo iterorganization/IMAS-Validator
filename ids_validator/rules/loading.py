@@ -29,7 +29,7 @@ def load_rules(
             or 'Generic'
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
-        result_collector: Dataclass for validate options
+        validate_options: Dataclass for validate options
 
     Returns:
         Loaded validation rules.
