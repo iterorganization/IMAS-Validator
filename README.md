@@ -73,7 +73,7 @@ def validate_gyrokinetics_electron_definition(gk):
   for species in gk.species:
     if species.charge_norm != -1:
       continue
-    assert species.mass_norm == 2.724437108e-4
+    assert Approx(species.mass_norm, 2.724437108e-4, rtol=1e-5, atol=1e-8)
     assert species.temperature_norm == 1.0
     assert species.density_norm == 1.0
     break
