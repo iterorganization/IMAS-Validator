@@ -43,15 +43,13 @@ def test_validate():
         get=get,
         factory=IDSFactory("3.40.1"),
     ), patch(f"{module}._check_imas_version"):
-        rulesets = ["ITER-MD"]
-        ids_url = ""
         validate_options = ValidateOptions(
+            rulesets=["ITER-MD"],
             extra_rule_dirs=[Path("tests/rulesets/validate-test")],
             apply_generic=False,
         )
         results = validate(
-            rulesets=rulesets,
-            ids_url=ids_url,
+            imas_uri='',
             validate_options=validate_options,
         )
         assert len(results) == 3
