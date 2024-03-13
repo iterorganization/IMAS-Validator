@@ -8,6 +8,7 @@ from imaspy.exception import DataEntryException
 
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.validate import validate
+from ids_validator.validate_options import ValidateOptions
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0]),
@@ -46,11 +47,14 @@ def test_validate():
         ids_url = ""
         extra_rule_dirs = [Path("tests/rulesets/validate-test")]
         apply_generic = False
+        validate_options = ValidateOptions(
+            extra_rule_dirs=extra_rule_dirs,
+            apply_generic=apply_generic,
+        )
         results = validate(
             rulesets=rulesets,
             ids_url=ids_url,
-            extra_rule_dirs=extra_rule_dirs,
-            apply_generic=apply_generic,
+            validate_options=validate_options,
         )
         assert len(results) == 3
         assert all(isinstance(res, IDSValidationResult) for res in results)

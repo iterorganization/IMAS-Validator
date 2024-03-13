@@ -4,11 +4,18 @@ import pytest
 
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
+from ids_validator.validate_options import ValidateOptions
 
 
 @pytest.fixture
-def res_collector():
-    res_col = ResultCollector(use_pdb=True)
+def validate_options():
+    validate_options = ValidateOptions(use_pdb=True)
+    return validate_options
+
+
+@pytest.fixture
+def res_collector(validate_options):
+    res_col = ResultCollector(validate_options=validate_options)
     return res_col
 
 
@@ -36,10 +43,12 @@ def rule_error(res_collector):
 
 
 @pytest.fixture
-def rule_executor(rule, rule_error, res_collector):
+def rule_executor(rule, rule_error, res_collector, validate_options):
     dbentry = Mock()
     rules = [rule, rule_error]
-    rule_executor = RuleExecutor(dbentry, rules, res_collector, use_pdb=True)
+    rule_executor = RuleExecutor(
+        dbentry, rules, res_collector, validate_options=validate_options
+    )
     return rule_executor
 
 

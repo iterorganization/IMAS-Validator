@@ -4,7 +4,7 @@ IDS data
 """
 
 import pdb
-from typing import Iterator, List, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
@@ -12,6 +12,7 @@ from imaspy.ids_toplevel import IDSToplevel
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
+from ids_validator.validate_options import ValidateOptions
 
 IDSInstance = Tuple[IDSToplevel, str, int]
 
@@ -24,7 +25,7 @@ class RuleExecutor:
         db_entry: DBEntry,
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
-        use_pdb: bool = False,
+        validate_options: Optional[ValidateOptions] = None,
     ):
         """Initialize RuleExecutor
 
@@ -33,12 +34,14 @@ class RuleExecutor:
             rules: List of rules to apply to the data.
             result_collector: ResultCollector object that stores the results after
                 execution
-            use_pdb: Whether or not to drop into debugger for failed tests
+            validate_options: Dataclass for validate options
         """
+        if validate_options is None:
+            validate_options = ValidateOptions()
         self.db_entry = db_entry
         self.rules = rules
         self.result_collector = result_collector
-        self.use_pdb = use_pdb
+        self.use_pdb = validate_options.use_pdb
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""

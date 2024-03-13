@@ -13,13 +13,13 @@ from ids_validator.exceptions import (
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
+from ids_validator.validate_options import ValidateOptions
 
 
 def load_rules(
     rulesets: List[str],
-    apply_generic: bool,
-    extra_rule_dirs: List[Path],
     result_collector: ResultCollector,
+    validate_options: ValidateOptions,
 ) -> List[IDSValidationRule]:
     """
     Load IDSValidationRule objects from given rulesets and directories
@@ -27,18 +27,16 @@ def load_rules(
     Args:
         rulesets: List of identifiers of for ruleset groups like 'ITER-MD'
             or 'Generic'
-        apply_generic: Whether or not to apply the generic ruleset that applies to
-            all IDSs
-        extra_rule_dirs: List of directories in which to look for rulesets
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
+        result_collector: Dataclass for validate options
 
     Returns:
         Loaded validation rules.
     """
-    ruleset_dirs = discover_rulesets(extra_rule_dirs=extra_rule_dirs)
+    ruleset_dirs = discover_rulesets(extra_rule_dirs=validate_options.extra_rule_dirs)
     filtered_dirs = filter_rulesets(
-        ruleset_dirs, rulesets=rulesets, apply_generic=apply_generic
+        ruleset_dirs, rulesets=rulesets, apply_generic=validate_options.apply_generic
     )
     paths = discover_rule_modules(filtered_dirs)
     rules = []

@@ -4,7 +4,7 @@ validation tool
 """
 
 import traceback
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from imaspy.ids_primitive import IDSPrimitive
 
@@ -12,20 +12,23 @@ from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate_options import ValidateOptions
 
 
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self, use_pdb: bool = False) -> None:
+    def __init__(self, validate_options: Optional[ValidateOptions] = None) -> None:
         """
         Initialize ResultCollector
 
         Args:
-            use_pdb: Whether or not to drop into debugger for failed tests
+            validate_options: Dataclass for validate options
         """
+        if validate_options is None:
+            validate_options = ValidateOptions()
         self.results: List[IDSValidationResult] = []
-        self.use_pdb = use_pdb
+        self.use_pdb = validate_options.use_pdb
 
     def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
         """Set which rule and IDSs should be stored in results
