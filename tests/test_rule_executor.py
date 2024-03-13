@@ -11,6 +11,7 @@ from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
+from ids_validator.validate_options import ValidateOptions
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0, 1, 3, 5]),
@@ -77,8 +78,10 @@ def rules():
 
 @pytest.fixture
 def rule_executor(dbentry, rules):
-    result_collector = ResultCollector()
-    rule_executor = RuleExecutor(dbentry, rules, result_collector)
+    result_collector = ResultCollector(validate_options=ValidateOptions())
+    rule_executor = RuleExecutor(
+        dbentry, rules, result_collector, validate_options=ValidateOptions()
+    )
     return rule_executor
 
 
