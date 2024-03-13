@@ -3,11 +3,13 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
+import pdb
 from typing import Iterator, List, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
+from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
 
@@ -22,6 +24,7 @@ class RuleExecutor:
         db_entry: DBEntry,
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
+        use_pdb: bool = False,
     ):
         """Initialize RuleExecutor
 
@@ -30,10 +33,12 @@ class RuleExecutor:
             rules: List of rules to apply to the data.
             result_collector: ResultCollector object that stores the results after
                 execution
+            use_pdb: Whether or not to drop into debugger for failed tests
         """
         self.db_entry = db_entry
         self.rules = rules
         self.result_collector = result_collector
+        self.use_pdb = use_pdb
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""
@@ -41,10 +46,26 @@ class RuleExecutor:
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
-            try:
-                rule.apply_func(ids_toplevels)
-            except Exception as e:
-                self.result_collector.add_error_result(e)
+            self.run(rule, ids_toplevels)
+
+    def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
+        try:
+            rule.apply_func(ids_toplevels)
+        except Exception as exc:
+            tb = exc.__traceback__
+            if isinstance(exc, InternalValidateDebugException):
+                tbi = tb
+                # make sure the last frame in the traceback (where pdb is dropped)
+                # represents the validation function itself, not the assert_ function
+                while tbi is not None and tbi.tb_next is not None:
+                    if tbi.tb_next.tb_frame.f_code.co_name == "assert_":
+                        tbi.tb_next = None
+                        break
+                    tbi = tbi.tb_next
+            else:
+                self.result_collector.add_error_result(exc)
+            if self.use_pdb:
+                pdb.post_mortem(tb)
 
     def find_matching_rules(
         self,

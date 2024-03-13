@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Tuple
 
 from imaspy.ids_primitive import IDSPrimitive
 
+from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
@@ -16,9 +17,15 @@ from ids_validator.validate.result import IDSValidationResult
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self) -> None:
-        """Initialize ResultCollector"""
+    def __init__(self, use_pdb: bool = False) -> None:
+        """
+        Initialize ResultCollector
+
+        Args:
+            use_pdb: Whether or not to drop into debugger for failed tests
+        """
         self.results: List[IDSValidationResult] = []
+        self.use_pdb = use_pdb
 
     def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
         """Set which rule and IDSs should be stored in results
@@ -63,14 +70,15 @@ class ResultCollector:
             msg: Given message for failed assertion
         """
         tb = traceback.extract_stack()
+        # pop last stack frame so that new last frame is inside validation test
+        tb.pop()
         if isinstance(test, IDSWrapper):
             nodes_dict = self.create_nodes_dict(test._ids_nodes)
         else:
             nodes_dict = {}
-        # pop last stack frame so that new last frame is inside validation test
-        tb.pop()
+        res_bool = bool(test)
         result = IDSValidationResult(
-            bool(test),
+            res_bool,
             msg,
             self._current_rule,
             self._current_idss,
@@ -79,6 +87,9 @@ class ResultCollector:
             exc=None,
         )
         self.results.append(result)
+        # raise exception for debugging traceback
+        if self.use_pdb and not res_bool:
+            raise InternalValidateDebugException()
 
     def create_nodes_dict(
         self, ids_nodes: List[IDSPrimitive]
