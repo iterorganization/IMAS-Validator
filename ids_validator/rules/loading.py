@@ -24,8 +24,6 @@ def load_rules(
     Load IDSValidationRule objects from given rulesets and directories
 
     Args:
-        rulesets: List of identifiers of for ruleset groups like 'ITER-MD'
-            or 'Generic'
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
         validate_options: Dataclass for validate options
@@ -49,7 +47,7 @@ def discover_rulesets(
     Make a list of directories and child directories which might contain rules.
 
     Args:
-        extra_rule_dirs: List of directories in which to look for rulesets
+        validate_options: Dataclass for validate options
 
     Returns:
         List of directories that might contain rules
@@ -79,8 +77,7 @@ def filter_rulesets(
 
     Args:
         ruleset_dirs: List of directories in which to look for rulesets
-        rulesets: List of names for ruleset groups that should be applied
-        apply_generic: Whether or not to apply the generic ruleset
+        validate_options: Dataclass for validate options
 
     Returns:
         List of directories corresponding to given rule sets
