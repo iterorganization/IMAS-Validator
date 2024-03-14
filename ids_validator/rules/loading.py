@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
 from ids_validator.exceptions import (
     EmptyRuleFileWarning,
@@ -177,33 +177,11 @@ def filter_rules(
 
     Args:
         rules: List of loaded IDSValidationRule objects
-        func_filter: Dictionary of filter criteria
 
     Returns:
         List of directories corresponding to given rule sets
     """
-    allowed_keys = ["name", "ids"]
-    for key in validate_options.func_filter.keys():
-        if key not in allowed_keys:
-            raise ValueError(f"Key '{key}' not in allowed keys {allowed_keys}")
-    for key, val in validate_options.func_filter.items():
-        if not isinstance(val, List):
-            raise TypeError(f"Value for {key} is not a list")
-    filtered_rules = list(
-        filter(lambda x: _filter_rule_func(x, validate_options.func_filter), rules)
-    )
+    filtered_rules = [
+        rule for rule in rules if validate_options.rule_filter.is_selected(rule)
+    ]
     return filtered_rules
-
-
-def _filter_rule_func(
-    rule: IDSValidationRule, func_filter: Dict[str, List[str]]
-) -> bool:
-    if "name" in func_filter.keys() and not all(
-        x in rule.func.__name__ for x in func_filter["name"]
-    ):
-        return False
-    if "ids" in func_filter.keys() and not all(
-        x in rule.ids_names for x in func_filter["ids"]
-    ):
-        return False
-    return True

@@ -19,7 +19,7 @@ from ids_validator.rules.loading import (
     filter_rulesets,
     load_rules_from_path,
 )
-from ids_validator.validate_options import ValidateOptions
+from ids_validator.validate_options import RuleFilter, ValidateOptions
 
 
 @pytest.fixture(scope="function")
@@ -208,21 +208,19 @@ def test_filter_rules(res_collector):
     rules = load_rules_from_path(path, res_collector)
     path = Path("tests/rulesets/filter_test/ITER-MD/equilibrium.py")
     rules += load_rules_from_path(path, res_collector)
-    assert 8 == len(filter_rules(rules, {}))
-    assert 8 == len(filter_rules(rules, {"name": [], "ids": []}))
-    assert 2 == len(filter_rules(rules, {"name": ["core_profiles"]}))
-    assert 2 == len(filter_rules(rules, {"name": ["equilibrium"]}))
-    assert 4 == len(filter_rules(rules, {"name": ["test"]}))
-    assert 4 == len(filter_rules(rules, {"ids": ["equilibrium"]}))
-    assert 4 == len(filter_rules(rules, {"ids": ["core_profiles"]}))
-    assert 2 == len(filter_rules(rules, {"name": ["test"], "ids": ["core_profiles"]}))
-    assert 2 == len(filter_rules(rules, {"name": ["test", "4"]}))
+    assert_filter_rules(rules, 8, RuleFilter())
+    assert_filter_rules(rules, 8, RuleFilter(name=[], ids=[]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["val_core_profiles"]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["val_equilibrium"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["core_profiles"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["equilibrium"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["test"]))
+    assert_filter_rules(rules, 4, RuleFilter(ids=["equilibrium"]))
+    assert_filter_rules(rules, 4, RuleFilter(ids=["core_profiles"]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["test"], ids=["core_profiles"]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["test", "4"]))
 
 
-def test_filter_rules_input_errors(res_collector):
-    path = Path("tests/rulesets/filter_test/ITER-MD/core_profiles.py")
-    rules = load_rules_from_path(path, res_collector)
-    with pytest.raises(ValueError):
-        filter_rules(rules, {"disallowed_key": []})
-    with pytest.raises(TypeError):
-        filter_rules(rules, {"name": "not_a_list"})
+def assert_filter_rules(rules, res, rule_filter):
+    validate_options = ValidateOptions(rule_filter=rule_filter)
+    assert len(filter_rules(rules, validate_options=validate_options)) == res
