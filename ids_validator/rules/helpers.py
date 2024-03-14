@@ -110,7 +110,8 @@ def _check_order(wrapped: IDSWrapper, op: Callable) -> IDSWrapper:
 
 
 def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper:
-    """Return whether a and b are equal within a tolerance
+    """Return whether a and b are equal within a tolerance by wrapping np.allclose
+    (https://numpy.org/doc/stable/reference/generated/numpy.allclose.html)
 
     Args:
         a, b: Inputs to compare
@@ -120,13 +121,13 @@ def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper
     ids_nodes = []
     if isinstance(a, IDSWrapper):
         a_val = a._obj
-        ids_nodes += a._ids_nodes.copy()
+        ids_nodes += a._ids_nodes
     else:
         a_val = a
     if isinstance(b, IDSWrapper):
         b_val = b._obj
-        ids_nodes += b._ids_nodes.copy()
+        ids_nodes += b._ids_nodes
     else:
         b_val = b
-    res = bool(np.allclose(a_val, b_val, rtol=rtol, atol=atol))
-    return IDSWrapper(res, ids_nodes=ids_nodes.copy())
+    res = np.allclose(a_val, b_val, rtol=rtol, atol=atol)
+    return IDSWrapper(res, ids_nodes=ids_nodes)
