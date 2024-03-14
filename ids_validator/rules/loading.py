@@ -177,6 +177,7 @@ def filter_rules(
 
     Args:
         rules: List of loaded IDSValidationRule objects
+        validate_options: Dataclass for validate options
 
     Returns:
         List of directories corresponding to given rule sets
