@@ -113,7 +113,7 @@ def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper
     """Return whether a and b are equal within a tolerance
 
     This method uses :external:py:func:`numpy.allclose` internally. Please check the
-    numpy documentation for a detailed exlanation of the arguments.
+    numpy documentation for a detailed explanation of the arguments.
 
     Args:
         a, b: Inputs to compare
