@@ -6,7 +6,7 @@ import pytest
 from imaspy.ids_base import IDSBase
 from imaspy.ids_toplevel import IDSToplevel
 
-from ids_validator.rules.helpers import Decreasing, Increasing, Select
+from ids_validator.rules.helpers import Approx, Decreasing, Increasing, Select
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
@@ -159,3 +159,31 @@ def test_increasing_ids_nodes():
     c = Increasing(a + b)
     assert c
     assert c._ids_nodes == [("a", 0), ("b", 1)]
+
+
+def test_approx():
+    for x, y, rtol, atol, z in [
+        ([1, 2], [3, 4], 1e-5, 1e-8, False),
+        ([1.0, 2.0], [1.0, 2.0 + 1e-6], 1e-5, 1e-8, True),
+        (1.0, 1.0 + 1e-6, 1e-5, 1e-8, True),
+        (1.0, 1.0 + 1e-6, 1e-5, 1e-5, True),
+        (1.0, 1.0 + 1e-4, 1e-5, 1e-8, False),
+        (1.0, 1.0 + 1e-6, 1e-8, 1e-8, False),
+        (0.0, 0.0 - 1e-6, 1e-5, 1e-8, False),
+    ]:
+        a = IDSWrapper(x, ids_nodes=[("a", 0)])
+        b = IDSWrapper(y, ids_nodes=[("b", 1)])
+        c = Approx(a, b, rtol=rtol, atol=atol)
+        assert c == z
+        assert c._ids_nodes == [("a", 0), ("b", 1)]
+
+
+def test_approx_non_wrapper():
+    a = IDSWrapper(1.0, ids_nodes=[("a", 0)])
+    b = 1.0 + 1e-6
+    c = Approx(a, b, rtol=1e-5, atol=1e-8)
+    assert c
+    assert c._ids_nodes == [("a", 0)]
+    d = Approx(a, b, rtol=1e-7, atol=1e-8)
+    assert not d
+    assert d._ids_nodes == [("a", 0)]

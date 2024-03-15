@@ -3,7 +3,7 @@ This file describes the helper functions for the validation rules
 """
 
 import operator
-from typing import Callable, Iterator, List
+from typing import Any, Callable, Iterator, List
 
 import numpy as np
 from imaspy.ids_base import IDSBase
@@ -107,3 +107,29 @@ def _check_order(wrapped: IDSWrapper, op: Callable) -> IDSWrapper:
     diff = np.diff(node_arr)
     res = bool(np.all(op(diff, 0)))
     return IDSWrapper(res, ids_nodes=wrapped._ids_nodes.copy())
+
+
+def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper:
+    """Return whether a and b are equal within a tolerance
+
+    This method uses :external:py:func:`numpy.allclose` internally. Please check the
+    numpy documentation for a detailed explanation of the arguments.
+
+    Args:
+        a, b: Inputs to compare
+        rtol: Relative tolerance parameter
+        atol: Absolute tolerance parameter
+    """
+    ids_nodes = []
+    if isinstance(a, IDSWrapper):
+        a_val = a._obj
+        ids_nodes += a._ids_nodes
+    else:
+        a_val = a
+    if isinstance(b, IDSWrapper):
+        b_val = b._obj
+        ids_nodes += b._ids_nodes
+    else:
+        b_val = b
+    res = np.allclose(a_val, b_val, rtol=rtol, atol=atol)
+    return IDSWrapper(res, ids_nodes=ids_nodes)
