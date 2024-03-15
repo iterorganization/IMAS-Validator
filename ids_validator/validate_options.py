@@ -5,18 +5,17 @@ from typing import List
 from ids_validator.rules.data import IDSValidationRule
 
 
+@dataclass(frozen=True)
 class RuleFilter:
-    """Class for filtering individual rules"""
+    """Class for filtering individual rules.
 
-    def __init__(self, name: List[str] = [], ids: List[str] = []):
-        """RuleFilter initialization
+    For more information, see :ref:`rule filtering`
+    """
 
-        Args:
-            name: strings that should be present in rule name
-            ids: strings that should be present rule ids_names
-        """
-        self.name = name
-        self.ids = ids
+    name: List[str] = field(default_factory=list)
+    """List of strings that should be present in rule name"""
+    ids: List[str] = field(default_factory=list)
+    """List of strings that should be present rule ids_names"""
 
     def is_selected(self, rule: IDSValidationRule) -> bool:
         """Check whether rule should be applied or not
@@ -25,7 +24,7 @@ class RuleFilter:
             rule: rule to be checked
 
         Returns:
-            Booloan whether or not validation rule should be applied
+            Whether or not validation rule should be applied
         """
         if not all(x in rule.name for x in self.name):
             return False

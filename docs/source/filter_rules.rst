@@ -1,38 +1,44 @@
+.. _`rule filtering`:
+
 Rule Filtering
 ==============
 
-Users can filter which subset of the found validation rules should be applied.
+When running the validator, you can filter which subset of the found validation rules should be applied.
 This is done through the options:
-- name
-- ids
-The filter returns only the rules that adhere to all these conditions:
 
-Code examples
--------------
+name
+    Checks whether or not a list of given strings are included in the rule name. Rule names are defined as 'ruleset/file/function_name'.
 
-Below are some examples:
+ids
+    Checks whether or not a list of given strings are included in the rule ids_names. Rule ids_names are defined as ('ids_name_1', 'ids_name_2')
 
-To get all rules with 'time' in their name
-.. code-block:: python
+The filter returns only the rules that adhere to all supplied conditions.
 
-  rule_filter = RuleFilter(name = ['time'])
+Examples
+--------
 
-To get all rules concerning 'core_profile' idss
-.. code-block:: python
+- Only run rules with 'time' in their name
 
-  rule_filter = RuleFilter(ids = ['core_profile'])
+  .. code-block:: python
 
-To get all rules with both 'core' and 'density' in their name
-.. code-block:: python
+    rule_filter = RuleFilter(name = ['time'])
 
-  rule_filter = RuleFilter(name = ['core', 'density'])
+- Only run rules concerning 'core_profile' IDSs
 
-To get all rules with 'temperature' in their name concerning 'equilibrium' idss
-.. code-block:: python
+  .. code-block:: python
 
-  rule_filter = RuleFilter(name = ['temperature'], ids = ['equilibrium'])
+    rule_filter = RuleFilter(ids = ['core_profile'])
 
-CLI examples
-------------
+- Only run rules with both 'core' and 'density' in their name
 
-TBA
+  .. code-block:: python
+
+    rule_filter = RuleFilter(name = ['core', 'density'])
+
+- Only run rules with 'temperature' in their name concerning 'equilibrium' IDSs
+
+  .. code-block:: python
+
+    rule_filter = RuleFilter(name = ['temperature'], ids = ['equilibrium'])
+
+.. seealso:: API documentation for :py:class:`~ids_validator.validate_options.RuleFilter`.

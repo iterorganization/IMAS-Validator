@@ -22,7 +22,6 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
     extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
     apply_generic = True,
     use_pdb = False,
-    rule_filter = RuleFilter(name = ['time']),
   )
   results = validate(imas_uri=imas_uri, validate_options=validate_options)
 
