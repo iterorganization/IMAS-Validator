@@ -18,10 +18,6 @@ def configure_argument_parser():
     validate_group.add_argument('-e', '--extra-rule-dirs', type=str, default=[], help="Specify path to your custom ruleset")
     validate_group.add_argument('-g', '--generic', action='store_true')
 
-    praise_parser = subparsers.add_parser('praise', help='Mockup Command')
-    praise_group = praise_parser.add_argument_group("Praise Arguments")
-    praise_group.add_argument('name',help='name of person')
-
     return parser
 
 
@@ -43,9 +39,6 @@ def main():
             print('===========================')
             print(command.result)
             print('===========================\n')
-
-    elif args.command.lower() == 'praise':
-        print(f"praising {args.name} for something")
 
 if __name__ == '__main__':
     main()
