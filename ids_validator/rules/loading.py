@@ -37,6 +37,7 @@ def load_rules(
     rules = []
     for path in paths:
         rules += load_rules_from_path(path, result_collector)
+    rules = filter_rules(rules, validate_options)
     return rules
 
 
@@ -55,7 +56,7 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     for rule_dir in validate_options.extra_rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        rule_dirs += get_child_dirs(rule_dir)
+        rule_dirs += _get_child_dirs(rule_dir)
     # ENV VARIABLE PARSING:
     env_var_dir_list = handle_env_var_rule_dirs()
     # OPTIONAL ENTRY POINT HANDLING
@@ -151,7 +152,7 @@ def handle_env_var_rule_dirs() -> List[Path]:
     for rule_dir in rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        env_var_dirs += get_child_dirs(rule_dir)
+        env_var_dirs += _get_child_dirs(rule_dir)
 
     return env_var_dirs
 
@@ -163,6 +164,25 @@ def handle_entrypoints() -> List[Path]:
     return []
 
 
-def get_child_dirs(dir: Path) -> List[Path]:
+def _get_child_dirs(dir: Path) -> List[Path]:
     child_dirs = [path for path in dir.iterdir() if path.is_dir()]
     return child_dirs
+
+
+def filter_rules(
+    rules: List[IDSValidationRule], validate_options: ValidateOptions
+) -> List[IDSValidationRule]:
+    """
+    Filter a list of rules based on a given dictionary of criteria
+
+    Args:
+        rules: List of loaded IDSValidationRule objects
+        validate_options: Dataclass for validate options
+
+    Returns:
+        List of directories corresponding to given rule sets
+    """
+    filtered_rules = [
+        rule for rule in rules if validate_options.rule_filter.is_selected(rule)
+    ]
+    return filtered_rules

@@ -15,10 +15,11 @@ from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.loading import (
     discover_rule_modules,
     discover_rulesets,
+    filter_rules,
     filter_rulesets,
     load_rules_from_path,
 )
-from ids_validator.validate_options import ValidateOptions
+from ids_validator.validate_options import RuleFilter, ValidateOptions
 
 
 @pytest.fixture(scope="function")
@@ -43,6 +44,7 @@ def test_discover_rulesets_explicit():
         Path("tests/rulesets/base/generic"),
         Path("tests/rulesets/base/ITER-MD"),
         Path("tests/rulesets/validate-test"),
+        Path("tests/rulesets/filter_test"),
     ]
     validate_options = ValidateOptions(extra_rule_dirs=extra_rule_dirs)
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
@@ -199,3 +201,26 @@ def test_run_path(res_collector):
     val_registry = ValidatorRegistry(rule_path)
     run_path(rule_path, val_registry, res_collector)
     assert len(val_registry.validators) == 1
+
+
+def test_filter_rules(res_collector):
+    path = Path("tests/rulesets/filter_test/ITER-MD/core_profiles.py")
+    rules = load_rules_from_path(path, res_collector)
+    path = Path("tests/rulesets/filter_test/ITER-MD/equilibrium.py")
+    rules += load_rules_from_path(path, res_collector)
+    assert_filter_rules(rules, 8, RuleFilter())
+    assert_filter_rules(rules, 8, RuleFilter(name=[], ids=[]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["val_core_profiles"]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["val_equilibrium"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["core_profiles"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["equilibrium"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["test"]))
+    assert_filter_rules(rules, 4, RuleFilter(ids=["equilibrium"]))
+    assert_filter_rules(rules, 4, RuleFilter(ids=["core_profiles"]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["test"], ids=["core_profiles"]))
+    assert_filter_rules(rules, 2, RuleFilter(name=["test", "4"]))
+
+
+def assert_filter_rules(rules, res, rule_filter):
+    validate_options = ValidateOptions(rule_filter=rule_filter)
+    assert len(filter_rules(rules, validate_options=validate_options)) == res

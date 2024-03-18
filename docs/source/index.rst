@@ -26,6 +26,7 @@ Manual
    installing
    defining_rules
    usage
+   filter_rules
 
 
 .. toctree::
