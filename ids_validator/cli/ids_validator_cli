@@ -28,6 +28,7 @@ def configure_argument_parser():
 def main():
     parser = configure_argument_parser()
     args = parser.parse_args(sys.argv[1:])
+    print(f"ARGS: {args}")
 
     if args.debug:
         print("enable debug option")
