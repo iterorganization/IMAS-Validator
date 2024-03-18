@@ -10,7 +10,7 @@ This is done through the options:
 name
     Checks whether or not a list of given strings are included in the rule name.
     Rule names are defined as 'ruleset/file/function_name'
-    (e.g. 'ITER-MD/core_profiles/validate_temperature').
+    (e.g. 'ITER-MD/core_profiles.py/validate_temperature').
 
 ids
     Checks whether or not a list of given strings are included in the rule ids_names.
