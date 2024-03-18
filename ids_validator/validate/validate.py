@@ -2,7 +2,6 @@
 This file describes the main function for the IMAS IDS validation tool
 """
 
-from pathlib import Path
 from typing import List
 
 from imaspy import DBEntry
@@ -14,36 +13,35 @@ from ids_validator.rules.loading import load_rules
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
+from ids_validator.validate_options import ValidateOptions
+
+default_val_opts = ValidateOptions()
 
 
 def validate(
-    rulesets: List[str],
-    ids_url: str,
-    extra_rule_dirs: List[Path] = [],
-    apply_generic: bool = True,
+    imas_uri: str,
+    validate_options: ValidateOptions = default_val_opts,
 ) -> List[IDSValidationResult]:
     """
     Main function
     Args:
-        rulesets: names of rulesets to be applied
-        ids_url: url for DBEntry object
-        extra_rule_dirs: List of names for ruleset groups that should be applied
-        apply_generic: Whether or not to apply the generic ruleset
+        imas_uri: url for DBEntry object
+        validate_options: dataclass with options for validate function
 
     Returns:
         List of IDSValidationResult objects
     """
 
     _check_imas_version()
-    dbentry = DBEntry(ids_url, "r")
-    result_collector = ResultCollector()
+    dbentry = DBEntry(imas_uri, "r")
+    result_collector = ResultCollector(validate_options=validate_options)
     rules = load_rules(
-        rulesets=rulesets,
-        extra_rule_dirs=extra_rule_dirs,
-        apply_generic=apply_generic,
         result_collector=result_collector,
+        validate_options=validate_options,
     )
-    rule_executor = RuleExecutor(dbentry, rules, result_collector)
+    rule_executor = RuleExecutor(
+        dbentry, rules, result_collector, validate_options=validate_options
+    )
     rule_executor.apply_rules_to_data()
     results = result_collector.results
     return results

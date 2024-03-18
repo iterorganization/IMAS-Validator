@@ -55,3 +55,10 @@ class IMASVersionError(RuntimeError):
             "IDS Validation requires an IMAS installation of version 5.1 or newer."
             f" {version_msg}. See the README for more details."
         )
+
+
+class InternalValidateDebugException(RuntimeError):
+    """Error raised specifically to open the debugger for failed validation tests"""
+
+    def __init__(self) -> None:
+        super().__init__("Go to debugger")

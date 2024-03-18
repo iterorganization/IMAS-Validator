@@ -12,14 +12,18 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
 
 .. code-block:: python
 
+  from ids_validator.validate_options import ValidateOptions, RuleFilter
   from ids_validator.validate.validate import validate
 
-  rulesets = ['ITER-MD', 'MyCustomRules']
-  ids_url = "url/to/specific/ids"
-  extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
-  apply_generic = True
 
-  results = validate(rulesets, ids_url, extra_rule_dirs, apply_generic)
+  imas_uri = "imas:hdf5?path=path/to/data/entry"
+  validate_options = ValidateOptions(
+    rulesets = ['ITER-MD', 'MyCustomRules'],
+    extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
+    apply_generic = True,
+    use_pdb = False,
+  )
+  results = validate(imas_uri=imas_uri, validate_options=validate_options)
 
 You can also set the environment variable `RULESET_PATH` to show the loading tool where to look for rule sets.
 
@@ -34,16 +38,17 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
 
 .. code-block:: python
 
+  from ids_validator.validate_options import ValidateOptions, RuleFilter
   from ids_validator.rules.loading import load_rules
   from ids_validator.validate.result import ResultCollector
 
-  rulesets = ['ITER-MD', 'MyCustomRules']
-  apply_generic = True
-  extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom']
-  result_collector = ResultCollector()
-  rules_list = load_rules(
-    rulesets=rulesets,
-    apply_generic=apply_generic,
-    extra_rule_dirs=extra_rule_dirs,
-    result_collector=result_collector
+
+  validate_options = ValidateOptions(
+    rulesets = ['ITER-MD', 'MyCustomRules'],
+    extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
+    apply_generic = True,
+    use_pdb = False,
+    rule_filter = RuleFilter(name = ['time'], ids = ['core_profile']),
   )
+  result_collector = ResultCollector(validate_options=validate_options)
+  rules_list = load_rules(validate_options=validate_options)

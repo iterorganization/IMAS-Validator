@@ -53,3 +53,10 @@ The rules are defined inside the python files as follows:
       break
     else:
       error("No electron species found", gk.species)
+
+  @validator("core_profiles")  # noqa: F821
+  def validate_ion_charge(cp):
+    """Validate that profiles_1d/ion/z_ion is defined"""
+    for p1d in cp.profiles_1d:
+      for ion in p1d.ion:
+        assert ion.z_ion.has_value

@@ -1,11 +1,5 @@
-Copyright (c) 2020-2023 ITER Organization, Route de Vinon-sur-Verdon, CS 90 046,
+Copyright (c) 2024 ITER Organization, Route de Vinon-sur-Verdon, CS 90 046,
                         13067 St-Paul-lez-Durance Cedex, France
-
-Copyright (c) 2020-2023 Karel Lucas van de Plassche <karelvandeplassche@gmail.com>
-
-Copyright (c) 2020 Dutch Institute for Fundamental Energy Research <info@differ.nl>
-
-Copyright (c) 2020-2022 Daan van Vugt <dvanvugt@ignitioncomputing.com>
 
 All rights reserved.
 

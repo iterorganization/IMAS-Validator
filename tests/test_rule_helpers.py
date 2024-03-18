@@ -1,11 +1,12 @@
 from typing import List
 
 import imaspy
+import numpy as np
 import pytest
 from imaspy.ids_base import IDSBase
 from imaspy.ids_toplevel import IDSToplevel
 
-from ids_validator.rules.helpers import Select
+from ids_validator.rules.helpers import Approx, Decreasing, Increasing, Select
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
@@ -112,3 +113,77 @@ def test_select_empty_nodes(select_ids):
             select_ids.time,
         ],
     )
+
+
+@pytest.mark.parametrize("func", (Increasing, Decreasing))
+def test_increasing_decreasing_errors(select_ids, func):
+    with pytest.raises(TypeError):  # IDS must be wrapped
+        func(select_ids)
+    with pytest.raises(ValueError):  # Wrapped object must be an IDS
+        func(IDSWrapper(False))
+    with pytest.raises(ValueError):  # Wrapped object must be 1d
+        func(IDSWrapper(select_ids.ids_properties.homogeneous_time))
+    with pytest.raises(ValueError):  # Wrapped object must be 1d
+        func(IDSWrapper(np.arange(6).reshape([2, 3])))
+    assert Increasing(IDSWrapper(np.arange(6)))
+
+
+def test_increasing():
+    assert Increasing(IDSWrapper([1, 2, 3]))
+    assert not Increasing(IDSWrapper([1, 3, 2]))
+    assert not Increasing(IDSWrapper([1, 2, 2]))
+    assert not Increasing(IDSWrapper([3, 2, 1]))
+    assert Increasing(IDSWrapper([]))
+    assert Increasing(IDSWrapper([1]))
+
+
+def test_decreasing():
+    assert not Decreasing(IDSWrapper([1, 2, 3]))
+    assert not Decreasing(IDSWrapper([1, 3, 2]))
+    assert not Decreasing(IDSWrapper([2, 2, 1]))
+    assert Decreasing(IDSWrapper([3, 2, 1]))
+    assert Decreasing(IDSWrapper([]))
+    assert Decreasing(IDSWrapper([1]))
+
+
+def test_increasing_works_on_ids(select_ids):
+    select_ids.time = [1, 2, 3]
+    assert Increasing(IDSWrapper(select_ids).time)
+    select_ids.time = [3, 2, 1]
+    assert not Increasing(IDSWrapper(select_ids).time)
+
+
+def test_increasing_ids_nodes():
+    a = IDSWrapper([1, 2, 3], ids_nodes=[("a", 0)])
+    b = IDSWrapper([4, 5, 6], ids_nodes=[("b", 1)])
+    c = Increasing(a + b)
+    assert c
+    assert c._ids_nodes == [("a", 0), ("b", 1)]
+
+
+def test_approx():
+    for x, y, rtol, atol, z in [
+        ([1, 2], [3, 4], 1e-5, 1e-8, False),
+        ([1.0, 2.0], [1.0, 2.0 + 1e-6], 1e-5, 1e-8, True),
+        (1.0, 1.0 + 1e-6, 1e-5, 1e-8, True),
+        (1.0, 1.0 + 1e-6, 1e-5, 1e-5, True),
+        (1.0, 1.0 + 1e-4, 1e-5, 1e-8, False),
+        (1.0, 1.0 + 1e-6, 1e-8, 1e-8, False),
+        (0.0, 0.0 - 1e-6, 1e-5, 1e-8, False),
+    ]:
+        a = IDSWrapper(x, ids_nodes=[("a", 0)])
+        b = IDSWrapper(y, ids_nodes=[("b", 1)])
+        c = Approx(a, b, rtol=rtol, atol=atol)
+        assert c == z
+        assert c._ids_nodes == [("a", 0), ("b", 1)]
+
+
+def test_approx_non_wrapper():
+    a = IDSWrapper(1.0, ids_nodes=[("a", 0)])
+    b = 1.0 + 1e-6
+    c = Approx(a, b, rtol=1e-5, atol=1e-8)
+    assert c
+    assert c._ids_nodes == [("a", 0)]
+    d = Approx(a, b, rtol=1e-7, atol=1e-8)
+    assert not d
+    assert d._ids_nodes == [("a", 0)]

@@ -2,8 +2,10 @@
 This file describes the helper functions for the validation rules
 """
 
-from typing import Iterator, List
+import operator
+from typing import Any, Callable, Iterator, List
 
+import numpy as np
 from imaspy.ids_base import IDSBase
 from imaspy.util import find_paths, visit_children
 
@@ -75,16 +77,59 @@ class Select:
         return iter(self._matches)
 
 
-def Increasing() -> None:
-    """"""
-    pass
+def Increasing(wrapped: IDSWrapper) -> IDSWrapper:
+    """Return whether a given array is strictly increasing
+
+    Args:
+        wrapped: 1D IDSPrimitive or numpy array
+    """
+    return _check_order(wrapped, operator.gt)
 
 
-def Decreasing() -> None:
-    """"""
-    pass
+def Decreasing(wrapped: IDSWrapper) -> IDSWrapper:
+    """Return whether a given array is strictly decreasing
+
+    Args:
+        wrapped: 1D IDSPrimitive or numpy array
+    """
+    return _check_order(wrapped, operator.lt)
 
 
-def Exists() -> None:
-    """"""
-    pass
+def _check_order(wrapped: IDSWrapper, op: Callable) -> IDSWrapper:
+    if not isinstance(wrapped, IDSWrapper):
+        raise TypeError("First argument must be an IDS node")
+    node_arr = np.asarray(wrapped._obj)
+    if node_arr.ndim != 1:
+        raise ValueError(
+            f"Expected a 1D array, but {wrapped._obj!r} has {node_arr.ndim} dimensions"
+        )
+
+    diff = np.diff(node_arr)
+    res = bool(np.all(op(diff, 0)))
+    return IDSWrapper(res, ids_nodes=wrapped._ids_nodes.copy())
+
+
+def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper:
+    """Return whether a and b are equal within a tolerance
+
+    This method uses :external:py:func:`numpy.allclose` internally. Please check the
+    numpy documentation for a detailed explanation of the arguments.
+
+    Args:
+        a, b: Inputs to compare
+        rtol: Relative tolerance parameter
+        atol: Absolute tolerance parameter
+    """
+    ids_nodes = []
+    if isinstance(a, IDSWrapper):
+        a_val = a._obj
+        ids_nodes += a._ids_nodes
+    else:
+        a_val = a
+    if isinstance(b, IDSWrapper):
+        b_val = b._obj
+        ids_nodes += b._ids_nodes
+    else:
+        b_val = b
+    res = np.allclose(a_val, b_val, rtol=rtol, atol=atol)
+    return IDSWrapper(res, ids_nodes=ids_nodes)

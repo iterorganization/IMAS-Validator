@@ -5,7 +5,7 @@ validation tool
 
 import traceback
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from ids_validator.rules.data import IDSValidationRule
 
@@ -24,5 +24,10 @@ class IDSValidationResult:
     """Tuple of ids_names and occurrences"""
     tb: traceback.StackSummary
     """A stack of traceback frames"""
+    nodes_dict: Dict[Tuple[str, int], List[str]]
+    """
+    Set of nodes that have contributed in this result, identified by a combination of
+    the ids name and occurence
+    """
     exc: Optional[Exception] = None
     """Exception that was encountered while running validation test"""

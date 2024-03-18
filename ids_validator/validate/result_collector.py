@@ -4,18 +4,29 @@ validation tool
 """
 
 import traceback
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
+from imaspy.ids_primitive import IDSPrimitive
+
+from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
+from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate_options import ValidateOptions
 
 
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self) -> None:
-        """Initialize ResultCollector"""
+    def __init__(self, validate_options: ValidateOptions) -> None:
+        """
+        Initialize ResultCollector
+
+        Args:
+            validate_options: Dataclass for validate options
+        """
         self.results: List[IDSValidationResult] = []
+        self.validate_options = validate_options
 
     def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
         """Set which rule and IDSs should be stored in results
@@ -24,6 +35,11 @@ class ResultCollector:
             rule: Rule to apply to IDS data
             idss: Tuple of ids_names and occurrences
         """
+        unique_ids_names = set(ids[0] for ids in idss)
+        if len(unique_ids_names) != len(idss):
+            raise NotImplementedError(
+                "Two occurrence of one IDS in a single validation rule is not supported"
+            )
         self._current_rule = rule
         self._current_idss = idss
 
@@ -40,6 +56,7 @@ class ResultCollector:
             self._current_rule,
             self._current_idss,
             tb,
+            {},
             exc=exc,
         )
         self.results.append(result)
@@ -56,12 +73,42 @@ class ResultCollector:
         tb = traceback.extract_stack()
         # pop last stack frame so that new last frame is inside validation test
         tb.pop()
+        if isinstance(test, IDSWrapper):
+            nodes_dict = self.create_nodes_dict(test._ids_nodes)
+        else:
+            nodes_dict = {}
+        res_bool = bool(test)
         result = IDSValidationResult(
-            bool(test),
+            res_bool,
             msg,
             self._current_rule,
             self._current_idss,
             tb,
+            nodes_dict,
             exc=None,
         )
         self.results.append(result)
+        # raise exception for debugging traceback
+        if self.validate_options.use_pdb and not res_bool:
+            raise InternalValidateDebugException()
+
+    def create_nodes_dict(
+        self, ids_nodes: List[IDSPrimitive]
+    ) -> Dict[Tuple[str, int], List[str]]:
+        """
+        Create dict with list of touched nodes for the IDSValidationResult object
+
+        Args:
+            ids_nodes: List of IDSPrimitive nodes that have been touched in this test
+        """
+        result: Dict[Tuple[str, int], List[str]] = {
+            key: [] for key in self._current_idss
+        }
+        occ_dict = {key[0]: key for key in self._current_idss}
+        for node in ids_nodes:
+            ids_name = node._toplevel.metadata.name
+            ids_result = result[occ_dict[ids_name]]
+            path = node._path
+            if path not in ids_result:
+                ids_result.append(path)
+        return result

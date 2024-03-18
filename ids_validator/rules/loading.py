@@ -13,56 +13,50 @@ from ids_validator.exceptions import (
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
+from ids_validator.validate_options import ValidateOptions
 
 
 def load_rules(
-    rulesets: List[str],
-    apply_generic: bool,
-    extra_rule_dirs: List[Path],
     result_collector: ResultCollector,
+    validate_options: ValidateOptions,
 ) -> List[IDSValidationRule]:
     """
     Load IDSValidationRule objects from given rulesets and directories
 
     Args:
-        rulesets: List of identifiers of for ruleset groups like 'ITER-MD'
-            or 'Generic'
-        apply_generic: Whether or not to apply the generic ruleset that applies to
-            all IDSs
-        extra_rule_dirs: List of directories in which to look for rulesets
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
+        validate_options: Dataclass for validate options
 
     Returns:
         Loaded validation rules.
     """
-    ruleset_dirs = discover_rulesets(extra_rule_dirs=extra_rule_dirs)
-    filtered_dirs = filter_rulesets(
-        ruleset_dirs, rulesets=rulesets, apply_generic=apply_generic
-    )
+    ruleset_dirs = discover_rulesets(validate_options=validate_options)
+    filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
     paths = discover_rule_modules(filtered_dirs)
     rules = []
     for path in paths:
         rules += load_rules_from_path(path, result_collector)
+    rules = filter_rules(rules, validate_options)
     return rules
 
 
-def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
+def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     """
     Make a list of directories and child directories which might contain rules.
 
     Args:
-        extra_rule_dirs: List of directories in which to look for rulesets
+        validate_options: Dataclass for validate options
 
     Returns:
         List of directories that might contain rules
     """
     # ARG PARSING
     rule_dirs = []
-    for rule_dir in extra_rule_dirs:
+    for rule_dir in validate_options.extra_rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        rule_dirs += get_child_dirs(rule_dir)
+        rule_dirs += _get_child_dirs(rule_dir)
     # ENV VARIABLE PARSING:
     env_var_dir_list = handle_env_var_rule_dirs()
     # OPTIONAL ENTRY POINT HANDLING
@@ -73,7 +67,8 @@ def discover_rulesets(extra_rule_dirs: List[Path] = []) -> List[Path]:
 
 
 def filter_rulesets(
-    ruleset_dirs: List[Path], rulesets: List[str], apply_generic: bool
+    ruleset_dirs: List[Path],
+    validate_options: ValidateOptions,
 ) -> List[Path]:
     """
     filter list of directories to only those that contain rulesets which should be
@@ -81,8 +76,7 @@ def filter_rulesets(
 
     Args:
         ruleset_dirs: List of directories in which to look for rulesets
-        rulesets: List of names for ruleset groups that should be applied
-        apply_generic: Whether or not to apply the generic ruleset
+        validate_options: Dataclass for validate options
 
     Returns:
         List of directories corresponding to given rule sets
@@ -90,12 +84,12 @@ def filter_rulesets(
     filtered_rulesets: List[Path] = []
     for ruleset_dir in ruleset_dirs:
         name = ruleset_dir.name
-        if apply_generic and name == "generic":
+        if validate_options.apply_generic and name == "generic":
             filtered_rulesets.append(ruleset_dir)
-        elif name in rulesets:
+        elif name in validate_options.rulesets:
             filtered_rulesets.append(ruleset_dir)
     filtered_ruleset_names = [p.name for p in filtered_rulesets]
-    for ruleset in rulesets:
+    for ruleset in validate_options.rulesets:
         if ruleset not in filtered_ruleset_names:
             raise InvalidRulesetName(ruleset, ruleset_dirs)
     return filtered_rulesets
@@ -158,7 +152,7 @@ def handle_env_var_rule_dirs() -> List[Path]:
     for rule_dir in rule_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        env_var_dirs += get_child_dirs(rule_dir)
+        env_var_dirs += _get_child_dirs(rule_dir)
 
     return env_var_dirs
 
@@ -170,6 +164,25 @@ def handle_entrypoints() -> List[Path]:
     return []
 
 
-def get_child_dirs(dir: Path) -> List[Path]:
+def _get_child_dirs(dir: Path) -> List[Path]:
     child_dirs = [path for path in dir.iterdir() if path.is_dir()]
     return child_dirs
+
+
+def filter_rules(
+    rules: List[IDSValidationRule], validate_options: ValidateOptions
+) -> List[IDSValidationRule]:
+    """
+    Filter a list of rules based on a given dictionary of criteria
+
+    Args:
+        rules: List of loaded IDSValidationRule objects
+        validate_options: Dataclass for validate options
+
+    Returns:
+        List of directories corresponding to given rule sets
+    """
+    filtered_rules = [
+        rule for rule in rules if validate_options.rule_filter.is_selected(rule)
+    ]
+    return filtered_rules
