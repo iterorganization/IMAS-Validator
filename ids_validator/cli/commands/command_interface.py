@@ -5,10 +5,12 @@ from typing import List
 from ids_validator.validate.result import IDSValidationResult
 
 
-class CommandNotExecutedException(Exception): ...
+class CommandNotExecutedException(Exception):
+    """
+    Exception to be raised when one tries to get not-executed command result
+    """
 
-
-class RulesetNotImplementedException(Exception): ...
+    ...
 
 
 class CommandInterface(ABC):

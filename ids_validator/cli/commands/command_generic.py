@@ -4,21 +4,14 @@ from typing import List
 
 from ids_validator.validate.result import IDSValidationResult
 
-from .command_interface import (
-    CommandInterface,
-    CommandNotExecutedException,
-    RulesetNotImplementedException,
-)
+from .command_interface import CommandInterface, CommandNotExecutedException
 
 
 class GenericCommand(CommandInterface):
 
     @property
     def result(self) -> List[IDSValidationResult]:
-        if not self._result and self.executed():
-            raise RulesetNotImplementedException("All rulesets are not implemented")
-
-        elif not self.executed():
+        if not self.executed():
             additional_info = str(self)
             raise CommandNotExecutedException(
                 f"Cannot collect result of command that was not executed.\n"
