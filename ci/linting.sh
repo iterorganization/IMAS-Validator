@@ -26,6 +26,6 @@ python -m venv venv
 pip install --upgrade .[linting]
 
 black --check ids_validator
-flake8 ids_validator
+flake8 ids_validator --extend-ignore=E701,E704
 mypy ids_validator
 isort --check-only ids_validator
