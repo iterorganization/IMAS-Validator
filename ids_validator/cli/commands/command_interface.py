@@ -33,6 +33,13 @@ class CommandInterface(ABC):
         ...
 
     @abstractmethod
+    def execute(self) -> None:
+        """
+        Executes command with stored arguments and fills self._result variable
+        """
+        ...
+
+    @abstractmethod
     def executed(self) -> bool:
         """
         Returns True if command was executed, False otherwise

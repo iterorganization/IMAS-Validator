@@ -1,9 +1,9 @@
 import argparse
 import logging
-from typing import List
+from typing import Sequence
 
-from commands.command_interface import CommandInterface
-from commands.validate_command import ValidateCommand
+from .commands.command_interface import CommandInterface
+from .commands.validate_command import ValidateCommand
 
 
 class CommandParser:
@@ -12,7 +12,7 @@ class CommandParser:
 
     def __init__(self) -> None: ...
 
-    def parse(self, args: argparse.Namespace) -> List[CommandInterface]:
+    def parse(self, args: argparse.Namespace) -> Sequence[CommandInterface]:
         command = args.command
         command_objs = []
         uri_list = args.uri[:]
