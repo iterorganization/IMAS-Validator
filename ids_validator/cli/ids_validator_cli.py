@@ -50,23 +50,26 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     parser = configure_argument_parser()
-    args = parser.parse_args(sys.argv[1:])
+    args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
 
     if args.debug:
         print("enable debug option")
-    if args.command.lower() == "validate":
-        command_parser = CommandParser()
-        print(f"=== TYPE = {type(args)}")
-        command_objects = command_parser.parse(args)
+    try:
+        if args.command.lower() == "validate":
+            command_parser = CommandParser()
+            print(f"=== TYPE = {type(args)}")
+            command_objects = command_parser.parse(args)
 
-        for command in command_objects:
-            command.execute()
+            for command in command_objects:
+                command.execute()
 
-        # temporary, print command results:
-        for command in command_objects:
-            print("===========================")
-            print(command.result)
-            print("===========================\n")
+            # temporary, print command results:
+            for command in command_objects:
+                print("===========================")
+                print(command.result)
+                print("===========================\n")
+    except AttributeError:
+        parser.print_help()
 
 
 if __name__ == "__main__":
