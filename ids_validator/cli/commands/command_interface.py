@@ -1,34 +1,38 @@
+import argparse
 from abc import ABC, abstractmethod
+from typing import List
 
-class CommandNotExecutedException(Exception):
-    ...
+from ids_validator.validate.result import IDSValidationResult
 
-class RulesetNotImplementedException(Exception):
-    ...
+
+class CommandNotExecutedException(Exception): ...
+
+
+class RulesetNotImplementedException(Exception): ...
+
 
 class CommandInterface(ABC):
 
     @property
     @abstractmethod
-    def result(self):
-        ...
+    def result(self) -> List[IDSValidationResult]: ...
 
     @abstractmethod
-    def __init__(self, args):
-        ...
+    def __init__(self, args: argparse.Namespace) -> None: ...
 
     @abstractmethod
-    def __str__(self):
-        '''
+    def __str__(self) -> str:
+        """
         Cast class instance to string.
         :return:
-            String in format: COMMAND <argument1_name>=<argument1_value> ... <argumentN_name>=<argumentN_value>
-        '''
+            String in format: COMMAND <argument1_name>=<argument1_value>
+                                  ... <argumentN_name>=<argumentN_value>
+        """
         ...
 
     @abstractmethod
-    def executed(self):
-        '''
+    def executed(self) -> bool:
+        """
         Returns True if command was executed, False otherwise
-        '''
+        """
         ...
