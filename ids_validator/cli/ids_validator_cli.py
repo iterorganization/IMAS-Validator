@@ -31,20 +31,30 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "-r",
         "--ruleset",
         type=str,
-        required=True,
         action="append",
-        help="Specify name of generic ruleset" " available under RULESET_PATH variable",
+        nargs="*",
+        default=[],
+        help="""Specify with following argument one or more rulesets
+                available under RULESET_PATH variable.""",
     )
 
     validate_group.add_argument(
         "-e",
         "--extra-rule-dirs",
         type=str,
+        action="append",
+        nargs="*",
         default=[],
-        help="Specify path to your custom ruleset",
+        help="""Specify path to your custom ruleset. Subsequent usage of following
+                argument will overwrite previous occurrences of the argument""",
     )
 
-    validate_group.add_argument("-g", "--generic", action="store_true")
+    validate_group.add_argument(
+        "-g",
+        "--no-generic",
+        action="store_false",
+        help="Disable usage of generic ruleset",
+    )
     return parser
 
 

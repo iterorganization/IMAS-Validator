@@ -16,11 +16,13 @@ class ValidateCommand(GenericCommand):
         super(ValidateCommand, self).__init__(args)
         self.uri = args.uri[0]
         self.validate_options = ValidateOptions(
-            rulesets=args.ruleset,
+            rulesets=[ruleset for sublist in args.ruleset for ruleset in sublist],
             extra_rule_dirs=(
-                [Path(args.extra_rule_dirs)] if args.extra_rule_dirs else []
+                [Path(dirs) for sublist in args.extra_rule_dirs for dirs in sublist]
+                if args.extra_rule_dirs
+                else []
             ),
-            apply_generic=args.generic,
+            apply_generic=args.no_generic,
             use_pdb=args.debug,
         )
 
