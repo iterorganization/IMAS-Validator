@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 from typing import List
+import logging
 
 from ids_validator.exceptions import (
     EmptyRuleFileWarning,
@@ -14,6 +15,10 @@ from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
+from ids_validator.setup_logging import connect_formatter
+
+logger = logging.getLogger(__name__)
+connect_formatter(logger)
 
 
 def load_rules(
@@ -38,6 +43,8 @@ def load_rules(
     for path in paths:
         rules += load_rules_from_path(path, result_collector)
     rules = filter_rules(rules, validate_options)
+    if len(rules) == 0:
+        logger.warning('No rules found')
     return rules
 
 
@@ -134,6 +141,7 @@ def load_rules_from_path(
 
     run_path(rule_path, val_registry, result_collector)
     if len(val_registry.validators) == 0:
+        logger.warning('No rules in rule file')
         raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators
 

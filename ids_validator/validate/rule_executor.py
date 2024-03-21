@@ -5,6 +5,7 @@ IDS data
 
 import pdb
 from typing import Iterator, List, Tuple
+import logging
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
@@ -13,6 +14,11 @@ from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
+from ids_validator.setup_logging import connect_formatter
+
+
+logger = logging.getLogger(__name__)
+connect_formatter(logger)
 
 IDSInstance = Tuple[IDSToplevel, str, int]
 
@@ -52,6 +58,7 @@ class RuleExecutor:
             self.run(rule, ids_toplevels)
 
     def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
+        res_num = len(self.result_collector.results)
         try:
             rule.apply_func(ids_toplevels)
         except Exception as exc:
@@ -69,6 +76,9 @@ class RuleExecutor:
                 self.result_collector.add_error_result(exc)
             if self.validate_options.use_pdb:
                 pdb.post_mortem(tb)
+        finally:
+            if len(self.result_collector.results) == res_num:
+                logger.warning(f"No assertions in {rule.name}")
 
     def find_matching_rules(
         self,
