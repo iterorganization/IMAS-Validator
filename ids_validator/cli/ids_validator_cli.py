@@ -19,10 +19,9 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     validate_group = validate_parser.add_argument_group("Validator arguments")
 
     validate_group.add_argument(
-        "-u",
-        "--uri",
+        "URI",
         type=str,
-        required=True,
+        nargs="+",
         action="append",
         help="uri for database entree",
     )
@@ -32,7 +31,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "--ruleset",
         type=str,
         action="append",
-        nargs="*",
+        nargs="+",
         default=[],
         help="""Specify with following argument one or more rulesets
                 available under RULESET_PATH variable.""",
@@ -43,7 +42,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "--extra-rule-dirs",
         type=str,
         action="append",
-        nargs="*",
+        nargs="+",
         default=[],
         help="""Specify path to your custom ruleset. Subsequent usage of following
                 argument will overwrite previous occurrences of the argument""",

@@ -15,7 +15,7 @@ class CommandParser:
     def parse(self, args: argparse.Namespace) -> Sequence[CommandInterface]:
         command = args.command
         command_objs = []
-        uri_list = args.uri[:]
+        uri_list = args.URI[:][0]
         if command.lower() == "validate":
             for uri in uri_list:
                 args.uri = [uri]
