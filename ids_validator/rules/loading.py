@@ -1,9 +1,9 @@
 """This file describes the functionality for discovering and loading validation rules"""
 
+import logging
 import os
 from pathlib import Path
 from typing import List
-import logging
 
 from ids_validator.exceptions import (
     EmptyRuleFileWarning,
@@ -13,9 +13,9 @@ from ids_validator.exceptions import (
 )
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
+from ids_validator.setup_logging import connect_formatter
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
-from ids_validator.setup_logging import connect_formatter
 
 logger = logging.getLogger(__name__)
 connect_formatter(logger)
@@ -36,15 +36,18 @@ def load_rules(
     Returns:
         Loaded validation rules.
     """
+    logger.info("Started loading rules")
     ruleset_dirs = discover_rulesets(validate_options=validate_options)
     filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
     paths = discover_rule_modules(filtered_dirs)
     rules = []
     for path in paths:
         rules += load_rules_from_path(path, result_collector)
+    logger.info(f"{len(rules)} total rules found")
     rules = filter_rules(rules, validate_options)
     if len(rules) == 0:
-        logger.warning('No rules found')
+        logger.warning("No rules found")
+    logger.info(f"{len(rules)} rules found after filtering")
     return rules
 
 
@@ -70,6 +73,7 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     entrypoint_dir_list = handle_entrypoints()
     # COMBINE ALL
     ruleset_dirs = list(set(rule_dirs + env_var_dir_list + entrypoint_dir_list))
+    logger.info(f"Found rulesets: {ruleset_dirs}")
     return ruleset_dirs
 
 
@@ -99,6 +103,7 @@ def filter_rulesets(
     for ruleset in validate_options.rulesets:
         if ruleset not in filtered_ruleset_names:
             raise InvalidRulesetName(ruleset, ruleset_dirs)
+    logger.info(f"Using rulesets: {filtered_rulesets}")
     return filtered_rulesets
 
 
@@ -141,7 +146,7 @@ def load_rules_from_path(
 
     run_path(rule_path, val_registry, result_collector)
     if len(val_registry.validators) == 0:
-        logger.warning('No rules in rule file')
+        logger.warning("No rules in rule file")
         raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators
 

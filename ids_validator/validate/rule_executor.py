@@ -3,19 +3,18 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
+import logging
 import pdb
 from typing import Iterator, List, Tuple
-import logging
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
+from ids_validator.setup_logging import connect_formatter
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
-from ids_validator.setup_logging import connect_formatter
-
 
 logger = logging.getLogger(__name__)
 connect_formatter(logger)
@@ -51,10 +50,12 @@ class RuleExecutor:
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""
+        logger.info("Started executing rules")
         for ids_instances, rule in self.find_matching_rules():
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
+            logger.info(f"Running {rule.name}")
             self.run(rule, ids_toplevels)
 
     def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:

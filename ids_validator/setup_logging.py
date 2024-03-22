@@ -27,17 +27,18 @@ class _PrettyFormatter(logging.Formatter):
         logging.CRITICAL: logging.Formatter(bold_red + formatstr, time_format),
     }
 
-    def format(self, record):
-        formatter = self.FORMATS.get(record.levelno)
+    def format(self, record: logging.LogRecord) -> str:
+        formatter = self.FORMATS.get(record.levelno, self.FORMATS[logging.INFO])
         return formatter.format(record)
 
 
-def default_stream_handler():
+def default_stream_handler() -> logging.StreamHandler:
     ch = logging.StreamHandler()
     ch.setLevel(logging.WARNING)
     ch.setFormatter(_PrettyFormatter())
+    return ch
 
 
-def connect_formatter(logger):
+def connect_formatter(logger: logging.Logger) -> None:
     """Connect general formatter to given logger"""
     logger.addHandler(default_stream_handler())
