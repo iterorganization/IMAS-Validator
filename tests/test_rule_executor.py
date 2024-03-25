@@ -51,10 +51,10 @@ def list_all_occurrences(ids_name: str):
 
 
 @pytest.fixture(autouse=True)
-def beep(test_logger):
+def patch_logger(test_logger):
     module = "ids_validator.validate.rule_executor"
-    with patch(f"{module}.logger", new=test_logger) as boop:
-        yield boop
+    with patch(f"{module}.logger", new=test_logger) as patched_logger:
+        yield patched_logger
 
 
 @pytest.fixture
