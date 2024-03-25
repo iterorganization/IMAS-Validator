@@ -1,6 +1,6 @@
-import unittest.mock
 from collections import Counter
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -24,13 +24,20 @@ from ids_validator.validate_options import RuleFilter, ValidateOptions
 
 @pytest.fixture(scope="function")
 def res_collector():
-    mock = unittest.mock.MagicMock()
+    mock = MagicMock()
     # MagicMock doesn't automatically create mock attributes starting with 'assert'
-    mock.assert_ = unittest.mock.Mock()
+    mock.assert_ = Mock()
     return mock
 
 
-def test_discover_rulesets_explicit():
+@pytest.fixture(autouse=True)
+def beep(test_logger):
+    module = "ids_validator.rules.loading"
+    with patch(f"{module}.logger", new=test_logger) as boop:
+        yield boop
+
+
+def test_discover_rulesets_explicit(test_logger):
     extra_rule_dirs = [
         Path("tests/rulesets"),
         Path("tests/rulesets/base"),
@@ -50,9 +57,10 @@ def test_discover_rulesets_explicit():
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
+    test_logger.info.assert_called_with("Found 8 rulesets")
 
 
-def test_discover_rulesets_env_var(monkeypatch):
+def test_discover_rulesets_env_var(monkeypatch, test_logger):
     monkeypatch.setenv("RULESET_PATH", "tests/rulesets/env_var:tests/rulesets/env_var2")
     unfiltered_rulesets = [
         Path("tests/rulesets/env_var/generic"),
@@ -63,6 +71,7 @@ def test_discover_rulesets_env_var(monkeypatch):
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
+    test_logger.info.assert_called_with("Found 3 rulesets")
 
 
 def test_discover_rulesets_invalid_env_var(monkeypatch):
@@ -78,7 +87,7 @@ def test_discover_rulesets_invalid_env_var(monkeypatch):
 #     pass
 
 
-def test_filter_rulesets_all():
+def test_filter_rulesets_all(test_logger):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
@@ -89,9 +98,10 @@ def test_filter_rulesets_all():
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
+    test_logger.info.assert_called_with("Using 2 / 3 rulesets")
 
 
-def test_filter_rulesets_none():
+def test_filter_rulesets_none(test_logger):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = []
@@ -102,9 +112,10 @@ def test_filter_rulesets_none():
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
+    test_logger.info.assert_called_with("Using 0 / 3 rulesets")
 
 
-def test_filter_rulesets_apply_generic():
+def test_filter_rulesets_apply_generic(test_logger):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = [Path(f"{base}/generic")]
@@ -115,9 +126,10 @@ def test_filter_rulesets_apply_generic():
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
+    test_logger.info.assert_called_with("Using 1 / 3 rulesets")
 
 
-def test_filter_rulesets_with_rulesets():
+def test_filter_rulesets_with_rulesets(test_logger):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = [Path(f"{base}/ITER-MD")]
@@ -128,6 +140,7 @@ def test_filter_rulesets_with_rulesets():
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
+    test_logger.info.assert_called_with("Using 1 / 3 rulesets")
 
 
 def test_filter_rulesets_invalid_ruleset():
@@ -166,11 +179,12 @@ def test_load_rules_from_path(res_collector):
     assert rules[0].kwfields == {}
 
 
-def test_load_rules_from_path_empty_file(res_collector):
+def test_load_rules_from_path_empty_file(res_collector, test_logger):
     path = Path("tests/rulesets/exceptions/generic/empty.py")
     with pytest.raises(EmptyRuleFileWarning):
         rules = load_rules_from_path(path, res_collector)
         assert len(rules) == 0
+    test_logger.warning.assert_called_with(f"No rules in rule file {path}")
 
 
 def test_load_rules_syntax_error(res_collector):

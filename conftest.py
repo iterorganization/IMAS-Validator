@@ -1,3 +1,4 @@
+from unittest.mock import Mock
 import numpy
 import pytest
 import imaspy
@@ -49,3 +50,9 @@ def test_data_waves():
     wv.coherent_wave[0].full_wave[0].e_field.plus[0].values = [1, 1j, -1, -1j]  # CPX_1D
     # And wrap it:
     return IDSWrapper(wv)
+
+
+@pytest.fixture
+def test_logger():
+    logger = Mock()
+    return logger

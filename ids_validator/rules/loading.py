@@ -73,7 +73,7 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     entrypoint_dir_list = handle_entrypoints()
     # COMBINE ALL
     ruleset_dirs = list(set(rule_dirs + env_var_dir_list + entrypoint_dir_list))
-    logger.info(f"Found rulesets: {ruleset_dirs}")
+    logger.info(f"Found {len(ruleset_dirs)} rulesets")
     return ruleset_dirs
 
 
@@ -103,7 +103,7 @@ def filter_rulesets(
     for ruleset in validate_options.rulesets:
         if ruleset not in filtered_ruleset_names:
             raise InvalidRulesetName(ruleset, ruleset_dirs)
-    logger.info(f"Using rulesets: {filtered_rulesets}")
+    logger.info(f"Using {len(filtered_rulesets)} / {len(ruleset_dirs)} rulesets")
     return filtered_rulesets
 
 
@@ -146,7 +146,7 @@ def load_rules_from_path(
 
     run_path(rule_path, val_registry, result_collector)
     if len(val_registry.validators) == 0:
-        logger.warning("No rules in rule file")
+        logger.warning(f"No rules in rule file {rule_path}")
         raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators
 

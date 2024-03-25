@@ -1,6 +1,6 @@
 from functools import lru_cache, reduce
 from pathlib import Path
-from unittest.mock import Mock, call
+from unittest.mock import Mock, call, patch
 
 import numpy
 import pytest
@@ -48,6 +48,13 @@ def get(ids_name: str, occurrence: int = 0):
 
 def list_all_occurrences(ids_name: str):
     return _occurrence_dict.get(ids_name, [])
+
+
+@pytest.fixture(autouse=True)
+def beep(test_logger):
+    module = "ids_validator.validate.rule_executor"
+    with patch(f"{module}.logger", new=test_logger) as boop:
+        yield boop
 
 
 @pytest.fixture
@@ -99,7 +106,7 @@ def test_dbentry_mock(dbentry):
     assert cp3.ids_properties.comment == "Test IDS: core_profiles/3"
 
 
-def test_apply_rules_to_data(rule_executor):
+def test_apply_rules_to_data(rule_executor, test_logger):
     rules = rule_executor.rules
     dbentry = rule_executor.db_entry
     # Function to test:
@@ -133,6 +140,17 @@ def test_apply_rules_to_data(rule_executor):
     ]
     assert dbentry.get.call_count == len(get_calls)
     dbentry.get.assert_has_calls(get_calls, any_order=True)
+    info_log_calls = [
+        call("Started executing rules"),
+        *8 * [call("Running t/all.py/Mock func 0")],
+        *4 * [call("Running t/core_profiles.py/Mock func 1")],
+    ]
+    warning_log_calls = [
+        *8 * [call("No assertions in t/all.py/Mock func 0")],
+        *4 * [call("No assertions in t/core_profiles.py/Mock func 1")],
+    ]
+    test_logger.info.assert_has_calls(info_log_calls, any_order=True)
+    test_logger.warning.assert_has_calls(warning_log_calls, any_order=True)
 
 
 def test_find_matching_rules(rule_executor):
