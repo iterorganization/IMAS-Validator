@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+import logging
 import numpy
 import pytest
 import imaspy
@@ -52,7 +52,7 @@ def test_data_waves():
     return IDSWrapper(wv)
 
 
-@pytest.fixture
-def test_logger():
-    logger = Mock()
-    return logger
+@pytest.fixture(autouse=True)
+def set_caplog(caplog):
+    with caplog.at_level(logging.INFO, logger="ids_validator"):
+        yield

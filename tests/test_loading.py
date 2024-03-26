@@ -1,6 +1,7 @@
+import logging
 from collections import Counter
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock
 
 import pytest
 
@@ -30,14 +31,7 @@ def res_collector():
     return mock
 
 
-@pytest.fixture(autouse=True)
-def patch_logger(test_logger):
-    module = "ids_validator.rules.loading"
-    with patch(f"{module}.logger", new=test_logger) as patched_logger:
-        yield patched_logger
-
-
-def test_discover_rulesets_explicit(test_logger):
+def test_discover_rulesets_explicit(caplog):
     extra_rule_dirs = [
         Path("tests/rulesets"),
         Path("tests/rulesets/base"),
@@ -57,13 +51,16 @@ def test_discover_rulesets_explicit(test_logger):
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
-    test_logger.info.assert_called_with(
+    log_text = (
         "Found 8 rulesets: ITER-MD, base, env_var, env_var2, exceptions, filter_test, "
         + "generic, validate-test"
     )
+    assert caplog.record_tuples == [
+        ("ids_validator.rules.loading", logging.INFO, log_text)
+    ]
 
 
-def test_discover_rulesets_env_var(monkeypatch, test_logger):
+def test_discover_rulesets_env_var(monkeypatch, caplog):
     monkeypatch.setenv("RULESET_PATH", "tests/rulesets/env_var:tests/rulesets/env_var2")
     unfiltered_rulesets = [
         Path("tests/rulesets/env_var/generic"),
@@ -74,7 +71,13 @@ def test_discover_rulesets_env_var(monkeypatch, test_logger):
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
-    test_logger.info.assert_called_with("Found 3 rulesets: ITER-MD, generic, generic")
+    assert caplog.record_tuples == [
+        (
+            "ids_validator.rules.loading",
+            logging.INFO,
+            "Found 3 rulesets: ITER-MD, generic, generic",
+        )
+    ]
 
 
 def test_discover_rulesets_invalid_env_var(monkeypatch):
@@ -90,7 +93,7 @@ def test_discover_rulesets_invalid_env_var(monkeypatch):
 #     pass
 
 
-def test_filter_rulesets_all(test_logger):
+def test_filter_rulesets_all(caplog):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
@@ -101,10 +104,16 @@ def test_filter_rulesets_all(test_logger):
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
-    test_logger.info.assert_called_with("Using 2 / 3 rulesets")
+    assert caplog.record_tuples == [
+        (
+            "ids_validator.rules.loading",
+            logging.INFO,
+            "Using 2 / 3 rulesets",
+        )
+    ]
 
 
-def test_filter_rulesets_none(test_logger):
+def test_filter_rulesets_none(caplog):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = []
@@ -115,10 +124,16 @@ def test_filter_rulesets_none(test_logger):
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
-    test_logger.info.assert_called_with("Using 0 / 3 rulesets")
+    assert caplog.record_tuples == [
+        (
+            "ids_validator.rules.loading",
+            logging.INFO,
+            "Using 0 / 3 rulesets",
+        )
+    ]
 
 
-def test_filter_rulesets_apply_generic(test_logger):
+def test_filter_rulesets_apply_generic(caplog):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = [Path(f"{base}/generic")]
@@ -129,10 +144,16 @@ def test_filter_rulesets_apply_generic(test_logger):
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
-    test_logger.info.assert_called_with("Using 1 / 3 rulesets")
+    assert caplog.record_tuples == [
+        (
+            "ids_validator.rules.loading",
+            logging.INFO,
+            "Using 1 / 3 rulesets",
+        )
+    ]
 
 
-def test_filter_rulesets_with_rulesets(test_logger):
+def test_filter_rulesets_with_rulesets(caplog):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
     filtered_rulesets = [Path(f"{base}/ITER-MD")]
@@ -143,7 +164,13 @@ def test_filter_rulesets_with_rulesets(test_logger):
     assert Counter(
         filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     ) == Counter(filtered_rulesets)
-    test_logger.info.assert_called_with("Using 1 / 3 rulesets")
+    assert caplog.record_tuples == [
+        (
+            "ids_validator.rules.loading",
+            logging.INFO,
+            "Using 1 / 3 rulesets",
+        )
+    ]
 
 
 def test_filter_rulesets_invalid_ruleset():
@@ -182,12 +209,18 @@ def test_load_rules_from_path(res_collector):
     assert rules[0].kwfields == {}
 
 
-def test_load_rules_from_path_empty_file(res_collector, test_logger):
+def test_load_rules_from_path_empty_file(res_collector, caplog):
     path = Path("tests/rulesets/exceptions/generic/empty.py")
     with pytest.raises(EmptyRuleFileWarning):
         rules = load_rules_from_path(path, res_collector)
         assert len(rules) == 0
-    test_logger.warning.assert_called_with(f"No rules in rule file {path}")
+    assert caplog.record_tuples == [
+        (
+            "ids_validator.rules.loading",
+            logging.WARNING,
+            f"No rules in rule file {path}",
+        )
+    ]
 
 
 def test_load_rules_syntax_error(res_collector):

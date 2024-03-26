@@ -1,9 +1,9 @@
+import logging
 from functools import lru_cache
 from pathlib import Path
 from unittest.mock import patch
 
 import numpy
-import pytest
 from imaspy import IDSFactory
 from imaspy.exception import DataEntryException
 
@@ -15,13 +15,6 @@ _occurrence_dict = {
     "core_profiles": numpy.array([0]),
     "equilibrium": numpy.array([0]),
 }
-
-
-@pytest.fixture(autouse=True)
-def patch_logger(test_logger):
-    module = "ids_validator.validate.validate"
-    with patch(f"{module}.logger", new=test_logger) as patched_logger:
-        yield patched_logger
 
 
 def list_all_occurrences(ids_name: str):
@@ -41,7 +34,7 @@ def get(ids_name: str, occurrence: int = 0):
     return ids
 
 
-def test_validate(test_logger):
+def test_validate(caplog):
     module = "ids_validator.validate.validate"
     # patch _check_imas_version for now
     with patch(
@@ -85,4 +78,10 @@ def test_validate(test_logger):
         assert results[2].tb[-1].name == "validate_test_rule_success"
         assert results[2].exc is None
 
-        test_logger.info.assert_called_with("3 results obtained")
+        assert caplog.record_tuples == [
+            (
+                "ids_validator.validate.validate",
+                logging.WARNING,
+                "3 results obtained",
+            )
+        ]
