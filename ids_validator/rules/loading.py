@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import List
 
 from ids_validator.exceptions import (
-    EmptyRuleFileWarning,
     InvalidRulesetName,
     InvalidRulesetPath,
     WrongFileExtensionError,
@@ -148,7 +147,6 @@ def load_rules_from_path(
     run_path(rule_path, val_registry, result_collector)
     if len(val_registry.validators) == 0:
         logger.warning(f"No rules in rule file {rule_path}")
-        raise EmptyRuleFileWarning(rule_path)
     return val_registry.validators
 
 

@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, Mock
 import pytest
 
 from ids_validator.exceptions import (
-    EmptyRuleFileWarning,
     InvalidRulesetName,
     InvalidRulesetPath,
     WrongFileExtensionError,
@@ -211,9 +210,8 @@ def test_load_rules_from_path(res_collector):
 
 def test_load_rules_from_path_empty_file(res_collector, caplog):
     path = Path("tests/rulesets/exceptions/generic/empty.py")
-    with pytest.raises(EmptyRuleFileWarning):
-        rules = load_rules_from_path(path, res_collector)
-        assert len(rules) == 0
+    rules = load_rules_from_path(path, res_collector)
+    assert len(rules) == 0
     assert caplog.record_tuples == [
         (
             "ids_validator.rules.loading",
