@@ -12,12 +12,10 @@ from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
-from ids_validator.setup_logging import connect_formatter
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
-connect_formatter(logger)
 
 IDSInstance = Tuple[IDSToplevel, str, int]
 
@@ -55,7 +53,17 @@ class RuleExecutor:
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
-            logger.info(f"Running {rule.name}")
+            logger.info(
+                f"Running {rule.name} on "
+                + ", ".join(
+                    sorted(
+                        [
+                            str(ids_name) + ":" + str(ids_occ)
+                            for ids_name, ids_occ in idss
+                        ]
+                    )
+                )
+            )
             self.run(rule, ids_toplevels)
 
     def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
@@ -79,7 +87,11 @@ class RuleExecutor:
                 pdb.post_mortem(tb)
         finally:
             if len(self.result_collector.results) == res_num:
-                logger.warning(f"No assertions in {rule.name}")
+                logger.warning(
+                    f"No assertions in {rule.name}. "
+                    + "Make sure the validation test is testing something "
+                    + "with an assert statement."
+                )
 
     def find_matching_rules(
         self,

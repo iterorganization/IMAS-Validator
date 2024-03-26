@@ -11,14 +11,12 @@ from packaging.version import Version
 
 from ids_validator.exceptions import IMASVersionError
 from ids_validator.rules.loading import load_rules
-from ids_validator.setup_logging import connect_formatter
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
-connect_formatter(logger)
 
 default_val_opts = ValidateOptions()
 

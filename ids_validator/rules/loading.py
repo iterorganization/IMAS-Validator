@@ -13,12 +13,10 @@ from ids_validator.exceptions import (
 )
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
-from ids_validator.setup_logging import connect_formatter
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
-connect_formatter(logger)
 
 
 def load_rules(
@@ -46,7 +44,7 @@ def load_rules(
     logger.info(f"{len(rules)} total rules found")
     rules = filter_rules(rules, validate_options)
     if len(rules) == 0:
-        logger.warning("No rules found")
+        logger.warning("No rules found after filtering")
     logger.info(f"{len(rules)} rules found after filtering")
     return rules
 
@@ -73,7 +71,10 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     entrypoint_dir_list = handle_entrypoints()
     # COMBINE ALL
     ruleset_dirs = list(set(rule_dirs + env_var_dir_list + entrypoint_dir_list))
-    logger.info(f"Found {len(ruleset_dirs)} rulesets")
+    logger.info(
+        f"Found {len(ruleset_dirs)} rulesets: "
+        + ", ".join(sorted([rs.name for rs in ruleset_dirs]))
+    )
     return ruleset_dirs
 
 

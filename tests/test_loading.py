@@ -57,7 +57,10 @@ def test_discover_rulesets_explicit(test_logger):
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
-    test_logger.info.assert_called_with("Found 8 rulesets")
+    test_logger.info.assert_called_with(
+        "Found 8 rulesets: ITER-MD, base, env_var, env_var2, exceptions, filter_test, "
+        + "generic, validate-test"
+    )
 
 
 def test_discover_rulesets_env_var(monkeypatch, test_logger):
@@ -71,7 +74,7 @@ def test_discover_rulesets_env_var(monkeypatch, test_logger):
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
-    test_logger.info.assert_called_with("Found 3 rulesets")
+    test_logger.info.assert_called_with("Found 3 rulesets: ITER-MD, generic, generic")
 
 
 def test_discover_rulesets_invalid_env_var(monkeypatch):

@@ -142,12 +142,25 @@ def test_apply_rules_to_data(rule_executor, test_logger):
     dbentry.get.assert_has_calls(get_calls, any_order=True)
     info_log_calls = [
         call("Started executing rules"),
-        *8 * [call("Running t/all.py/Mock func 0")],
-        *4 * [call("Running t/core_profiles.py/Mock func 1")],
+        *[
+            call(f"Running t/all.py/Mock func 0 on {ids_name}:{occurrence}")
+            for ids_name in _occurrence_dict
+            for occurrence in _occurrence_dict[ids_name]
+        ],
+        *[
+            call(
+                f"Running t/core_profiles.py/Mock func 1 on core_profiles:{occurrence}"
+            )
+            for occurrence in _occurrence_dict["core_profiles"]
+        ],
     ]
+    fix_assert_str = (
+        "Make sure the validation test is testing something with an assert statement."
+    )
     warning_log_calls = [
-        *8 * [call("No assertions in t/all.py/Mock func 0")],
-        *4 * [call("No assertions in t/core_profiles.py/Mock func 1")],
+        *8 * [call(f"No assertions in t/all.py/Mock func 0. {fix_assert_str}")],
+        *4
+        * [call(f"No assertions in t/core_profiles.py/Mock func 1. {fix_assert_str}")],
     ]
     test_logger.info.assert_has_calls(info_log_calls, any_order=True)
     test_logger.warning.assert_has_calls(warning_log_calls, any_order=True)
