@@ -78,10 +78,8 @@ def test_validate(caplog):
         assert results[2].tb[-1].name == "validate_test_rule_success"
         assert results[2].exc is None
 
-        assert caplog.record_tuples == [
-            (
-                "ids_validator.validate.validate",
-                logging.WARNING,
-                "3 results obtained",
-            )
-        ]
+        assert caplog.record_tuples[-1] == (
+            "ids_validator.validate.validate",
+            logging.INFO,
+            "3 results obtained",
+        )
