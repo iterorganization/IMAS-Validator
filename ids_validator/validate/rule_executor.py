@@ -53,14 +53,10 @@ class RuleExecutor:
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
-            logger.info(
-                f"Running {rule.name} on "
-                ", ".join(
-                    sorted(
-                        f"{str(ids_name)}/{str(ids_occ)}" for ids_name, ids_occ in idss
-                    )
-                )
+            idss_str = ", ".join(
+                sorted(f"{ids_name}/{ids_occ}" for ids_name, ids_occ in idss)
             )
+            logger.info(f"Running {rule.name} on {idss_str}")
             self.run(rule, ids_toplevels)
 
     def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
