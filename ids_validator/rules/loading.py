@@ -72,7 +72,7 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     ruleset_dirs = list(set(rule_dirs + env_var_dir_list + entrypoint_dir_list))
     logger.info(
         f"Found {len(ruleset_dirs)} rulesets: "
-        + ", ".join(sorted([rs.name for rs in ruleset_dirs]))
+        f"{', '.join(sorted([rs.name for rs in ruleset_dirs]))}"
     )
     return ruleset_dirs
 

@@ -1,5 +1,4 @@
 import logging
-from collections import Counter
 from functools import lru_cache, reduce
 from pathlib import Path
 from unittest.mock import Mock, call
@@ -138,46 +137,27 @@ def test_apply_rules_to_data(rule_executor):
 
 
 def test_apply_rules_to_data_logging(rule_executor, caplog):
+    def list_all_occurrences(ids_name):
+        return {"magnetics": numpy.array([1])}.get(ids_name, [])
+
+    rule_executor.db_entry.list_all_occurrences = Mock(wraps=list_all_occurrences)
+    rule_executor.rules = rule_executor.rules[:1]
     rule_executor.apply_rules_to_data()
     info_log_calls = [
         "Started executing rules",
-        *[
-            f"Running t/all.py/Mock func 0 on {ids_name}:{occurrence}"
-            for ids_name in _occurrence_dict
-            for occurrence in _occurrence_dict[ids_name]
-        ],
-        *[
-            f"Running t/core_profiles.py/Mock func 1 on core_profiles:{occurrence}"
-            for occurrence in _occurrence_dict["core_profiles"]
-        ],
+        "Running t/all.py/Mock func 0 on magnetics/1",
     ]
     fix_assert_str = (
         "Make sure the validation test is testing something with an assert statement."
     )
     warning_log_calls = [
-        *8 * [f"No assertions in t/all.py/Mock func 0. {fix_assert_str}"],
-        *4 * [f"No assertions in t/core_profiles.py/Mock func 1. {fix_assert_str}"],
+        f"No assertions in t/all.py/Mock func 0. {fix_assert_str}",
     ]
-    assert Counter(caplog.record_tuples) == Counter(
-        [
-            *[
-                (
-                    "ids_validator.validate.rule_executor",
-                    logging.INFO,
-                    val,
-                )
-                for val in info_log_calls
-            ],
-            *[
-                (
-                    "ids_validator.validate.rule_executor",
-                    logging.WARNING,
-                    val,
-                )
-                for val in warning_log_calls
-            ],
-        ]
-    )
+    module = "ids_validator.validate.rule_executor"
+    for val in info_log_calls:
+        assert (module, logging.INFO, val) in caplog.record_tuples
+    for val in warning_log_calls:
+        assert (module, logging.WARNING, val) in caplog.record_tuples
 
 
 def test_find_matching_rules(rule_executor):

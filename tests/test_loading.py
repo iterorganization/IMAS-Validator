@@ -52,7 +52,7 @@ def test_discover_rulesets_explicit(caplog):
     )
     log_text = (
         "Found 8 rulesets: ITER-MD, base, env_var, env_var2, exceptions, filter_test, "
-        + "generic, validate-test"
+        "generic, validate-test"
     )
     assert caplog.record_tuples == [
         ("ids_validator.rules.loading", logging.INFO, log_text)

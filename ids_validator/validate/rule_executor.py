@@ -55,12 +55,9 @@ class RuleExecutor:
             self.result_collector.set_context(rule, idss)
             logger.info(
                 f"Running {rule.name} on "
-                + ", ".join(
+                ", ".join(
                     sorted(
-                        [
-                            str(ids_name) + ":" + str(ids_occ)
-                            for ids_name, ids_occ in idss
-                        ]
+                        f"{str(ids_name)}/{str(ids_occ)}" for ids_name, ids_occ in idss
                     )
                 )
             )
@@ -89,8 +86,8 @@ class RuleExecutor:
             if len(self.result_collector.results) == res_num:
                 logger.warning(
                     f"No assertions in {rule.name}. "
-                    + "Make sure the validation test is testing something "
-                    + "with an assert statement."
+                    "Make sure the validation test is testing something "
+                    "with an assert statement."
                 )
 
     def find_matching_rules(
