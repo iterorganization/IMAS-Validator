@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import sys
+from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 
@@ -57,16 +58,15 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main() -> None:
+def main(argv: List) -> None:
     parser = configure_argument_parser()
-    args = parser.parse_args(args=None if sys.argv[1:] else ["--help"])
+    args = parser.parse_args(args=None if argv else ["--help"])
 
     if args.debug:
-        print("enable debug option")
+        print("debug option enabled")
     try:
         if args.command.lower() == "validate":
             command_parser = CommandParser()
-            print(f"=== TYPE = {type(args)}")
             command_objects = command_parser.parse(args)
 
             for command in command_objects:
@@ -82,4 +82,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    argv: List = sys.argv[1:]
+    main(argv)
