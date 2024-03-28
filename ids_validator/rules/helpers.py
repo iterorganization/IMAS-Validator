@@ -12,6 +12,10 @@ from imaspy.util import find_paths, visit_children
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
+# Make the following helpers available for rule developers:
+__all__ = ["Select", "Increasing", "Decreasing", "Approx"]
+
+
 class Select:
     """Select children of an IDS toplevel or structure, based on the given criteria.
 
@@ -133,3 +137,6 @@ def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper
         b_val = b
     res = np.allclose(a_val, b_val, rtol=rtol, atol=atol)
     return IDSWrapper(res, ids_nodes=ids_nodes)
+
+
+HELPER_DICT = {helper_name: globals()[helper_name] for helper_name in __all__}
