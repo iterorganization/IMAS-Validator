@@ -110,6 +110,7 @@ disallow_untyped_decorators = true
 [[tool.mypy.overrides]]
 module = [
     "tests.*",
+    "assets.*",
 ]
 ignore_errors = true
 
