@@ -12,7 +12,6 @@ from imaspy.util import find_paths, visit_children
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
-
 # Make the following helpers available for rule developers:
 __all__ = ["Select", "Increasing", "Decreasing", "Approx", "Parent"]
 
