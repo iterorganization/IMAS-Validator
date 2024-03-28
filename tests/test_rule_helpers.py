@@ -6,7 +6,7 @@ import pytest
 from imaspy.ids_base import IDSBase
 from imaspy.ids_toplevel import IDSToplevel
 
-from ids_validator.rules.helpers import Approx, Decreasing, Increasing, Select
+from ids_validator.rules.helpers import Approx, Decreasing, Increasing, Parent, Select
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
@@ -187,3 +187,18 @@ def test_approx_non_wrapper():
     d = Approx(a, b, rtol=1e-7, atol=1e-8)
     assert not d
     assert d._ids_nodes == [("a", 0)]
+
+
+def test_parent(select_ids):
+    node = IDSWrapper(select_ids.ids_properties.homogeneous_time)
+    assert Parent(node)._obj is select_ids.ids_properties
+    assert Parent(Parent(node))._obj is Parent(node, 2)._obj is select_ids
+    with pytest.raises(ValueError):
+        Parent(node, 3)
+    with pytest.raises(ValueError):
+        Parent(IDSWrapper(select_ids))
+
+    node = IDSWrapper(select_ids.profiles_1d[0].time)
+    assert Parent(node, 1)._obj is select_ids.profiles_1d[0]
+    assert Parent(node, 2)._obj is select_ids.profiles_1d
+    assert Parent(node, 3)._obj is select_ids

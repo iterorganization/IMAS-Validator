@@ -7,13 +7,14 @@ from typing import Any, Callable, Iterator, List
 
 import numpy as np
 from imaspy.ids_base import IDSBase
+from imaspy.ids_toplevel import IDSToplevel
 from imaspy.util import find_paths, visit_children
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
 # Make the following helpers available for rule developers:
-__all__ = ["Select", "Increasing", "Decreasing", "Approx"]
+__all__ = ["Select", "Increasing", "Decreasing", "Approx", "Parent"]
 
 
 class Select:
@@ -137,6 +138,46 @@ def Approx(a: Any, b: Any, rtol: float = 1e-5, atol: float = 1e-8) -> IDSWrapper
         b_val = b
     res = np.allclose(a_val, b_val, rtol=rtol, atol=atol)
     return IDSWrapper(res, ids_nodes=ids_nodes)
+
+
+def Parent(wrapped: IDSWrapper, level: int = 1) -> IDSWrapper:
+    """Get the parent of an IDS node.
+
+    Will raise an exception when attempting to get the parent of an IDS toplevel node.
+
+    Example:
+        .. code-block:: python
+
+            >>> node = core_profiles.profiles_1d[0].ion[1].label
+            >>> Parent(node)
+            IDSWrapper(<IDSStructure (IDS:core_profiles, profiles_1d[0]/ion[1])>)
+            >>> Parent(node, 2)
+            IDSWrapper(<IDSStructArray (IDS:core_profiles, profiles_1d[0]/ion with 2 items)>)
+            >>> Parent(node, 3)
+            IDSWrapper(<IDSStructure (IDS:core_profiles, profiles_1d[0])>)
+            >>> Parent(node, 4)
+            IDSWrapper(<IDSStructArray (IDS:core_profiles, profiles_1d with 1 items)>)
+            >>> Parent(node, 5)
+            IDSWrapper(<IDSToplevel (IDS:core_profiles)>)
+            >>> Parent(node, 6)
+            [...]
+            ValueError: Cannot get the parent of <IDSToplevel (IDS:core_profiles)>
+
+    Args:
+        wrapped: IDS node
+        level: Specify which "level" parent you want. For example, ``level=2`` returns
+            the grandparent of the given IDS node.
+    """  # noqa: 501
+    if not isinstance(wrapped, IDSWrapper):
+        raise TypeError("First argument must be an IDS node")
+    node = wrapped._obj
+    if not isinstance(node, IDSBase):
+        raise TypeError("First argument must be an IDS node")
+    for _ in range(level):
+        if isinstance(node, IDSToplevel):
+            raise ValueError(f"Cannot get the parent of {node!r}")
+        node = node._parent
+    return IDSWrapper(node)
 
 
 HELPER_DICT = {helper_name: globals()[helper_name] for helper_name in __all__}
