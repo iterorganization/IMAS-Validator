@@ -30,3 +30,58 @@ def validate_homogeneous_time(ids):
                 not node.metadata.type.is_dynamic
             ), f"Dynamic quantity {node!r} may not be filled when homogeneous_time == 2"
 
+
+@validator("*")
+def validate_increasing_time(ids):
+    """Validate that all non-empty time vectors are strictly increasing."""
+    dynamic_aos = []
+    for time_quantity in Select(ids, "(^|/)time$", has_value=True):
+        # 1D time array:
+        if time_quantity.metadata.ndim == 1:
+            assert Increasing(time_quantity)
+        # FLT_0D times also occur for timed arrays of structures
+        else:
+            # Get the corresponding AoS quantity (e.g. profiles_1d for
+            # profiles_1d[0].time):d
+            aos = Parent(time_quantity, 2)
+            if aos not in dynamic_aos:
+                dynamic_aos.append(aos)
+
+    # Validate time "vectors" for timed arrays of structures
+    for aos in dynamic_aos:
+        last_time = float("-inf")
+        for struct in aos:
+            assert (
+                last_time < struct.time
+            ), f"Non-increasing time found for dynamic Array of Structures: {aos!r}"
+            last_time = struct.time
+
+
+@validator("*")
+def validate_min_max(ids):
+    """Validate that ``*_min`` values are lower than ``*_max`` values, and the related
+    value is within the bounds.
+
+    Notes:
+
+    * ``{value}_min <= {value}_max`` is only checked when both values are filled.
+    * ``{value}_min <= {value} <= {value}_max`` (value is within bounds) is only
+      validated when all three quantities are filled.
+    """
+    for quantity_min in Select(ids, "_min$", has_value=True):
+        quantity_name = str(quantity_min.metadata.name)[:-4]  # strip off _min
+        quantity = getattr(Parent(quantity_min), quantity_name, None)
+        quantity_max = getattr(Parent(quantity_min), quantity_name + "_max", None)
+
+        # If _max exists and is filled, check that it is >= _min
+        if quantity_max is not None and quantity_max.has_value:
+            assert quantity_min <= quantity_max
+
+            # quantity exist, is not a structure and is filled, check that the quantity
+            # is within bounds:
+            if (
+                quantity is not None
+                and not quantity.metadata.data_type.value.startswith("struct")
+                and quantity.has_value
+            ):
+                assert quantity_min <= quantity <= quantity_max
