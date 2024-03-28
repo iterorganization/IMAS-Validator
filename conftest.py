@@ -1,9 +1,14 @@
 import logging
+import os
+
+import imaspy
 import numpy
 import pytest
-import imaspy
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
+
+# Tests assume that this environment variable is not set, so ensure it isn't:
+os.environ.pop("RULESET_PATH", "")
 
 
 @pytest.fixture

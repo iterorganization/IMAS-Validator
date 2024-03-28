@@ -5,6 +5,9 @@ import os
 from pathlib import Path
 from typing import List
 
+from importlib_resources import files
+
+import ids_validator
 from ids_validator.exceptions import (
     InvalidRulesetName,
     InvalidRulesetPath,
@@ -60,7 +63,18 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     """
     # ARG PARSING
     rule_dirs = []
-    for rule_dir in validate_options.extra_rule_dirs:
+    # Load bundled rule sets?
+    ruleset_dirs = []
+    if validate_options.use_bundled_rulesets:
+        bundled_rule_dir = files(ids_validator) / "assets" / "rulesets"
+        if not isinstance(bundled_rule_dir, Path):
+            raise NotImplementedError(
+                "Loading bundled rulesets is not (yet) supported when they are stored "
+                "in a zipfile. Please raise an issue on https://jira.iter.org/."
+            )
+        ruleset_dirs = [bundled_rule_dir]
+    ruleset_dirs.extend(validate_options.extra_rule_dirs)
+    for rule_dir in ruleset_dirs:
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
         rule_dirs += _get_child_dirs(rule_dir)

@@ -30,6 +30,15 @@ def res_collector():
     return mock
 
 
+def test_load_bundled_rulesets():
+    discovered_rulesets = discover_rulesets(ValidateOptions(use_bundled_rulesets=True))
+    assert len(discovered_rulesets) == 1
+    assert (
+        discovered_rulesets[0]
+        == discovered_rulesets[0].parents[2] / "assets" / "rulesets" / "generic"
+    )
+
+
 def test_discover_rulesets_explicit(caplog):
     extra_rule_dirs = [
         Path("tests/rulesets"),
@@ -46,7 +55,10 @@ def test_discover_rulesets_explicit(caplog):
         Path("tests/rulesets/validate-test"),
         Path("tests/rulesets/filter_test"),
     ]
-    validate_options = ValidateOptions(extra_rule_dirs=extra_rule_dirs)
+    validate_options = ValidateOptions(
+        extra_rule_dirs=extra_rule_dirs,
+        use_bundled_rulesets=False,
+    )
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
@@ -66,7 +78,7 @@ def test_discover_rulesets_env_var(monkeypatch, caplog):
         Path("tests/rulesets/env_var/ITER-MD"),
         Path("tests/rulesets/env_var2/generic"),
     ]
-    validate_options = ValidateOptions(extra_rule_dirs=[])
+    validate_options = ValidateOptions(extra_rule_dirs=[], use_bundled_rulesets=False)
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
