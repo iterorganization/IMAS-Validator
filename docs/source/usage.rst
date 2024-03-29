@@ -12,13 +12,18 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
 
 .. code-block:: python
 
+  import logging
   from ids_validator.validate_options import ValidateOptions, RuleFilter
   from ids_validator.validate.validate import validate
+  logger = logging.getLogger('ids_validator')
+  logger.setLevel(logging.INFO)
+  logger.handlers[0]setLevel(logging.WARNING)
 
 
   imas_uri = "imas:hdf5?path=path/to/data/entry"
   validate_options = ValidateOptions(
     rulesets = ['ITER-MD', 'MyCustomRules'],
+    use_bundled_rulesets = True,
     extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
     apply_generic = True,
     use_pdb = False,
