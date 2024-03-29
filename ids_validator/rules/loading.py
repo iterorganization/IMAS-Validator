@@ -79,7 +79,11 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
 
 
 def get_ruleset_directories(validate_options: ValidateOptions) -> List[Path]:
-    """Return a list of directory Paths which contain rulesets."""
+    """Return a list of directory Paths which contain rulesets.
+
+    Args:
+        validate_options: Dataclass for validate options
+    """
     # Ruleset directories from options:
     ruleset_dirs = validate_options.extra_rule_dirs.copy()
     # Load bundled rule sets:
