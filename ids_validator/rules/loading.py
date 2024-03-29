@@ -73,8 +73,7 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     # Keep unique paths:
     rulesets = sorted(set(rule_dirs), key=attrgetter("name"))
     logger.info(
-        f"Found {len(rulesets)} rulesets: "
-        f"{', '.join(rs.name for rs in rulesets)}"
+        f"Found {len(rulesets)} rulesets: {', '.join(rs.name for rs in rulesets)}"
     )
     return rulesets
 
