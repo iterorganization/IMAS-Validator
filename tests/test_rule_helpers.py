@@ -202,3 +202,7 @@ def test_parent(select_ids):
     assert Parent(node, 1)._obj is select_ids.profiles_1d[0]
     assert Parent(node, 2)._obj is select_ids.profiles_1d
     assert Parent(node, 3)._obj is select_ids
+
+    # Getting parents <= 0 will just return and IDSWrapper with the same node:
+    assert Parent(node, 0)._obj is node._obj
+    assert Parent(node, -1)._obj is node._obj
