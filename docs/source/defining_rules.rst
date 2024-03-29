@@ -6,7 +6,7 @@ Ruleset folder structure
 
 IDSValidationRule functions are defined in directories as provided by the user.
 They are grouped in directories per ruleset by name based on which they are filtered in the loading function.
-Inside these directories are python files which contain the rules
+Inside these directories are python files which contain the rules.
 The folder structure is as follows:
 
 .. code-block:: text
@@ -60,3 +60,5 @@ The rules are defined inside the python files as follows:
     for p1d in cp.profiles_1d:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
+        
+.. seealso:: :py:class:`Helper methods<ids_validator.rules.helpers>` were made to make it easier to define validation rules.
