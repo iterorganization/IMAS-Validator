@@ -8,6 +8,7 @@ from types import CodeType
 from typing import Any
 
 from ids_validator.rules.data import ValidatorRegistry
+from ids_validator.rules.helpers import HELPER_DICT
 from ids_validator.validate.result_collector import ResultCollector
 
 
@@ -84,5 +85,6 @@ def run_path(
     glob = {
         "validator": val_registry.validator,
         "assert": result_collector.assert_,
+        **HELPER_DICT,
     }
     exec(new_code, glob)
