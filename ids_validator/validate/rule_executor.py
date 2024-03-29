@@ -75,6 +75,7 @@ class RuleExecutor:
                         break
                     tbi = tbi.tb_next
             else:
+                logger.error(str(exc))
                 self.result_collector.add_error_result(exc)
             if self.validate_options.use_pdb:
                 pdb.post_mortem(tb)
