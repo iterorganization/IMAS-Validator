@@ -17,7 +17,7 @@ Provide a list of rulesets, an ids url, a list of paths where to look for rulese
   from ids_validator.validate.validate import validate
   logger = logging.getLogger('ids_validator')
   logger.setLevel(logging.INFO)
-  logger.handlers[0]setLevel(logging.WARNING)
+  logger.handlers[0].setLevel(logging.WARNING)
 
 
   imas_uri = "imas:hdf5?path=path/to/data/entry"
