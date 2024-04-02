@@ -60,7 +60,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
 def main(argv: List) -> None:
     parser = configure_argument_parser()
-    args = parser.parse_args(args=None if argv else ["--help"])
+    args = parser.parse_args(args=argv if argv else ["--help"])
 
     if args.debug:
         print("debug option enabled")
