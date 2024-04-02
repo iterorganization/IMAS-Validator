@@ -1,8 +1,10 @@
 from ids_validator.cli import ids_validator_cli
+from pathlib import Path
 import imas
 import imaspy
 import shutil
 import pytest
+import os
 
 def test_cli_no_arguments():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
@@ -21,19 +23,23 @@ def test_cli_wrong_command():
         assert pytest_wrapped_e.value.code == 42
 
 def test_non_existing_pulsefile():
-    # Make sure that testdb doesn't exist
-    shutil.rmtree("testdb",ignore_errors=True)
 
-    argv = ['validate', 'imas:mdsplus?path=testdb']
+    tmp_dir = Path(".") / "empty_testdb"
+    tmp_dir.mkdir()
+
+    argv = ['validate', 'imas:hdf5?path=empty_testdb']
 
     with pytest.raises(imaspy.exception.LowlevelError) as pytest_wrapped_e:
         ids_validator_cli.main(argv)
 
 def test_existing_pulsefile():
 
-    entry = imas.DBEntry("imas:mdsplus?path=testdb", mode="x")
+    tmp_dir = Path(".") / "testdb"
+    tmp_dir.mkdir()
+
+    entry = imas.DBEntry("imas:hdf5?path=testdb", mode="x")
     entry.close()
 
-    argv = ['validate', 'imas:mdsplus?path=testdb']
+    argv = ['validate', 'imas:hdf5?path=testdb']
 
     ids_validator_cli.main(argv)
