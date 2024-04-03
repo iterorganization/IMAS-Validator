@@ -2,7 +2,7 @@ import argparse
 import logging
 from typing import Sequence
 
-from .commands.command_interface import CommandInterface
+from .commands.command_interface import CommandInterface, CommandNotRecognisedException
 from .commands.validate_command import ValidateCommand
 
 
@@ -16,14 +16,14 @@ class CommandParser:
         command = args.command
         command_objs = []
         uri_list = args.URI[:][0]
-        if command.lower() == "validate":
+        if command == "validate":
             for uri in uri_list:
                 args.uri = [uri]
                 command_objs.append(ValidateCommand(args))
-        elif command.lower() == "<put new commands here>":
+        elif command == "<put new commands here>":
             ...
         else:
-            raise Exception(
+            raise CommandNotRecognisedException(
                 f"Command < {command} > not recognised, stopping execution."
             )
 

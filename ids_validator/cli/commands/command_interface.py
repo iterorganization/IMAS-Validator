@@ -13,6 +13,14 @@ class CommandNotExecutedException(Exception):
     ...
 
 
+class CommandNotRecognisedException(Exception):
+    """
+    Exception to be raised when incorrect command is provided
+    """
+
+    ...
+
+
 class CommandInterface(ABC):
 
     @property

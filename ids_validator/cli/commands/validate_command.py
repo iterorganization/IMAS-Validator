@@ -16,9 +16,20 @@ class ValidateCommand(GenericCommand):
         super(ValidateCommand, self).__init__(args)
         self.uri = args.uri[0]
         self.validate_options = ValidateOptions(
-            rulesets=[ruleset for sublist in args.ruleset for ruleset in sublist],
+            # List comprehansion for flattening 2D list into 1D.
+            # CLI After providing -r option passes this argument as [['ruleset' ...]]
+            rulesets=[
+                ruleset for given_rulesets in args.ruleset for ruleset in given_rulesets
+            ],
+            # List comprehansion for flattening 2D list into 1D.
+            # CLI After providing -r option passes this argument as [['ruleset' ...]]
+            # If empty return empty list
             extra_rule_dirs=(
-                [Path(dirs) for sublist in args.extra_rule_dirs for dirs in sublist]
+                [
+                    Path(extra_ruleset)
+                    for given_extra_rulesets in args.extra_rule_dirs
+                    for extra_ruleset in given_extra_rulesets
+                ]
                 if args.extra_rule_dirs
                 else []
             ),

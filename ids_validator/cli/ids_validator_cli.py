@@ -4,6 +4,7 @@ import sys
 from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
+from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
 
 
 def configure_argument_parser() -> argparse.ArgumentParser:
@@ -14,7 +15,6 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(
         dest="command", description="subparsers for command"
     )
-
     validate_parser = subparsers.add_parser("validate", help="validate command")
 
     validate_group = validate_parser.add_argument_group("Validator arguments")
@@ -59,25 +59,25 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: List) -> None:
+
     parser = configure_argument_parser()
     args = parser.parse_args(args=argv if argv else ["--help"])
 
     if args.debug:
         print("debug option enabled")
     try:
-        if args.command.lower() == "validate":
-            command_parser = CommandParser()
-            command_objects = command_parser.parse(args)
+        command_parser = CommandParser()
+        command_objects = command_parser.parse(args)
 
-            for command in command_objects:
-                command.execute()
+        for command in command_objects:
+            command.execute()
 
-            # temporary, print command results:
-            for command in command_objects:
-                print("===========================")
-                print(command.result)
-                print("===========================\n")
-    except AttributeError:
+        # temporary, print command results:
+        for command in command_objects:
+            print("===========================")
+            print(command.result)
+            print("===========================\n")
+    except CommandNotRecognisedException:
         parser.print_help()
 
 
