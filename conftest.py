@@ -1,8 +1,14 @@
+import logging
+import os
+
+import imaspy
 import numpy
 import pytest
-import imaspy
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
+
+# Tests assume that this environment variable is not set, so ensure it isn't:
+os.environ.pop("RULESET_PATH", "")
 
 
 @pytest.fixture
@@ -49,3 +55,9 @@ def test_data_waves():
     wv.coherent_wave[0].full_wave[0].e_field.plus[0].values = [1, 1j, -1, -1j]  # CPX_1D
     # And wrap it:
     return IDSWrapper(wv)
+
+
+@pytest.fixture(autouse=True)
+def set_caplog(caplog):
+    with caplog.at_level(logging.INFO, logger="ids_validator"):
+        yield

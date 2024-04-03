@@ -28,13 +28,6 @@ class InvalidRulesetName(ValueError):
         super().__init__(f"Ruleset name {name!r} cannot be found. {suggestions}")
 
 
-class EmptyRuleFileWarning(Warning):
-    """Warning when a file contains no rules"""
-
-    def __init__(self, file: Path) -> None:
-        super().__init__(f"Ruleset file {str(file)!r} does not contain any rules")
-
-
 class WrongFileExtensionError(ValueError):
     """Error when a ruleset file does not have .py as a file extension"""
 

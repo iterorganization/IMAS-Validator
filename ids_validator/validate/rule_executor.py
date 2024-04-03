@@ -3,6 +3,7 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
+import logging
 import pdb
 from typing import Iterator, List, Tuple
 
@@ -13,6 +14,8 @@ from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
+
+logger = logging.getLogger(__name__)
 
 IDSInstance = Tuple[IDSToplevel, str, int]
 
@@ -45,13 +48,19 @@ class RuleExecutor:
 
     def apply_rules_to_data(self) -> None:
         """Apply set of rules to the Data Entry."""
+        logger.info("Started executing rules")
         for ids_instances, rule in self.find_matching_rules():
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
             self.result_collector.set_context(rule, idss)
+            idss_str = ", ".join(
+                sorted(f"{ids_name}/{ids_occ}" for ids_name, ids_occ in idss)
+            )
+            logger.info(f"Running {rule.name} on {idss_str}")
             self.run(rule, ids_toplevels)
 
     def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
+        res_num = len(self.result_collector.results)
         try:
             rule.apply_func(ids_toplevels)
         except Exception as exc:
@@ -69,6 +78,13 @@ class RuleExecutor:
                 self.result_collector.add_error_result(exc)
             if self.validate_options.use_pdb:
                 pdb.post_mortem(tb)
+        finally:
+            if len(self.result_collector.results) == res_num:
+                logger.warning(
+                    f"No assertions in {rule.name}. "
+                    "Make sure the validation test is testing something "
+                    "with an assert statement."
+                )
 
     def find_matching_rules(
         self,

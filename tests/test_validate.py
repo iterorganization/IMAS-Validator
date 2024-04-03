@@ -1,3 +1,4 @@
+import logging
 from functools import lru_cache
 from pathlib import Path
 from unittest.mock import patch
@@ -33,7 +34,7 @@ def get(ids_name: str, occurrence: int = 0):
     return ids
 
 
-def test_validate():
+def test_validate(caplog):
     module = "ids_validator.validate.validate"
     # patch _check_imas_version for now
     with patch(
@@ -76,3 +77,9 @@ def test_validate():
         assert results[2].idss == [("core_profiles", 0)]
         assert results[2].tb[-1].name == "validate_test_rule_success"
         assert results[2].exc is None
+
+        assert caplog.record_tuples[-1] == (
+            "ids_validator.validate.validate",
+            logging.INFO,
+            "3 results obtained",
+        )

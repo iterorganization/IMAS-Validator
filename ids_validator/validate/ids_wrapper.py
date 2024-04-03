@@ -81,6 +81,12 @@ class IDSWrapper:
     def __getitem__(self, item: Any) -> "IDSWrapper":
         return IDSWrapper(self._obj[item], ids_nodes=self._ids_nodes)
 
+    def __repr__(self) -> str:
+        return f"IDSWrapper({self._obj!r})"
+
+    def __str__(self) -> str:
+        return str(self._obj)
+
     # comparison operators
     __eq__ = _binary_wrapper(operator.eq, "eq")
     __ne__ = _binary_wrapper(operator.ne, "ne")
