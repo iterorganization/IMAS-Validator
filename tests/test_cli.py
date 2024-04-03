@@ -34,10 +34,11 @@ def test_existing_pulsefile(tmp_path):
     db_dir = tmp_path / "testdb"
     db_dir.mkdir()
 
-    entry = imas.DBEntry(uri=f"imas:hdf5?path={db_dir}", mode="x")
+    uri = f"imas:hdf5?path={db_dir}"
+    entry = imas.DBEntry(uri=uri, mode="x")
     entry.close()
 
-    argv = ['validate', 'imas:hdf5?path=testdb']
+    argv = ['validate', uri]
 
     ids_validator_cli.main(argv)
 
