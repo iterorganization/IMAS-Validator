@@ -5,7 +5,6 @@ This file describes the functions for ast rewriting
 import ast
 from pathlib import Path
 from types import CodeType
-from typing import Any
 
 from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.helpers import HELPER_DICT
