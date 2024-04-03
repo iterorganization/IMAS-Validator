@@ -51,9 +51,10 @@ def test_validate_command_str_cast():
                               debug=False)
 
     command_object = validate_command.ValidateCommand(args)
-
+    
     assert str(command_object) ==\
            "VALIDATE URI=i VALIDATE_OPTIONS=ValidateOptions(rulesets=['test_ruleset']," \
+           " use_bundled_rulesets=True," \
            " extra_rule_dirs=[PosixPath('.')]," \
            " apply_generic=True," \
            " use_pdb=False," \
