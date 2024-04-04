@@ -9,8 +9,8 @@ def test_cli_no_arguments():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         ids_validator_cli.main([])
 
-        assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 42
+    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.value.code == 42
 
 def test_cli_wrong_command():
     argv = ['wrong_command']
@@ -18,14 +18,14 @@ def test_cli_wrong_command():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
         ids_validator_cli.main(argv)
 
-        assert pytest_wrapped_e.type == SystemExit
-        assert pytest_wrapped_e.value.code == 42
+    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.value.code == 42
 
 def test_non_existing_pulsefile(tmp_path):
     empty_db_dir = tmp_path / "empty_testdb"
     empty_db_dir.mkdir()
 
-    argv = ['validate', 'imas:hdf5?path=empy_testdb']
+    argv = ['validate', f'imas:hdf5?path={empty_db_dir}']
 
     with pytest.raises(imaspy.exception.LowlevelError) as pytest_wrapped_e:
         ids_validator_cli.main(argv)

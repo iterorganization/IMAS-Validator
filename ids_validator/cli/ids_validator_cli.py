@@ -10,8 +10,6 @@ from ids_validator.cli.commands.command_interface import CommandNotRecognisedExc
 def configure_argument_parser() -> argparse.ArgumentParser:
     # Management of input arguments
     parser = argparse.ArgumentParser(description="IDS validator")
-    parser.add_argument("-d", "--debug", action="store_true")
-
     subparsers = parser.add_subparsers(
         dest="command", description="subparsers for command"
     )
@@ -55,6 +53,11 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         action="store_false",
         help="Disable usage of generic ruleset",
     )
+
+    validate_group.add_argument(
+        "-d", "--debug", action="store_true", help="drop into debugger if tests fails"
+    )
+
     return parser
 
 
@@ -68,7 +71,6 @@ def main(argv: List) -> None:
     try:
         command_parser = CommandParser()
         command_objects = command_parser.parse(args)
-
         for command in command_objects:
             command.execute()
 
