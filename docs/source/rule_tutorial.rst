@@ -4,6 +4,10 @@ Rule definition tutorial
 ========================
 
 Here is a step-by-step tutorial to build an ids-validator ruleset for the first time from scratch.
+
+Setting up ids_validator
+------------------------
+
 First make a projects folder.
 
 .. code-block:: bash
@@ -21,6 +25,9 @@ Then go back to the projects folder and create the following ruleset folder stru
   mkdir my_rulesets/my_ruleset
   touch my_rulesets/my_ruleset/my_tests.py
 
+Defining validation rules
+-------------------------
+
 The validation rules are defined inside the python files as follows:
 
 - Function with IDS instances
@@ -31,6 +38,9 @@ The validation rules are defined inside the python files as follows:
 The function argument is the IDS instance being tested. The IDSs are selected based on the @validator decorator argument
 
 .. note:: There is no need to separately import the helper functions and validator decorator.
+
+Examples
+--------
 
 For the first example we make sure that all equilibrium IDSs have a comment.
 Add the following validation rule to your rule file.
@@ -45,8 +55,8 @@ Select 'equilibrium' in the @validator decorator
 
 For the second example we make sure that all IDSs with a 1D time array have strictly increasing time arrays.
 Add the following validation rule to your rule file.
-Select all IDSs in the @validator decorator using a wildcard selector '*'
-Use :py:class:`Select<ids_validator.rules.helpers.Select>` to find all quantities that are called "time" or have a path that ends in "/time"
+Select all IDSs in the @validator decorator using a wildcard selector ``'*'``
+Use :py:class:`Select<ids_validator.rules.helpers.Select>` to find all quantities that are called ``"time"`` or have a path that ends in ``"/time"``
 Use IMASPy metadata to select only 1D time arrays (and filter out 0D time variables as found in dynamic Arrays of Structures)
 Check that their values are strictly :py:class:`Increasing<ids_validator.rules.helpers.Increasing>`
 
@@ -60,6 +70,9 @@ Check that their values are strictly :py:class:`Increasing<ids_validator.rules.h
         if time_quantity.metadata.ndim == 1:
             assert Increasing(time_quantity)
 
+
+Test run
+--------
 
 Now check if the rules are working:
 You can use your own data entries or use the one from this example
