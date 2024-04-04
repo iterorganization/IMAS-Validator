@@ -3,6 +3,7 @@ This file describes the data class for successes and failures of the
 validation tool
 """
 
+import logging
 import traceback
 from typing import Any, Dict, List, Tuple
 
@@ -13,6 +14,8 @@ from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate_options import ValidateOptions
+
+logger = logging.getLogger(__name__)
 
 
 class ResultCollector:
@@ -50,6 +53,7 @@ class ResultCollector:
             exc: Exception that was encountered while running validation test
         """
         tb = traceback.extract_tb(exc.__traceback__)
+        logger.error(f"{str(exc)} in {tb[-1].name}:{tb[-1].lineno}")
         result = IDSValidationResult(
             False,
             "",
