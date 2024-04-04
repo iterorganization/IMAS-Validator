@@ -53,7 +53,11 @@ class ResultCollector:
             exc: Exception that was encountered while running validation test
         """
         tb = traceback.extract_tb(exc.__traceback__)
-        logger.error(f"Exception while executing rule {self._current_rule.name}: '{str(exc)}' in {tb[-1].name}:{tb[-1].lineno}. This could be a bug in the rule. See detailed report for further information.")
+        logger.error(
+            f"Exception while executing rule {self._current_rule.name}: '{str(exc)}' "
+            f"in {tb[-1].name}:{tb[-1].lineno}. This could be a bug in the rule. See "
+            "detailed report for further information."
+        )
         result = IDSValidationResult(
             False,
             "",
