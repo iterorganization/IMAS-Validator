@@ -27,6 +27,7 @@ Manual
    defining_rules
    usage
    filter_rules
+   rule_tutorial
 
 
 .. toctree::

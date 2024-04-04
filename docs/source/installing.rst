@@ -1,3 +1,5 @@
+.. _`installing`:
+
 Installing the IMAS IDS validator
 =================================
 
