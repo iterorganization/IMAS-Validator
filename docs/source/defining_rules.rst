@@ -9,17 +9,23 @@ They are grouped in directories per ruleset by name based on which they are filt
 Inside these directories are python files which contain the rules.
 The folder structure is as follows:
 
+- rule directories contain rulesets (rule_dir, rule_dir_custom) and are found using the CLI argument --extra-rule-dirs/-e or through the env variable RULESET_PATH
+- rulesets contain validation rule files (Diagnostics, ITER-MD, ECR, MyCustomRules) and are found using the CLI argument ruleset --ruleset/-r
+- validation rule files contain validation functions
+
+This structure is shown underneath:
+
 .. code-block:: text
 
-  ├── rulesets
-  |   ├── generic
+  ├── rule_dir
+  |   ├── Diagnostics
   |   |   ├── common_ids.py
-  |   |   └── core_profiles.py
+  |   |   └── equilibrium.py
   |   └── ITER-MD
   |       ├── common_ids.py
   |       └── core_profiles.py
-  └── rulesets_custom
-      ├── ITER-MD
+  └── rule_dir_custom
+      ├── ECR
       |   ├── common_ids.py
       |   └── core_profiles.py
       └── MyCustomRules
@@ -34,14 +40,14 @@ The rules are defined inside the python files as follows:
 
 .. code-block:: python
 
-  @validator("*", min_dd_version="3.39.0")  # noqa: F821
+  @validator("*")
   def validate_ids_plugins_metadata(ids):
     plugins = ids.ids_properties.plugins
     assert plugins.node[:].path != ""
     assert plugins.node[:].put_operation[:].name != ""
     # etc.
 
-  @validator("gyrokinetics")  # noqa: F821
+  @validator("gyrokinetics")
   def validate_gyrokinetics_electron_definition(gk):
     # check electron definition
     for species in gk.species:
@@ -54,11 +60,12 @@ The rules are defined inside the python files as follows:
     else:
       error("No electron species found", gk.species)
 
-  @validator("core_profiles")  # noqa: F821
+  @validator("core_profiles")
   def validate_ion_charge(cp):
     """Validate that profiles_1d/ion/z_ion is defined"""
     for p1d in cp.profiles_1d:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
         
+For a step-by-step tutorial on how to define rules, see :ref:`rule tutorial`
 .. seealso:: :py:class:`Helper methods<ids_validator.rules.helpers>` were made to make it easier to define validation rules.
