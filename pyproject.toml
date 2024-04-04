@@ -77,6 +77,9 @@ linting = [
     "isort",
 ]
 
+[project.scripts]
+ids_validator = "ids_validator.cli.ids_validator_cli:execute_cli"
+
 [project.urls]
 homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"
 
@@ -110,6 +113,7 @@ disallow_untyped_decorators = true
 [[tool.mypy.overrides]]
 module = [
     "tests.*",
+    "ids_validator.assets.rulesets.*",
 ]
 ignore_errors = true
 

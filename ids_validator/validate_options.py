@@ -39,8 +39,12 @@ class ValidateOptions:
 
     rulesets: List[str] = field(default_factory=list)
     """Names of rulesets to be applied"""
+    use_bundled_rulesets: bool = True
+    """Whether or not to load the rulesets bundled with ids_validator.
+
+    Bundled rule sets can be found in the ``ids_validator/assets/rulesets`` folder."""
     extra_rule_dirs: List[Path] = field(default_factory=list)
-    """List of names for ruleset groups that should be applied"""
+    """Paths where to look for rule sets"""
     apply_generic: bool = True
     """Whether or not to apply the generic ruleset"""
     use_pdb: bool = False

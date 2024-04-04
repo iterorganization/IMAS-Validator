@@ -14,4 +14,4 @@ __pycache__/
 venv
 build
 junit.xml
-
+.idea/

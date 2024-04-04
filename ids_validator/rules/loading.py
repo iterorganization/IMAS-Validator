@@ -2,9 +2,13 @@
 
 import logging
 import os
+from operator import attrgetter
 from pathlib import Path
 from typing import List
 
+from importlib_resources import files
+
+import ids_validator
 from ids_validator.exceptions import (
     InvalidRulesetName,
     InvalidRulesetPath,
@@ -58,22 +62,42 @@ def discover_rulesets(validate_options: ValidateOptions) -> List[Path]:
     Returns:
         List of directories that might contain rules
     """
-    # ARG PARSING
-    rule_dirs = []
-    for rule_dir in validate_options.extra_rule_dirs:
+    rule_dirs: List[Path] = []
+    # Ruleset directories from bundled, options and environment variable:
+    for rule_dir in get_ruleset_directories(validate_options):
         if not rule_dir.exists():
             raise InvalidRulesetPath(rule_dir)
-        rule_dirs += _get_child_dirs(rule_dir)
-    # ENV VARIABLE PARSING:
-    env_var_dir_list = handle_env_var_rule_dirs()
-    # OPTIONAL ENTRY POINT HANDLING
-    entrypoint_dir_list = handle_entrypoints()
-    # COMBINE ALL
-    ruleset_dirs = list(set(rule_dirs + env_var_dir_list + entrypoint_dir_list))
+        rule_dirs.extend(_get_child_dirs(rule_dir))
+    # Handle rulesets from entrypoints (TODO?)
+    rule_dirs += handle_entrypoints()
+    # Keep unique paths:
+    rulesets = sorted(set(rule_dirs), key=attrgetter("name"))
     logger.info(
-        f"Found {len(ruleset_dirs)} rulesets: "
-        f"{', '.join(sorted([rs.name for rs in ruleset_dirs]))}"
+        f"Found {len(rulesets)} rulesets: {', '.join(rs.name for rs in rulesets)}"
     )
+    return rulesets
+
+
+def get_ruleset_directories(validate_options: ValidateOptions) -> List[Path]:
+    """Return a list of directory Paths which contain rulesets.
+
+    Args:
+        validate_options: Dataclass for validate options
+    """
+    # Ruleset directories from options:
+    ruleset_dirs = validate_options.extra_rule_dirs.copy()
+    # Load bundled rule sets:
+    if validate_options.use_bundled_rulesets:
+        bundled_rule_dir = files(ids_validator) / "assets" / "rulesets"
+        if not isinstance(bundled_rule_dir, Path):
+            raise NotImplementedError(
+                "Loading bundled rulesets is not (yet) supported when they are stored "
+                "in a zipfile. Please raise an issue on https://jira.iter.org/."
+            )
+        ruleset_dirs.append(bundled_rule_dir)
+    # Ruleset directories supplied through environment variable
+    env_ruleset_paths = os.environ.get("RULESET_PATH", "")
+    ruleset_dirs.extend(Path(part) for part in env_ruleset_paths.split(":") if part)
     return ruleset_dirs
 
 
@@ -148,25 +172,6 @@ def load_rules_from_path(
     if len(val_registry.validators) == 0:
         logger.warning(f"No rules in rule file {rule_path}")
     return val_registry.validators
-
-
-def handle_env_var_rule_dirs() -> List[Path]:
-    """
-    Make a list of directories and child directories which might contain rules based on
-    environment variable
-
-    Returns:
-        List of directories corresponding to given rule sets
-    """
-    env_ruleset_paths = os.environ.get("RULESET_PATH", "")
-    rule_dirs = [Path(part) for part in env_ruleset_paths.split(":") if part]
-    env_var_dirs = []
-    for rule_dir in rule_dirs:
-        if not rule_dir.exists():
-            raise InvalidRulesetPath(rule_dir)
-        env_var_dirs += _get_child_dirs(rule_dir)
-
-    return env_var_dirs
 
 
 def handle_entrypoints() -> List[Path]:

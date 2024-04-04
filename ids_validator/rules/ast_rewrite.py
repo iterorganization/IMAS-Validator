@@ -5,9 +5,9 @@ This file describes the functions for ast rewriting
 import ast
 from pathlib import Path
 from types import CodeType
-from typing import Any
 
 from ids_validator.rules.data import ValidatorRegistry
+from ids_validator.rules.helpers import HELPER_DICT
 from ids_validator.validate.result_collector import ResultCollector
 
 
@@ -39,7 +39,7 @@ class AssertTransformer(ast.NodeTransformer):
     Node transformer that swaps assert statement with given assert function
     """
 
-    def visit_Assert(self, node: Any) -> ast.Expr:
+    def visit_Assert(self, node: ast.Assert) -> ast.Expr:
         """
         Swap assert statement with given assert function
 
@@ -59,7 +59,12 @@ class AssertTransformer(ast.NodeTransformer):
                 func=ast.Name(id="assert", ctx=ast.Load()),
                 args=args,
                 keywords=[],
-            )
+            ),
+            # Copy information of the source location:
+            lineno=node.lineno,
+            end_lineno=node.end_lineno,
+            col_offset=node.col_offset,
+            end_col_offset=node.end_col_offset,
         )
         return replacement
 
@@ -84,5 +89,6 @@ def run_path(
     glob = {
         "validator": val_registry.validator,
         "assert": result_collector.assert_,
+        **HELPER_DICT,
     }
     exec(new_code, glob)

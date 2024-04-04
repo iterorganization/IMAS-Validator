@@ -1,7 +1,10 @@
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
 
+from ids_validator.rules.ast_rewrite import rewrite_assert
+from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
@@ -36,12 +39,28 @@ def rule_error(res_collector):
     return mock
 
 
+@pytest.fixture
+def rewritten_rule(res_collector):
+    val_registry = ValidatorRegistry(Path("a/b/c.py"))
+    code = rewrite_assert(
+        """
+@validator("*")
+def rewritten_rule(ids):
+    '''Put docs here'''
+    assert ids is not None
+""",
+        "a/b/c.py",
+    )
+    exec(code, {"validator": val_registry.validator, "assert": res_collector.assert_})
+    return val_registry.validators[0]
+
+
 def check_attrs(val_result, success):
     assert val_result.success == success
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == "cool_func_name"
     assert val_result.idss == [("core_profiles", 0)]
-    assert val_result.tb[-1].lineno == 20
+    assert val_result.tb[-1].lineno == 23
     assert val_result.exc is None
 
 
@@ -50,7 +69,7 @@ def check_attrs_error(val_result):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == val_result.tb[-1].name == "func_error"
     assert val_result.idss == [("core_profiles", 0)]
-    assert val_result.tb[-1].lineno == 31
+    assert val_result.tb[-1].lineno == 34
     assert isinstance(val_result.exc, ZeroDivisionError)
 
 
@@ -99,3 +118,15 @@ def test_appropriate_behavior_on_error(res_collector, rule, rule_error):
 def test_double_occurrence_not_implemented(res_collector, rule):
     with pytest.raises(NotImplementedError):
         res_collector.set_context(rule, [("core_profiles", 0), ("core_profiles", 1)])
+
+
+def test_rewritten_rule(res_collector, rewritten_rule):
+    res_collector.set_context(rewritten_rule, [("core_profiles", 0)])
+    rewritten_rule.func(True)
+    val_result = res_collector.results[0]
+    assert val_result.success is True
+    assert val_result.msg == ""
+    assert val_result.rule.func.__name__ == "rewritten_rule"
+    assert val_result.idss == [("core_profiles", 0)]
+    assert val_result.tb[-1].lineno == 5
+    assert val_result.exc is None

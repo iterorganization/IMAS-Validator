@@ -34,7 +34,6 @@ class _PrettyFormatter(logging.Formatter):
 
 def default_stream_handler() -> logging.StreamHandler:
     ch = logging.StreamHandler()
-    ch.setLevel(logging.WARNING)
     ch.setFormatter(_PrettyFormatter())
     return ch
 
