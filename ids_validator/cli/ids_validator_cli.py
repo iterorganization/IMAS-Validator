@@ -82,6 +82,9 @@ def main(argv: List) -> None:
     except CommandNotRecognisedException:
         parser.print_help()
 
+def execute_cli():
+    argv: List = sys.argv[1:]
+    main(argv)
 
 if __name__ == "__main__":
     argv: List = sys.argv[1:]

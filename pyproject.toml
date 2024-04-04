@@ -78,7 +78,7 @@ linting = [
 ]
 
 [project.scripts]
-ids_validator = "ids_validator.cli.ids_validator_cli:main"
+ids_validator = "ids_validator.cli.ids_validator_cli:execute_cli"
 
 [project.urls]
 homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"

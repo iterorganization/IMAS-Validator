@@ -4,6 +4,7 @@ import imas
 import imaspy
 import pytest
 import argparse
+from pathlib import Path
 
 def test_cli_no_arguments():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
@@ -51,13 +52,11 @@ def test_validate_command_str_cast():
                               debug=False)
 
     command_object = validate_command.ValidateCommand(args)
-    
-    assert str(command_object) ==\
-           "VALIDATE URI=i VALIDATE_OPTIONS=ValidateOptions(rulesets=['test_ruleset']," \
-           " use_bundled_rulesets=True," \
-           " extra_rule_dirs=[PosixPath('.')]," \
-           " apply_generic=True," \
-           " use_pdb=False," \
-           " rule_filter=RuleFilter(name=[], ids=[]))"
 
-
+    assert command_object.validate_options.rulesets == ['test_ruleset']
+    assert command_object.validate_options.use_bundled_rulesets == True
+    assert command_object.validate_options.extra_rule_dirs == [Path('.')]
+    assert command_object.validate_options.apply_generic == True
+    assert command_object.validate_options.use_pdb == False
+    assert command_object.validate_options.rule_filter.name == []
+    assert command_object.validate_options.rule_filter.ids == []
