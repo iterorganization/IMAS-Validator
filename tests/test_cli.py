@@ -10,7 +10,7 @@ def test_cli_no_arguments():
         ids_validator_cli.main([])
 
     assert pytest_wrapped_e.type == SystemExit
-    assert pytest_wrapped_e.value.code == 42
+    assert pytest_wrapped_e.value.code == 0
 
 def test_cli_wrong_command():
     argv = ['wrong_command']
@@ -19,7 +19,7 @@ def test_cli_wrong_command():
         ids_validator_cli.main(argv)
 
     assert pytest_wrapped_e.type == SystemExit
-    assert pytest_wrapped_e.value.code == 42
+    assert pytest_wrapped_e.value.code == 2
 
 def test_non_existing_pulsefile(tmp_path):
     empty_db_dir = tmp_path / "empty_testdb"
