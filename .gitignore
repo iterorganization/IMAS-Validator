@@ -9,6 +9,7 @@ __pycache__/
 # Unit test / coverage reports
 .cache
 
+tmp
 .coverage
 .venv
 venv

@@ -43,8 +43,10 @@ The rules are defined inside the python files as follows:
   @validator("*")
   def validate_ids_plugins_metadata(ids):
     plugins = ids.ids_properties.plugins
-    assert plugins.node[:].path != ""
-    assert plugins.node[:].put_operation[:].name != ""
+    for node in plugins.node:
+      assert node.path != ""
+      for name in node.put_operation:
+        assert name != ""
     # etc.
 
   @validator("gyrokinetics")

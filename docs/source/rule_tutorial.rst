@@ -16,14 +16,14 @@ First make a projects folder.
   cd my_projects
 
 Follow the :ref:`installation instructions<installing>` to install ids_validator inside the projects folder.
-Then go back to the projects folder and create the following ruleset folder structure
+For now we will add the tests to a tmp folder inside the ids_validator folder.
+Create the following ruleset folder structure
 
 .. code-block:: bash
 
-  cd my_projects
-  mkdir my_rulesets
-  mkdir my_rulesets/my_ruleset
-  touch my_rulesets/my_ruleset/my_tests.py
+  cd ids-validator
+  mkdir -p tmp/my_rulesets/my_ruleset
+  touch tmp/my_rulesets/my_ruleset/my_tests.py
 
 Defining validation rules
 -------------------------
@@ -47,7 +47,7 @@ Add the following validation rule to your rule file.
 Select 'equilibrium' in the @validator decorator
 
 .. code-block:: python
-  :caption: ``my_rulesets/my_ruleset/my_tests.py``
+  :caption: ``tmp/my_rulesets/my_ruleset/my_tests.py``
 
   @validator("equilibrium")
   def validate_comment(eq):
@@ -61,7 +61,7 @@ Use IMASPy metadata to select only 1D time arrays (and filter out 0D time variab
 Check that their values are strictly :py:class:`Increasing<ids_validator.rules.helpers.Increasing>`
 
 .. code-block:: python
-  :caption: ``my_rulesets/my_ruleset/my_tests.py``
+  :caption: ``tmp/my_rulesets/my_ruleset/my_tests.py``
 
   @validator("*")
   def validate_increasing_time(ids):
@@ -80,4 +80,4 @@ You can use your own data entries or use the one from this example
 .. code-block:: bash
 
   cd ids_validator
-  ids_validator validate 'imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134173/106/' -e ../my_rulesets -r my_ruleset
+  ids_validator validate 'imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134173/106/' -e tmp/my_rulesets -r my_ruleset
