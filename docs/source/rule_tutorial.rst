@@ -110,7 +110,14 @@ arguments we supply are:
 .. code-block:: console
 
   my_projects$ ids_validator validate \
-    'imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134173/106/' \
+    'imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134102/41' \
     -e ./my_rulesets \
     -r my_ruleset \
     --no-generic
+
+
+.. note::
+
+  The validator will need to load all data in the supplied data entry. Depending
+  on the size of your data entry it may take some time to load this data and
+  execut the rules.
