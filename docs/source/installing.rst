@@ -1,3 +1,5 @@
+.. _`installing`:
+
 Installing the IMAS IDS validator
 =================================
 
@@ -24,19 +26,23 @@ SDCC setup
 
   .. code-block:: bash
 
+    # load IMAS and IMASPy before install
+    module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
     python3 -m venv ./venv
     . venv/bin/activate
     pip install --upgrade pip
     pip install --upgrade wheel setuptools
-    pip install .
     # For development an installation in editable mode may be more convenient
-    # pip install -e .[all]
+    pip install -e .[all]
 
-* Load IMAS and IMASPy.
+* Load IMAS and IMASPy
 
   .. code-block:: bash
 
-    module load IMAS IMASPy
+    # Load modules every time you use ids_validator
+    module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
+    # And activate the Python virtual environment
+    . venv/bin/activate
 
 * Test the installation
 
@@ -74,9 +80,8 @@ Ubuntu installation
     . venv/bin/activate
     pip install --upgrade pip
     pip install --upgrade wheel setuptools
-    pip install .
     # For development an installation in editable mode may be more convenient
-    # pip install .[all]
+    pip install .[all]
 
 * Install IMASPy.
 

@@ -8,20 +8,37 @@ Using the IMAS IDS validator
 Validating rulesets
 -------------------
 
-Provide a list of rulesets, an ids url, a list of paths where to look for rulesets and whether or not to apply the generic ruleset.
+You should provide:
+
+- IDS url
+- Names of rulesets to be applied (optional)
+- Whether or not to load the rulesets bundled with ids_validator (optional)
+- Paths where to look for rule sets (optional)
+- Whether or not to apply the generic ruleset (optional)
+- Whether or not to drop into debugger for failed tests (optional)
+- Filter criteria (optional)
+
+You can also set the logging level of the ids_validator tool.
+This can be set to 'WARNING' (default) to get messages when something is potentially wrong,
+or it can be set to 'INFO' to get more information for debugging purposes
 
 .. code-block:: python
 
+  import logging
   from ids_validator.validate_options import ValidateOptions, RuleFilter
   from ids_validator.validate.validate import validate
+  logger = logging.getLogger('ids_validator')
+  logger.setLevel(logging.INFO)
 
 
   imas_uri = "imas:hdf5?path=path/to/data/entry"
   validate_options = ValidateOptions(
     rulesets = ['ITER-MD', 'MyCustomRules'],
+    use_bundled_rulesets = True,
     extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
     apply_generic = True,
     use_pdb = False,
+    rule_filter = RuleFilter(name = ['time'], ids = ['core_profile']),
   )
   results = validate(imas_uri=imas_uri, validate_options=validate_options)
 

@@ -28,6 +28,12 @@ Manual
    usage
    filter_rules
 
+.. toctree::
+   :caption: Tutorials
+   :maxdepth: 1
+
+   rule_tutorial
+
 
 .. toctree::
    :caption: API docs
