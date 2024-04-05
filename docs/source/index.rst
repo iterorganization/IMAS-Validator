@@ -27,6 +27,11 @@ Manual
    defining_rules
    usage
    filter_rules
+
+.. toctree::
+   :caption: Tutorials
+   :maxdepth: 1
+
    rule_tutorial
 
 

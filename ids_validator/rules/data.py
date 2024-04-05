@@ -65,10 +65,28 @@ class ValidatorRegistry:
         self.rule_path: Path = rule_path
 
     def validator(self, *ids_names: str) -> Callable:
-        """Decorator for validation test functions
+        """Decorator to register functions as validation rules
+
+        The validation rule function will be called with the requested IDSs as
+        arguments.
 
         Args:
-            ids_names: Names of ids instances to be validated
+            ids_names: Names of ids instances to be validated, for example
+                ``"core_profiles"`` or ``"pf_active"``. Use a wildcard ``"*"`` to accept
+                any IDS.
+
+        Example:
+            .. code-block:: python
+
+                @validator("core_profiles")
+                def rule_for_core_profiles(cp):
+                    \"\"\"Rule that applies to any core_profiles IDS.\"\"\"
+                    ... # Write rules
+
+                @validator("*")
+                def rule_for_any_ids(ids):
+                    \"\"\"Rule that applies to any IDS.\"\"\"
+                    ... # Write rules
         """
 
         # explicit kwfields

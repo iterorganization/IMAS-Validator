@@ -3,10 +3,15 @@
 Rule definition tutorial
 ========================
 
-Here is a step-by-step tutorial to build an ids-validator ruleset for the first time from scratch.
+Here is a step-by-step tutorial to build an ids-validator ruleset for the first
+time from scratch.
 
-Setting up ids_validator
-------------------------
+.. seealso::
+  :ref:`defining rules` for a more in-depth description of validation rules.
+
+
+Setting up ``ids_validator``
+----------------------------
 
 First make a projects folder.
 
@@ -15,69 +20,97 @@ First make a projects folder.
   mkdir my_projects
   cd my_projects
 
-Follow the :ref:`installation instructions<installing>` to install ids_validator inside the projects folder.
-For now we will add the tests to a tmp folder inside the ids_validator folder.
-Create the following ruleset folder structure
+Follow the :ref:`installation instructions<installing>` to install
+``ids_validator`` inside the ``my_projects`` folder. Let's start with creating
+the folder structure for our new ruleset:
 
-.. code-block:: bash
+.. code-block:: console
 
-  cd ids-validator
-  mkdir -p tmp/my_rulesets/my_ruleset
-  touch tmp/my_rulesets/my_ruleset/my_tests.py
+  my_projects$ ls
+  ids-validator
+  my_projects$ mkdir -p my_rulesets/my_ruleset
+  my_projects$ touch my_rulesets/my_ruleset/my_tests.py
+
+We have created a new rule set ``my_ruleset`` with one (empty) rule file
+``my_tests.py``.
+
 
 Defining validation rules
 -------------------------
 
-The validation rules are defined inside the python files as follows:
+Next we need to define validation rules in our new rule file. 
 
-- Function with IDS instances
-- :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>` decorator
-- Python logic using standard python, IMASPy IDSs and predefined :py:class:`helper methods<ids_validator.rules.helpers>`
-- Assert statements describing which conditions should be tested
+1. :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`
+   decorator
+2. Function definition accepting IDS instances as arguments
+3. A short description of the tests
+4. The tests, which can use standard python logic, IMASPy IDSs and predefined
+   :py:class:`helper methods<ids_validator.rules.helpers>`. Assert statements
+   describe which conditions should be adhered to.
 
-The function argument is the IDS instance being tested. The IDSs are selected based on the @validator decorator argument
+See :ref:`rule definition` for more information.
 
 .. note:: There is no need to separately import the helper functions and validator decorator.
 
 Examples
---------
+''''''''
 
-For the first example we make sure that all equilibrium IDSs have a comment.
-Add the following validation rule to your rule file.
-Select 'equilibrium' in the @validator decorator
+For the first example we make sure that all ``equilibrium`` IDSs have a comment.
+Add the following validation rule to your rule file. Select ``"equilibrium"`` in
+the ``@validator`` decorator, then check that ``ids_properties.comment`` is not
+empty:
 
 .. code-block:: python
-  :caption: ``tmp/my_rulesets/my_ruleset/my_tests.py``
+  :caption: ``my_rulesets/my_ruleset/my_tests.py``
 
   @validator("equilibrium")
   def validate_comment(eq):
+    """Validate that ids_properties.comment is filled."""
     assert eq.ids_properties.comment != ""
 
-For the second example we make sure that all IDSs with a 1D time array have strictly increasing time arrays.
-Add the following validation rule to your rule file.
-Select all IDSs in the @validator decorator using a wildcard selector ``'*'``
-Use :py:class:`Select<ids_validator.rules.helpers.Select>` to find all quantities that are called ``"time"`` or have a path that ends in ``"/time"``
-Use IMASPy metadata to select only 1D time arrays (and filter out 0D time variables as found in dynamic Arrays of Structures)
-Check that their values are strictly :py:class:`Increasing<ids_validator.rules.helpers.Increasing>`
+For the second example we make sure that all ``time`` arrays in all IDSs are
+strictly increasing.
+
+1. Select all IDSs in the ``@validator`` decorator using a wildcard selector
+   ``'*'``.
+2. Use the :py:class:`~ids_validator.rules.helpers.Select` helper method to find
+   all quantities that are called ``"time"`` or have a path that ends in
+   ``"/time"``.
+3. Use IMASPy metadata to select only 1D time arrays (and filter out 0D time
+   variables as found in dynamic Arrays of Structures)
+4. Check that their values are strictly with the
+   :py:class:`~ids_validator.rules.helpers.Increasing` helper method.
 
 .. code-block:: python
-  :caption: ``tmp/my_rulesets/my_ruleset/my_tests.py``
+  :caption: ``my_rulesets/my_ruleset/my_tests.py``
 
   @validator("*")
   def validate_increasing_time(ids):
+    """Validate all time arrays are strictly increasing"""
     for time_quantity in Select(ids, "(^|/)time$", has_value=True):
         # 1D time array:
         if time_quantity.metadata.ndim == 1:
             assert Increasing(time_quantity)
 
 
-Test run
---------
+Run the validations
+-------------------
 
-Now check if the rules are working:
-You can use your own data entries or use the one from this example
+Now we run the IDS validation tool to check if the rules are working. The
+arguments we supply are:
 
-.. code-block:: bash
+- The IMAS URI. You can use the example URI from the public database on SDCC, or
+  use a custom data entry.
+- ``-e ./my_rulesets`` to indicate that the ``my_rulesets`` folder contains rule
+  sets.
+- ``-r my_ruleset`` to enable the ``my_ruleset`` rule set that we just created.
+- ``--no-generic`` to disable the generic checks, so only our two rules are
+  executed.
 
-  cd ids_validator
-  ids_validator validate 'imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134173/106/' -e tmp/my_rulesets -r my_ruleset
+.. code-block:: console
+
+  my_projects$ ids_validator validate \
+    'imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/134173/106/' \
+    -e ./my_rulesets \
+    -r my_ruleset \
+    --no-generic

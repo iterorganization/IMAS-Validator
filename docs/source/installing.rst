@@ -35,12 +35,14 @@ SDCC setup
     # For development an installation in editable mode may be more convenient
     pip install -e .[all]
 
-* Load IMAS and IMASPy.
+* Load IMAS and IMASPy
 
   .. code-block:: bash
 
-    # load every time you use ids_validator
+    # Load modules every time you use ids_validator
     module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
+    # And activate the Python virtual environment
+    . venv/bin/activate
 
 * Test the installation
 
