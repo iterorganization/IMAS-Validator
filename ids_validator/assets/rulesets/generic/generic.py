@@ -89,17 +89,25 @@ def validate_min_max(ids):
 
 @validator("*")
 def validate_errorbars(ids):
-    """Validate that ``*_error_upper`` and `*_error_lower`` values are positive, and that error_upper is also filled whenever error_lower is non empty
+    """Validate that ``*_error_upper`` and `*_error_lower`` values are positive, and
+    that error_upper is also filled whenever error_lower is non empty
 
     Notes:
 
     * TBD
     """
     for error_upper in Select(ids, "_error_upper$", has_value=True):
-	    assert (error_upper >= 0), f"Negative value found for errorbar, while their values must be positive: {error_upper!r}"
-    
+        assert (
+            error_upper >= 0
+        ), "Negative value found for errorbar, while their values must be positive."
+
     for error_lower in Select(ids, "_error_lower$", has_value=True):
-	    assert (error_lower >= 0), f"Negative value found for errorbar, while their values must be positive: {error_lower!r}" 
-	    error_upper_name = str(error_lower.metadata.name).replace("lower","upper")
-	    error_upper = getattr(Parent(error_lower), error_upper_name, None)
-	    assert (error_upper is not None and error_upper.has_value), f"No value found for error_upper, while the related error_lower is filled: {error_upper!r}"
+        assert (
+            error_lower >= 0
+        ), "Negative value found for errorbar, while their values must be positive."
+        error_lower_name = str(error_lower.metadata.name)
+        error_upper_name = error_lower_name.replace("_error_lower", "_error_upper")
+        error_upper = getattr(Parent(error_lower), error_upper_name, None)
+        assert (
+            error_upper is not None and error_upper.has_value
+        ), "No value found for error_upper, while the related error_lower is filled."
