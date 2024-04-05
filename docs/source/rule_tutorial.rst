@@ -120,4 +120,4 @@ arguments we supply are:
 
   The validator will need to load all data in the supplied data entry. Depending
   on the size of your data entry it may take some time to load this data and
-  execut the rules.
+  execute the rules.
