@@ -28,13 +28,6 @@ class InvalidRulesetName(ValueError):
         super().__init__(f"Ruleset name {name!r} cannot be found. {suggestions}")
 
 
-class WrongFileExtensionWarning(Warning):
-    """Error when a ruleset file does not have .py as a file extension"""
-
-    def __init__(self, file: Path) -> None:
-        super().__init__(f"Ruleset file {str(file)!r} is not a python file")
-
-
 class IMASVersionError(RuntimeError):
     """Error raised when IMAS is not available, or of the wrong version."""
 
