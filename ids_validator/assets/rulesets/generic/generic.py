@@ -28,7 +28,7 @@ def validate_homogeneous_time(ids):
             # https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IMASPy-doc/generated/imaspy.ids_metadata.IDSType.html#imaspy.ids_metadata.IDSType
             assert (
                 not node.metadata.type.is_dynamic
-            ), f"Dynamic quantity {node!r} may not be filled when homogeneous_time == 2"
+            ), "Dynamic quantity may not be filled when homogeneous_time == 2"
 
 
 @validator("*")
@@ -90,11 +90,7 @@ def validate_min_max(ids):
 @validator("*")
 def validate_errorbars(ids):
     """Validate that ``*_error_upper`` and `*_error_lower`` values are positive, and
-    that error_upper is also filled whenever error_lower is non empty
-
-    Notes:
-
-    * TBD
+    that error_upper is also filled whenever ``error_lower`` is non empty
     """
     for error_upper in Select(ids, "_error_upper$", has_value=True):
         assert (
