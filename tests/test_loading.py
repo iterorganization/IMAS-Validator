@@ -8,7 +8,7 @@ import pytest
 from ids_validator.exceptions import (
     InvalidRulesetName,
     InvalidRulesetPath,
-    WrongFileExtensionError,
+    WrongFileExtensionWarning,
 )
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import ValidatorRegistry
@@ -241,7 +241,7 @@ def test_load_rules_syntax_error(res_collector):
 
 def test_load_rules_file_extension_error(res_collector):
     path = Path("tests/rulesets/exceptions/generic/wrong_file_extension.pie")
-    with pytest.raises(WrongFileExtensionError):
+    with pytest.raises(WrongFileExtensionWarning):
         load_rules_from_path(path, res_collector)
 
 

@@ -12,7 +12,7 @@ import ids_validator
 from ids_validator.exceptions import (
     InvalidRulesetName,
     InvalidRulesetPath,
-    WrongFileExtensionError,
+    WrongFileExtensionWarning,
 )
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
@@ -165,7 +165,7 @@ def load_rules_from_path(
         List IDSValidationRule objects from given file
     """
     if rule_path.suffix != ".py":
-        raise WrongFileExtensionError(rule_path)
+        raise WrongFileExtensionWarning(rule_path)
     val_registry = ValidatorRegistry(rule_path)
 
     run_path(rule_path, val_registry, result_collector)

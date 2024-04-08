@@ -28,7 +28,7 @@ class InvalidRulesetName(ValueError):
         super().__init__(f"Ruleset name {name!r} cannot be found. {suggestions}")
 
 
-class WrongFileExtensionError(ValueError):
+class WrongFileExtensionWarning(Warning):
     """Error when a ruleset file does not have .py as a file extension"""
 
     def __init__(self, file: Path) -> None:
