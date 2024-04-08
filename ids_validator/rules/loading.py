@@ -9,10 +9,7 @@ from typing import List
 from importlib_resources import files
 
 import ids_validator
-from ids_validator.exceptions import (
-    InvalidRulesetName,
-    InvalidRulesetPath,
-)
+from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector

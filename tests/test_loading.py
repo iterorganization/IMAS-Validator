@@ -5,10 +5,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from ids_validator.exceptions import (
-    InvalidRulesetName,
-    InvalidRulesetPath,
-)
+from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.loading import (
