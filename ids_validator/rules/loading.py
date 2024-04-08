@@ -9,11 +9,7 @@ from typing import List
 from importlib_resources import files
 
 import ids_validator
-from ids_validator.exceptions import (
-    InvalidRulesetName,
-    InvalidRulesetPath,
-    WrongFileExtensionError,
-)
+from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
 from ids_validator.validate.result_collector import ResultCollector
@@ -165,7 +161,10 @@ def load_rules_from_path(
         List IDSValidationRule objects from given file
     """
     if rule_path.suffix != ".py":
-        raise WrongFileExtensionError(rule_path)
+        logger.warning(
+            f"Ignoring ruleset file: {str(rule_path)!r} is not a python file"
+        )
+        return []
     val_registry = ValidatorRegistry(rule_path)
 
     run_path(rule_path, val_registry, result_collector)
