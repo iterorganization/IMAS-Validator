@@ -34,12 +34,19 @@ Manual
 
    rule_tutorial
 
-
 .. toctree::
    :caption: API docs
    :maxdepth: 1
 
    api
+
+.. toctree::
+   :caption: Development
+   :maxdepth: 1
+
+   code_style
+   ci_config
+
 
 
 LICENSE
