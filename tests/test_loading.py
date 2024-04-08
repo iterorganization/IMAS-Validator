@@ -220,7 +220,7 @@ def test_load_rules_syntax_error(res_collector):
 def test_load_rules_file_extension_error(res_collector, caplog):
     path = Path("tests/rulesets/exceptions/generic/wrong_file_extension.pie")
     load_rules_from_path(path, res_collector)
-    log_test = f"Ruleset file {str(path)!r} is not a python file"
+    log_test = f"Ignoring ruleset file: {str(path)!r} is not a python file"
     assert caplog.record_tuples == [
         ("ids_validator.rules.loading", logging.WARNING, log_test)
     ]
