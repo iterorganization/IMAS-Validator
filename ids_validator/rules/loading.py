@@ -161,7 +161,9 @@ def load_rules_from_path(
         List IDSValidationRule objects from given file
     """
     if rule_path.suffix != ".py":
-        logger.warning(f"Ignoring ruleset file: {str(rule_path)!r} is not a python file")
+        logger.warning(
+            f"Ignoring ruleset file: {str(rule_path)!r} is not a python file"
+        )
         return []
     val_registry = ValidatorRegistry(rule_path)
 
