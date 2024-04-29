@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 import argparse
 import sys
+import os
 from typing import List
+from datetime import datetime
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-
+from ids_validator.convert_output.convert_idsResult_to_xml import parse_output, create_JUnit_xml
 
 def configure_argument_parser() -> argparse.ArgumentParser:
     # Management of input arguments
@@ -79,6 +81,11 @@ def main(argv: List) -> None:
             print("===========================")
             print(command.result)
             print("===========================\n")
+            
+            #Create output file 
+            struct_validation_result_array = parse_output(command.result)
+            today = datetime.now().strftime("%Y-%m-%d")
+            create_JUnit_xml(struct_validation_result_array, "test_result_{today}.xml")
     except CommandNotRecognisedException:
         parser.print_help()
 
