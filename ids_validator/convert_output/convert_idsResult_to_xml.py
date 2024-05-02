@@ -1,4 +1,5 @@
 from xml.dom import minidom
+from typing import Any, List
 import re
 
 
@@ -38,9 +39,9 @@ class struct_validation_result:
         )
 
 
-def parse_output(output_str: str) -> list[struct_validation_result]:
+def parse_output(output_str: str) -> List[struct_validation_result]:
     """
-    Make a list of struct_validation_result from output of ids_validator.
+    Make a List of struct_validation_result from output of ids_validator.
 
     Args:
         output_str: Output ids_validator
@@ -101,7 +102,7 @@ def parse_output(output_str: str) -> list[struct_validation_result]:
 
 
 def create_JUnit_xml(
-    ids_validation_result_list: list[struct_validation_result],
+    ids_validation_result_list: List[struct_validation_result],
     save_path_file_input_str: str,
 ) -> None:
     """
@@ -117,7 +118,7 @@ def create_JUnit_xml(
     cpt_test_in_testsuite: int = 0
     cpt_failure_in_testsuite: int = 0
     ids_tmp: str = ""
-    testsuite_array: list = []
+    testsuite_array: List[minidom.Element] = []
 
     # Create minidom Document in JUnit xml format
     xml = minidom.Document()
@@ -195,8 +196,8 @@ def create_JUnit_xml(
         cpt_failure_in_testsuite = 0
 
     # Append testsuite to xml
-    for item in testsuite_array:
-        testsuites.appendChild(item)
+    for item_element in testsuite_array:
+        testsuites.appendChild(item_element)
 
     # Write xml file
     xml_str = testsuites.toprettyxml(indent="\t")
