@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import argparse
 import sys
-from typing import List
 from datetime import datetime
+from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
 from ids_validator.convert_output.convert_idsResult_to_xml import (
-    parse_output,
     create_JUnit_xml,
+    parse_output,
 )
 
 
