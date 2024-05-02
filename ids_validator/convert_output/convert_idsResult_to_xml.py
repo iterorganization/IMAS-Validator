@@ -14,14 +14,14 @@ class struct_validation_result:
     rule_name: str
     """Rule name"""
 
-    def __init__(self, success, msg, last_tb, ids_name, rule_name):
+    def __init__(self, success : bool, msg : str, last_tb : str, ids_name : str, rule_name : str) -> None:
         self.success = success
         self.msg = msg
         self.last_tb = last_tb
         self.ids_name = ids_name
         self.rule_name = rule_name
 
-    def to_str(self):
+    def to_str(self) -> None:
         print(
             "Success : "
             + str(self.success)
@@ -35,12 +35,7 @@ class struct_validation_result:
             + self.rule_name
         )
 
-
-testsuite_array = []
-struct_validation_result_array = []
-
-
-def parse_output(output_str):
+def parse_output(output_str : str) -> list[struct_validation_result]:
     """
     Make a list of struct_validation_result from output of ids_validator.
 
@@ -51,6 +46,8 @@ def parse_output(output_str):
         List of struct_validation_result
     """
 
+    struct_validation_result_array = []
+    
     # Get All struct_validation_result
     ids_validation_result_split = output_str.split("IDSValidationResult")
     ids_validation_result_split.pop(0)
@@ -59,13 +56,16 @@ def parse_output(output_str):
     for item in ids_validation_result_split:
         # Get success
         match_success = re.search(r"success=(\w+)", item)
-        if match_success.group(1) == "True":
-            success = True
-        else:
-            success = False
+        if match_success is None:
+            raise Exception("No match")
+        else : 
+            if match_success.group(1) == "True":
+                success = True
+            else:
+                success = False
         # Get message
         match_msg = re.search(r"msg='([^']+)'", item)
-        if match_msg:
+        if match_msg :
             msg = match_msg.group(1)
         else:
             msg = ""
@@ -97,7 +97,7 @@ def parse_output(output_str):
     return struct_validation_result_array
 
 
-def create_JUnit_xml(ids_validation_result_list, save_path_file_input_str):
+def create_JUnit_xml(ids_validation_result_list : list[struct_validation_result], save_path_file_input_str : str) -> None:
     """
     Creation of output file structure in JUnit xml format.
 
@@ -108,9 +108,10 @@ def create_JUnit_xml(ids_validation_result_list, save_path_file_input_str):
     Return:
     """
 
-    cpt_test_in_testsuite = 0
-    cpt_failure_in_testsuite = 0
-    ids_tmp = ""
+    cpt_test_in_testsuite : int = 0
+    cpt_failure_in_testsuite : int = 0
+    ids_tmp : str = ""
+    testsuite_array : list = []
 
     # Create minidom Document in JUnit xml format
     xml = minidom.Document()
@@ -187,7 +188,7 @@ def create_JUnit_xml(ids_validation_result_list, save_path_file_input_str):
         cpt_test_in_testsuite = 0
         cpt_failure_in_testsuite = 0
 
-    # Add testsuite to xml
+    # Append testsuite to xml
     for item in testsuite_array:
         testsuites.appendChild(item)
 
@@ -196,7 +197,7 @@ def create_JUnit_xml(ids_validation_result_list, save_path_file_input_str):
     write_xml_and_html_file(xml_str, save_path_file_input_str)
 
 
-def write_xml_and_html_file(input_str, save_path_file_input_str):
+def write_xml_and_html_file(input_str : str, save_path_file_input_str : str) -> None:
     """
     Write file xml, and convert him into html
 
@@ -208,6 +209,3 @@ def write_xml_and_html_file(input_str, save_path_file_input_str):
     """
     with open(save_path_file_input_str, "w+") as f:
         f.write(input_str)
-
-    testsuite_array.clear()
-    struct_validation_result_array.clear()
