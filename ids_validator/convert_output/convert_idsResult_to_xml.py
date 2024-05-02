@@ -1,7 +1,6 @@
-from xml.dom import minidom
-from typing import List
 import re
-
+from typing import List
+from xml.dom import minidom
 
 class struct_validation_result:
     success: bool
