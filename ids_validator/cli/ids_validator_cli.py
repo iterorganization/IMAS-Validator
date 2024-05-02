@@ -7,7 +7,11 @@ from datetime import datetime
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-from ids_validator.convert_output.convert_idsResult_to_xml import parse_output, create_JUnit_xml
+from ids_validator.convert_output.convert_idsResult_to_xml import (
+    parse_output,
+    create_JUnit_xml,
+)
+
 
 def configure_argument_parser() -> argparse.ArgumentParser:
     # Management of input arguments
@@ -83,8 +87,8 @@ def main(argv: List) -> None:
             print(command.result)
             print("===========================\n")
             str_to_parse = str_to_parse + str(command.result)
-            
-        #Create output file 
+
+        # Create output file
         struct_validation_result_array = parse_output(str_to_parse)
         today = datetime.now().strftime("%Y-%m-%d")
         file_name = f"test_result_{today}.xml"
