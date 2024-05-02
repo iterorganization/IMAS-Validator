@@ -79,8 +79,6 @@ def parse_output(output_str):
         result.last_tb = result.last_tb.replace(">", "")
         result.rule_name = result.rule_name.replace("'","")
         struct_validation_result_array.append(result)
-        result.to_str()
-        print()
 
     return struct_validation_result_array
 

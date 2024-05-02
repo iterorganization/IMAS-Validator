@@ -87,7 +87,8 @@ def main(argv: List) -> None:
         #Create output file 
         struct_validation_result_array = parse_output(str_to_parse)
         today = datetime.now().strftime("%Y-%m-%d")
-        create_JUnit_xml(struct_validation_result_array, "test_result_{today}.xml")
+        file_name = f"test_result_{today}.xml"
+        create_JUnit_xml(struct_validation_result_array, file_name)
     except CommandNotRecognisedException:
         parser.print_help()
 
