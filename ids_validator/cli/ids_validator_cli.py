@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import sys
-import os
 from typing import List
 from datetime import datetime
 
