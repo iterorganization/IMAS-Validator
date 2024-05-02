@@ -38,7 +38,7 @@ def parse_output(output_str):
     """
 
     #Get All struct_validation_result
-    ids_validation_result_split = output_str.split("struct_validation_result")
+    ids_validation_result_split = output_str.split("IDSValidationResult")
     ids_validation_result_split.pop(0)
 
     #Create all struct_validation_result and store them into an array
