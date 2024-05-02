@@ -76,16 +76,18 @@ def main(argv: List) -> None:
         for command in command_objects:
             command.execute()
 
+        str_to_parse = ""
         # temporary, print command results:
         for command in command_objects:
             print("===========================")
             print(command.result)
             print("===========================\n")
+            str_to_parse = str_to_parse + str(command.result)
             
-            #Create output file 
-            struct_validation_result_array = parse_output(command.result)
-            today = datetime.now().strftime("%Y-%m-%d")
-            create_JUnit_xml(struct_validation_result_array, "test_result_{today}.xml")
+        #Create output file 
+        struct_validation_result_array = parse_output(str_to_parse)
+        today = datetime.now().strftime("%Y-%m-%d")
+        create_JUnit_xml(struct_validation_result_array, "test_result_{today}.xml")
     except CommandNotRecognisedException:
         parser.print_help()
 
