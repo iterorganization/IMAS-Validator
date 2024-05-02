@@ -2,6 +2,7 @@ import re
 from typing import List
 from xml.dom import minidom
 
+
 class struct_validation_result:
     success: bool
     """Whether or not the validation test was successful"""
