@@ -33,9 +33,9 @@ def create_JUnit_xml(
     testsuites.setAttribute("tests", str(len(ids_validation_result_list)))
 
     # Get failures tests cpt
-    for item in ids_validation_result_list:
-        if item.success is False:
-            cpt_failure_in_testsuite = cpt_failure_in_testsuite + 1
+    cpt_failure_in_testsuite = sum(
+        not item.success for item in ids_validation_result_list
+    )
     testsuites.setAttribute("failures", str(cpt_failure_in_testsuite))
     cpt_failure_in_testsuite = 0
 
@@ -56,16 +56,16 @@ def create_JUnit_xml(
         for ids_validation_item in ids_validation_result_list:
             if testsuite_item.getAttribute("name") == ids_validation_item.idss[0][0]:
                 cpt_test_in_testsuite = cpt_test_in_testsuite + 1
+                testcase = xml.createElement("testcase")
+                testcase.setAttribute(
+                    "id",
+                    testsuite_item.getAttribute("id")
+                    + "."
+                    + str(cpt_test_in_testsuite),
+                )
+                testcase.setAttribute("name", ids_validation_item.rule.name)
                 if ids_validation_item.success is False:
                     cpt_failure_in_testsuite = cpt_failure_in_testsuite + 1
-                    testcase = xml.createElement("testcase")
-                    testcase.setAttribute(
-                        "id",
-                        testsuite_item.getAttribute("id")
-                        + "."
-                        + str(cpt_test_in_testsuite),
-                    )
-                    testcase.setAttribute("name", ids_validation_item.rule.name)
                     # Add testcase to testSuite
                     testsuite_item.appendChild(testcase)
                     # Create, set failure and append to testcase
@@ -80,14 +80,6 @@ def create_JUnit_xml(
                     # Add failure to testcase
                     testcase.appendChild(failure)
                 else:
-                    testcase = xml.createElement("testcase")
-                    testcase.setAttribute(
-                        "id",
-                        testsuite_item.getAttribute("id")
-                        + "."
-                        + str(cpt_test_in_testsuite),
-                    )
-                    testcase.setAttribute("name", ids_validation_item.rule.name)
                     # Create, set msg and append to testcase
                     if ids_validation_item.msg:
                         msg = xml.createElement("msg")
