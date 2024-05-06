@@ -6,10 +6,7 @@ from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-from ids_validator.convert_output.convert_idsResult_to_xml import (
-    create_JUnit_xml,
-    parse_output,
-)
+from ids_validator.convert_output.convert_idsResult_to_xml import create_JUnit_xml
 
 
 def configure_argument_parser() -> argparse.ArgumentParser:
