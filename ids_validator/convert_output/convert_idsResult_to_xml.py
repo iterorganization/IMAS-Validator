@@ -45,8 +45,8 @@ def create_JUnit_xml(
 
     # Set testsuite balise
     for i in range(len(ids_validation_result_list) - 1):
-        if i == 0 or ids_validation_result_list[i].idss.__str__ != ids_tmp:
-            ids_tmp = str(ids_validation_result_list[i].idss.__str__)
+        if i == 0 or ids_validation_result_list[i].idss[0][0] != ids_tmp:
+            ids_tmp = ids_validation_result_list[i].idss[0][0]
             testsuite = xml.createElement("testsuite")
             testsuite.setAttribute("id", "1." + str(len(testsuite_array) + 1))
             testsuite.setAttribute("name", ids_tmp)
@@ -55,7 +55,7 @@ def create_JUnit_xml(
     # Set Testcase and append to testsuite
     for testsuite_item in testsuite_array:
         for ids_validation_item in ids_validation_result_list:
-            if testsuite_item.getAttribute("name") == ids_validation_item.idss.__str__:
+            if testsuite_item.getAttribute("name") == ids_validation_item.idss[0][0]:
                 cpt_test_in_testsuite = cpt_test_in_testsuite + 1
                 if ids_validation_item.success is False:
                     cpt_failure_in_testsuite = cpt_failure_in_testsuite + 1
