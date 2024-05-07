@@ -5,12 +5,16 @@ from xml.dom import minidom
 from ids_validator.validate.result import IDSValidationResult
 
 
-def create_JUnit_xml(ids_validation_result_list: List[IDSValidationResult]) -> None:
+def create_JUnit_xml(
+        ids_validation_result_list: List[IDSValidationResult],
+        file_name : str
+    ) -> None:
     """
     Creation of output file structure in JUnit xml format.
 
     Args:
         ids_validation_result_list : List of struct_validation_result
+        file_name : output file name
 
     Return:
     """
@@ -95,19 +99,21 @@ def create_JUnit_xml(ids_validation_result_list: List[IDSValidationResult]) -> N
 
     # Write xml file
     xml_str = testsuites.toprettyxml(indent="\t")
-    write_xml_file(xml_str)
+    write_xml_file(xml_str, file_name)
 
 
-def write_xml_file(input_str: str) -> None:
+def write_xml_file(
+        input_str: str,
+        file_name: str
+    ) -> None:
     """
     Write file xml
 
     Args:
         input_str : content to write
-
+        file_name : output file name
     Return:
     """
-    file_name = input("Enter the file name (without extension): ")
     file_name_extension = file_name + ".xml"
     with open(file_name_extension, "w+") as f:
         f.write(input_str)

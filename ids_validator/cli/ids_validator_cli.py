@@ -59,6 +59,11 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "-d", "--debug", action="store_true", help="drop into debugger if tests fails"
     )
 
+    validate_group.add_argument(
+        "--output",
+        help="""Specify name of file result"""
+    )
+    
     return parser
 
 
@@ -82,7 +87,7 @@ def main(argv: List) -> None:
             print("===========================\n")
 
         # Create output file
-        create_JUnit_xml(command.result)
+        create_JUnit_xml(command.result, args.output)
     except CommandNotRecognisedException:
         parser.print_help()
 
