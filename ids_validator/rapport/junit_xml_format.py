@@ -46,7 +46,7 @@ def create_JUnit_xml(
     for i in range(len(ids_validation_result_list) - 1):
         for tuple_item in ids_validation_result_list[i].idss:
             if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
-                ids_tmp = tuple_item[0] + str(tuple_item[1])
+                ids_tmp = tuple_item[0] + "-" + str(tuple_item[1])
                 testsuite = xml.createElement("testsuite")
                 testsuite.setAttribute("id", "1." + str(len(testsuite_array) + 1))
                 testsuite.setAttribute("name", ids_tmp)
@@ -56,7 +56,7 @@ def create_JUnit_xml(
     for testsuite_item in testsuite_array:
         for ids_validation_item in ids_validation_result_list:
             for tuple_item in ids_validation_item.idss:
-                if testsuite_item.getAttribute("name") == tuple_item[0] + str(
+                if testsuite_item.getAttribute("name") == tuple_item[0] + "-" + str(
                     tuple_item[1]
                 ):
                     cpt_test_in_testsuite = cpt_test_in_testsuite + 1
