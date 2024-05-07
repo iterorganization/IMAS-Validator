@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 import argparse
 import sys
-from datetime import datetime
 from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-from ids_validator.convert_output.convert_idsResult_to_xml import create_JUnit_xml
+from ids_validator.rapport.junit_xml_format import create_JUnit_xml
 
 
 def configure_argument_parser() -> argparse.ArgumentParser:
@@ -83,9 +82,7 @@ def main(argv: List) -> None:
             print("===========================\n")
 
         # Create output file
-        today = datetime.now().strftime("%Y-%m-%d")
-        file_name = f"test_result_{today}.xml"
-        create_JUnit_xml(command.result, file_name)
+        create_JUnit_xml(command.result)
     except CommandNotRecognisedException:
         parser.print_help()
 

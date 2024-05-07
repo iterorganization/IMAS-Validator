@@ -1,19 +1,16 @@
+import os
 from typing import List
 from xml.dom import minidom
 
 from ids_validator.validate.result import IDSValidationResult
 
 
-def create_JUnit_xml(
-    ids_validation_result_list: List[IDSValidationResult],
-    save_path_file_input_str: str,
-) -> None:
+def create_JUnit_xml(ids_validation_result_list: List[IDSValidationResult]) -> None:
     """
     Creation of output file structure in JUnit xml format.
 
     Args:
         ids_validation_result_list : List of struct_validation_result
-        save_path_file_input_str: output file path
 
     Return:
     """
@@ -98,18 +95,20 @@ def create_JUnit_xml(
 
     # Write xml file
     xml_str = testsuites.toprettyxml(indent="\t")
-    write_xml_and_html_file(xml_str, save_path_file_input_str)
+    write_xml_file(xml_str)
 
 
-def write_xml_and_html_file(input_str: str, save_path_file_input_str: str) -> None:
+def write_xml_file(input_str: str) -> None:
     """
-    Write file xml, and convert him into html
+    Write file xml
 
     Args:
         input_str : content to write
-        save_path_file_input_str: output file path
 
     Return:
     """
-    with open(save_path_file_input_str, "w+") as f:
+    file_name = input("Enter the file name (without extension): ")
+    file_name_extension = file_name + ".xml"
+    with open(file_name_extension, "w+") as f:
         f.write(input_str)
+    print("Path file :", os.path.abspath(file_name_extension))
