@@ -45,7 +45,7 @@ def create_JUnit_xml(
     # Set testsuite balise
     for i in range(len(ids_validation_result_list) - 1):
         for tuple_item in ids_validation_result_list[i].idss:
-            if str(tuple_item[0]) + +"-" + +str(tuple_item[1]) != ids_tmp:
+            if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
                 ids_tmp = tuple_item[0] + str(tuple_item[1])
                 testsuite = xml.createElement("testsuite")
                 testsuite.setAttribute("id", "1." + str(len(testsuite_array) + 1))
