@@ -6,7 +6,7 @@ from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-from ids_validator.rapport.junit_xml_format import create_JUnit_xml
+from ids_validator.rapport.validationResultGenerator import ValidationResultGenerator
 
 
 def configure_argument_parser() -> argparse.ArgumentParser:
@@ -91,7 +91,8 @@ def main(argv: List) -> None:
         else:
             today = datetime.now().strftime("%Y-%m-%d")
             file_name = f"test_result_{today}"
-        create_JUnit_xml(command.result, file_name)
+        report_generator = ValidationResultGenerator(command.result, file_name)
+        report_generator.create_JUnit_xml()
     except CommandNotRecognisedException:
         parser.print_help()
 
