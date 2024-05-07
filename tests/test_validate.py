@@ -45,7 +45,7 @@ def test_validate(caplog):
         factory=IDSFactory("3.40.1"),
     ), patch(f"{module}._check_imas_version"):
         validate_options = ValidateOptions(
-            rulesets=["ITER-MD"],
+            rulesets=["test-ruleset"],
             extra_rule_dirs=[Path("tests/rulesets/validate-test")],
             apply_generic=False,
         )

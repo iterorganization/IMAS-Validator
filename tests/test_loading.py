@@ -47,7 +47,7 @@ def test_discover_rulesets_explicit(caplog):
         Path("tests/rulesets/env_var2"),
         Path("tests/rulesets/exceptions"),
         Path("tests/rulesets/base/generic"),
-        Path("tests/rulesets/base/ITER-MD"),
+        Path("tests/rulesets/base/test-ruleset"),
         Path("tests/rulesets/validate-test"),
         Path("tests/rulesets/filter_test"),
     ]
@@ -59,8 +59,8 @@ def test_discover_rulesets_explicit(caplog):
         unfiltered_rulesets
     )
     log_text = (
-        "Found 8 rulesets: ITER-MD, base, env_var, env_var2, exceptions, filter_test, "
-        "generic, validate-test"
+        "Found 8 rulesets: base, env_var, env_var2, exceptions, "
+        "filter_test, generic, test-ruleset, validate-test"
     )
     assert caplog.record_tuples == [
         ("ids_validator.rules.loading", logging.INFO, log_text)
@@ -71,14 +71,14 @@ def test_discover_rulesets_env_var(monkeypatch, caplog):
     monkeypatch.setenv("RULESET_PATH", "tests/rulesets/env_var:tests/rulesets/env_var2")
     unfiltered_rulesets = [
         Path("tests/rulesets/env_var/generic"),
-        Path("tests/rulesets/env_var/ITER-MD"),
+        Path("tests/rulesets/env_var/test-ruleset"),
         Path("tests/rulesets/env_var2/generic"),
     ]
     validate_options = ValidateOptions(extra_rule_dirs=[], use_bundled_rulesets=False)
     assert Counter(discover_rulesets(validate_options=validate_options)) == Counter(
         unfiltered_rulesets
     )
-    log_test = "Found 3 rulesets: ITER-MD, generic, generic"
+    log_test = "Found 3 rulesets: generic, generic, test-ruleset"
     assert caplog.record_tuples == [
         ("ids_validator.rules.loading", logging.INFO, log_test)
     ]
@@ -99,10 +99,14 @@ def test_discover_rulesets_invalid_env_var(monkeypatch):
 
 def test_filter_rulesets_all(caplog):
     base = "tests/rulesets/base"
-    unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
-    filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
+    unfiltered_rulesets = [
+        Path(base),
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+    ]
+    filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/test-ruleset")]
     validate_options = ValidateOptions(
-        rulesets=["ITER-MD"],
+        rulesets=["test-ruleset"],
         apply_generic=True,
     )
     assert Counter(
@@ -116,7 +120,11 @@ def test_filter_rulesets_all(caplog):
 
 def test_filter_rulesets_none(caplog):
     base = "tests/rulesets/base"
-    unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
+    unfiltered_rulesets = [
+        Path(base),
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+    ]
     filtered_rulesets = []
     validate_options = ValidateOptions(
         rulesets=[],
@@ -133,7 +141,11 @@ def test_filter_rulesets_none(caplog):
 
 def test_filter_rulesets_apply_generic(caplog):
     base = "tests/rulesets/base"
-    unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
+    unfiltered_rulesets = [
+        Path(base),
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+    ]
     filtered_rulesets = [Path(f"{base}/generic")]
     validate_options = ValidateOptions(
         rulesets=[],
@@ -150,10 +162,14 @@ def test_filter_rulesets_apply_generic(caplog):
 
 def test_filter_rulesets_with_rulesets(caplog):
     base = "tests/rulesets/base"
-    unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
-    filtered_rulesets = [Path(f"{base}/ITER-MD")]
+    unfiltered_rulesets = [
+        Path(base),
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+    ]
+    filtered_rulesets = [Path(f"{base}/test-ruleset")]
     validate_options = ValidateOptions(
-        rulesets=["ITER-MD"],
+        rulesets=["test-ruleset"],
         apply_generic=False,
     )
     assert Counter(
@@ -167,9 +183,13 @@ def test_filter_rulesets_with_rulesets(caplog):
 
 def test_filter_rulesets_invalid_ruleset():
     base = "tests/rulesets/base"
-    unfiltered_rulesets = [Path(base), Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
+    unfiltered_rulesets = [
+        Path(base),
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+    ]
     validate_options = ValidateOptions(
-        rulesets=["ITER-MD-woops-typo"],
+        rulesets=["test-ruleset-woops-typo"],
         apply_generic=False,
     )
     with pytest.raises(InvalidRulesetName):
@@ -178,12 +198,12 @@ def test_filter_rulesets_invalid_ruleset():
 
 def test_discover_rule_modules():
     base = "tests/rulesets/base"
-    filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/ITER-MD")]
+    filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/test-ruleset")]
     rule_modules = [
         Path(f"{base}/generic/common_ids.py"),
         Path(f"{base}/generic/core_profiles.py"),
-        Path(f"{base}/ITER-MD/common_ids.py"),
-        Path(f"{base}/ITER-MD/core_profiles.py"),
+        Path(f"{base}/test-ruleset/common_ids.py"),
+        Path(f"{base}/test-ruleset/core_profiles.py"),
     ]
     assert Counter(discover_rule_modules(filtered_rulesets)) == Counter(rule_modules)
 
@@ -245,9 +265,9 @@ def test_run_path(res_collector):
 
 
 def test_filter_rules(res_collector):
-    path = Path("tests/rulesets/filter_test/ITER-MD/core_profiles.py")
+    path = Path("tests/rulesets/filter_test/test-ruleset/core_profiles.py")
     rules = load_rules_from_path(path, res_collector)
-    path = Path("tests/rulesets/filter_test/ITER-MD/equilibrium.py")
+    path = Path("tests/rulesets/filter_test/test-ruleset/equilibrium.py")
     rules += load_rules_from_path(path, res_collector)
     assert_filter_rules(rules, 8, RuleFilter())
     assert_filter_rules(rules, 8, RuleFilter(name=[], ids=[]))
@@ -255,10 +275,10 @@ def test_filter_rules(res_collector):
     assert_filter_rules(rules, 2, RuleFilter(name=["val_equilibrium"]))
     assert_filter_rules(rules, 4, RuleFilter(name=["core_profiles"]))
     assert_filter_rules(rules, 4, RuleFilter(name=["equilibrium"]))
-    assert_filter_rules(rules, 4, RuleFilter(name=["test"]))
+    assert_filter_rules(rules, 8, RuleFilter(name=["test"]))
     assert_filter_rules(rules, 4, RuleFilter(ids=["equilibrium"]))
     assert_filter_rules(rules, 4, RuleFilter(ids=["core_profiles"]))
-    assert_filter_rules(rules, 2, RuleFilter(name=["test"], ids=["core_profiles"]))
+    assert_filter_rules(rules, 4, RuleFilter(name=["test"], ids=["core_profiles"]))
     assert_filter_rules(rules, 2, RuleFilter(name=["test", "4"]))
 
 
