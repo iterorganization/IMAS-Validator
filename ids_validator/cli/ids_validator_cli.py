@@ -59,11 +59,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "-d", "--debug", action="store_true", help="drop into debugger if tests fails"
     )
 
-    validate_group.add_argument(
-        "--output",
-        help="""Specify name of file result"""
-    )
-    
+    validate_group.add_argument("--output", help="""Specify name of file result""")
+
     return parser
 
 

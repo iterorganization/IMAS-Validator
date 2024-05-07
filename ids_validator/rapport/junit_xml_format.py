@@ -6,9 +6,8 @@ from ids_validator.validate.result import IDSValidationResult
 
 
 def create_JUnit_xml(
-        ids_validation_result_list: List[IDSValidationResult],
-        file_name : str
-    ) -> None:
+    ids_validation_result_list: List[IDSValidationResult], file_name: str
+) -> None:
     """
     Creation of output file structure in JUnit xml format.
 
@@ -102,10 +101,7 @@ def create_JUnit_xml(
     write_xml_file(xml_str, file_name)
 
 
-def write_xml_file(
-        input_str: str,
-        file_name: str
-    ) -> None:
+def write_xml_file(input_str: str, file_name: str) -> None:
     """
     Write file xml
 
