@@ -76,11 +76,13 @@ def create_JUnit_xml(
                         failure = xml.createElement("failure")
                         failure.setAttribute("message", ids_validation_item.msg)
                         failure.setAttribute("type", "")
-                        # failure.appendChild(xml.createTextNode("\n"))
-                        failure.appendChild(
-                            xml.createTextNode(str(ids_validation_item.tb[-1]))
+                        failure.setAttribute(
+                            "nodes dict", str(IDSValidationResult.nodes_dict)
                         )
-                        # failure.appendChild(xml.createTextNode("\n"))
+                        last_tb = str(ids_validation_item.tb[-1])
+                        last_tb = last_tb.replace("<", "")
+                        last_tb = last_tb.replace(">", "")
+                        failure.appendChild(xml.createTextNode(last_tb))
                         # Add failure to testcase
                         testcase.appendChild(failure)
                     else:
