@@ -15,6 +15,9 @@ class ValidationResultGenerator:
     _junit_xml: str
     """content to write in xml file"""
 
+    _junit_txt: str
+    """content to wrinte in plain text file"""
+
     def __init__(self, report_list: List[IDSValidationResult]):
         self._report_list = report_list
 
@@ -130,4 +133,72 @@ class ValidationResultGenerator:
         file_name_extension = file_name + ".xml"
         with open(file_name_extension, "w+") as f:
             f.write(self._junit_xml)
+        print("Path file :", os.path.abspath(file_name_extension))
+
+    def save_junit_txt(self, file_name: str) -> None:
+        self._junit_txt = ""
+        ids_tmp: str = ""
+
+        if file_name is None:
+            today = datetime.now().strftime("%Y-%m-%d")
+            file_name = f"summary_report_{today}"
+
+        cpt_test = len(self._report_list) - 1
+        cpt_failure = sum(not item.success for item in self._report_list)
+        cpt_succesful = cpt_test - cpt_failure
+
+        self._junit_txt += "Summary Report : \n"
+        self._junit_txt += "Number of tests carried out : " + str(cpt_test) + "\n"
+        self._junit_txt += "Number of successful tests : " + str(cpt_succesful) + "\n"
+        self._junit_txt += "Number of failed tests : " + str(cpt_failure) + "\n"
+        self._junit_txt += "\n"
+
+        for ids_validation_item in self._report_list:
+            for tuple_item in ids_validation_item.idss:
+                if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
+                    self._junit_txt += (
+                        "IDS : "
+                        + str(tuple_item[0])
+                        + " occurence : "
+                        + str(tuple_item[1])
+                        + "\n"
+                    )
+                    if ids_validation_item.success is False:
+                        last_tb = str(ids_validation_item.tb[-1])
+                        last_tb = last_tb.replace("<", "")
+                        last_tb = last_tb.replace(">", "")
+                        self._junit_txt += (
+                            "\tTest with rule name : "
+                            + ids_validation_item.rule.name
+                            + "is failed\n"
+                        )
+                        self._junit_txt += (
+                            "\t\tmessage : " + ids_validation_item.msg + "\n"
+                        )
+                        self._junit_txt += "\t\ttraceback : " + last_tb + "\n"
+                    else:
+                        self._junit_txt += (
+                            "\tTest with rule name : "
+                            + ids_validation_item.rule.name
+                            + "is successful\n"
+                        )
+
+        # Print summary report
+        print("===========================")
+        print(self._junit_txt)
+        print("===========================")
+        self.write_plain_text_file(file_name)
+
+    def write_plain_text_file(self, file_name: str) -> None:
+        """
+        Write plain text file
+
+        Args:
+            file_name : name of file
+
+        Return:
+        """
+        file_name_extension = file_name + ".txt"
+        with open(file_name_extension, "w+") as f:
+            f.write(self._junit_txt)
         print("Path file :", os.path.abspath(file_name_extension))
