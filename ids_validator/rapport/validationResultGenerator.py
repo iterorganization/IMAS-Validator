@@ -176,13 +176,13 @@ class ValidationResultGenerator:
                         + ids_validation_item.rule.name
                         + ", is failed\n"
                     )
-                    self._junit_txt += "\tMessage : " + ids_validation_item.msg + "\n"
-                    self._junit_txt += "\tTraceback : " + last_tb + "\n"
+                    self._junit_txt += "\t\tMessage : " + ids_validation_item.msg + "\n"
+                    self._junit_txt += "\t\tTraceback : " + last_tb + "\n"
                 else:
                     self._junit_txt += (
                         "\tTest with rule name : "
                         + ids_validation_item.rule.name
-                        + ",cat  is successful\n"
+                        + ", is successful\n"
                     )
 
         # Print summary report
