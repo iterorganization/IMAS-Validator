@@ -142,8 +142,10 @@ class ValidationResultGenerator:
         if file_name is None:
             today = datetime.now().strftime("%Y-%m-%d")
             file_name = f"summary_report_{today}"
+        else:
+            file_name = "summary_report_" + file_name
 
-        cpt_test = len(self._report_list) - 1
+        cpt_test = len(self._report_list)
         cpt_failure = sum(not item.success for item in self._report_list)
         cpt_succesful = cpt_test - cpt_failure
 
@@ -155,14 +157,14 @@ class ValidationResultGenerator:
 
         for ids_validation_item in self._report_list:
             for tuple_item in ids_validation_item.idss:
+                self._junit_txt += (
+                    "IDS : "
+                    + str(tuple_item[0])
+                    + " occurence : "
+                    + str(tuple_item[1])
+                    + "\n"
+                )
                 if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
-                    self._junit_txt += (
-                        "IDS : "
-                        + str(tuple_item[0])
-                        + " occurence : "
-                        + str(tuple_item[1])
-                        + "\n"
-                    )
                     if ids_validation_item.success is False:
                         last_tb = str(ids_validation_item.tb[-1])
                         last_tb = last_tb.replace("<", "")
@@ -170,17 +172,17 @@ class ValidationResultGenerator:
                         self._junit_txt += (
                             "\tTest with rule name : "
                             + ids_validation_item.rule.name
-                            + "is failed\n"
+                            + " is failed\n"
                         )
                         self._junit_txt += (
-                            "\t\tmessage : " + ids_validation_item.msg + "\n"
+                            "\tMessage : " + ids_validation_item.msg + "\n"
                         )
-                        self._junit_txt += "\t\ttraceback : " + last_tb + "\n"
+                        self._junit_txt += "\tTraceback : " + last_tb + "\n"
                     else:
                         self._junit_txt += (
                             "\tTest with rule name : "
                             + ids_validation_item.rule.name
-                            + "is successful\n"
+                            + " is successful\n"
                         )
 
         # Print summary report
