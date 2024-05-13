@@ -133,7 +133,7 @@ class ValidationResultGenerator:
         file_name_extension = file_name + ".xml"
         with open(file_name_extension, "w+") as f:
             f.write(self._junit_xml)
-        print("Path file :", os.path.abspath(file_name_extension))
+        print("Path file JUnit xml:", os.path.abspath(file_name_extension))
 
     def save_junit_txt(self, file_name: str) -> None:
         self._junit_txt = ""
@@ -203,4 +203,4 @@ class ValidationResultGenerator:
         file_name_extension = file_name + ".txt"
         with open(file_name_extension, "w+") as f:
             f.write(self._junit_txt)
-        print("Path file :", os.path.abspath(file_name_extension))
+        print("Path file summary report:", os.path.abspath(file_name_extension))
