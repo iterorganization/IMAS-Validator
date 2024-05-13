@@ -161,7 +161,7 @@ class ValidationResultGenerator:
                     self._junit_txt += (
                         "IDS "
                         + str(tuple_item[0])
-                        + " occurence "
+                        + " occurrence "
                         + str(tuple_item[1])
                         + "\n"
                     )
