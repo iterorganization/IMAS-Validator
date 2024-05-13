@@ -18,7 +18,7 @@ class ValidationResultGenerator:
     def __init__(self, report_list: List[IDSValidationResult]):
         self._report_list = report_list
 
-    def save_junit_xml(self, file_name=None) -> None:
+    def save_junit_xml(self, file_name: str) -> None:
         """
         Creation of output file structure in JUnit xml format.
 
