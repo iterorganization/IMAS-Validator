@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import List
 from xml.dom import minidom
 
@@ -8,22 +9,28 @@ from ids_validator.validate.result import IDSValidationResult
 class ValidationResultGenerator:
     """Class for generating report"""
 
-    report_list: List[IDSValidationResult]
+    _report_list: List[IDSValidationResult]
     """List of IDSValidationResult"""
 
-    file_name: str
-    """Name of output file"""
+    _junit_xml: str
+    """content to write in xml file"""
 
-    def __init__(self, report_list: List[IDSValidationResult], file_name: str):
-        self.report_list = report_list
-        self.file_name = file_name
+    def __init__(self, report_list: List[IDSValidationResult]):
+        self._report_list = report_list
 
-    def create_JUnit_xml(self) -> None:
+    def save_junit_xml(self, file_name=None) -> None:
         """
         Creation of output file structure in JUnit xml format.
 
+        Args:
+            file_name : name of file
+
         Return:
         """
+
+        if file_name is None:
+            today = datetime.now().strftime("%Y-%m-%d")
+            file_name = f"test_result_{today}"
 
         cpt_test_in_testsuite: int = 0
         cpt_failure_in_testsuite: int = 0
@@ -37,10 +44,10 @@ class ValidationResultGenerator:
         testsuites = xml.createElement("testsuites")
         testsuites.setAttribute("id", "1")
         testsuites.setAttribute("name", "ids_validator")
-        testsuites.setAttribute("tests", str(len(self.report_list)))
+        testsuites.setAttribute("tests", str(len(self._report_list)))
 
         # Get failures tests cpt
-        cpt_failure_in_testsuite = sum(not item.success for item in self.report_list)
+        cpt_failure_in_testsuite = sum(not item.success for item in self._report_list)
         testsuites.setAttribute("failures", str(cpt_failure_in_testsuite))
         cpt_failure_in_testsuite = 0
 
@@ -48,8 +55,8 @@ class ValidationResultGenerator:
         xml.appendChild(testsuites)
 
         # Set testsuite balise
-        for i in range(len(self.report_list) - 1):
-            for tuple_item in self.report_list[i].idss:
+        for i in range(len(self._report_list) - 1):
+            for tuple_item in self._report_list[i].idss:
                 if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
                     ids_tmp = tuple_item[0] + "-" + str(tuple_item[1])
                     testsuite = xml.createElement("testsuite")
@@ -59,7 +66,7 @@ class ValidationResultGenerator:
 
         # Set Testcase and append to testsuite
         for testsuite_item in testsuite_array:
-            for ids_validation_item in self.report_list:
+            for ids_validation_item in self._report_list:
                 for tuple_item in ids_validation_item.idss:
                     if testsuite_item.getAttribute("name") == tuple_item[0] + "-" + str(
                         tuple_item[1]
@@ -108,18 +115,19 @@ class ValidationResultGenerator:
             testsuites.appendChild(item_element)
 
         # Write xml file
-        xml_str = testsuites.toprettyxml(indent="\t")
-        self.write_xml_file(xml_str)
+        self._junit_xml = testsuites.toprettyxml(indent="\t")
+        self.write_xml_file(file_name)
 
-    def write_xml_file(self, input_str: str) -> None:
+    def write_xml_file(self, file_name: str) -> None:
         """
         Write file xml
 
         Args:
-            input_str : content to write
+            file_name : name of file
+
         Return:
         """
-        file_name_extension = self.file_name + ".xml"
+        file_name_extension = file_name + ".xml"
         with open(file_name_extension, "w+") as f:
-            f.write(input_str)
+            f.write(self._junit_xml)
         print("Path file :", os.path.abspath(file_name_extension))

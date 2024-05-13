@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import sys
-from datetime import datetime
 from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
@@ -85,14 +84,8 @@ def main(argv: List) -> None:
             print("===========================\n")
 
         # Create output file
-        file_name = ""
-        if args.output:
-            file_name = args.output
-        else:
-            today = datetime.now().strftime("%Y-%m-%d")
-            file_name = f"test_result_{today}"
-        report_generator = ValidationResultGenerator(command.result, file_name)
-        report_generator.create_JUnit_xml()
+        report_generator = ValidationResultGenerator(command.result)
+        report_generator.save_junit_xml(args.output)
     except CommandNotRecognisedException:
         parser.print_help()
 
