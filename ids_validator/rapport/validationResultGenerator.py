@@ -178,8 +178,8 @@ class ValidationResultGenerator:
                     )
                     self._junit_txt += "\t\tMessage : " + ids_validation_item.msg + "\n"
                     self._junit_txt += "\t\tTraceback : " + last_tb + "\n"
-                    self._junit_txt += "\t\tNodes_Dict : " + str(
-                        ids_validation_item.nodes_dict
+                    self._junit_txt += (
+                        "\t\tNodes_Dict : " + str(ids_validation_item.nodes_dict) + "\n"
                     )
                 else:
                     self._junit_txt += (

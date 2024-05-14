@@ -86,6 +86,7 @@ def main(argv: List) -> None:
         # Create xml output file
         report_generator = ValidationResultGenerator(command.result)
         report_generator.save_junit_xml(args.output)
+        # Create and print summary report
         report_generator.save_junit_txt(args.output)
     except CommandNotRecognisedException:
         parser.print_help()

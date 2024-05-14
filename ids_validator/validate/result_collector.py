@@ -58,9 +58,14 @@ class ResultCollector:
             f"in {tb[-1].name}:{tb[-1].lineno}. This could be a bug in the rule. See "
             "detailed report for further information."
         )
+        msg = (
+            f"Exception while executing rule {self._current_rule.name}: '{str(exc)}' "
+            + f"in {tb[-1].name}:{tb[-1].lineno}. This could be a bug in the rule. See "
+            + "detailed report for further information."
+        )
         result = IDSValidationResult(
             False,
-            "",
+            msg,
             self._current_rule,
             self._current_idss,
             tb,
