@@ -6,6 +6,7 @@ from typing import List
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
 from ids_validator.rapport.validationResultGenerator import ValidationResultGenerator
+from ids_validator.validate.result import IDSValidationResult
 
 
 def configure_argument_parser() -> argparse.ArgumentParser:
@@ -23,7 +24,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         type=str,
         nargs="+",
         action="append",
-        help="uri for database entree",
+        help="uri for database entry",
     )
 
     validate_group.add_argument(
@@ -59,7 +60,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "-d", "--debug", action="store_true", help="drop into debugger if tests fails"
     )
 
-    validate_group.add_argument("--output", help="""Specify name of file result""")
+    validate_group.add_argument("--output", help="""Specify name of the output file""")
 
     return parser
 
@@ -77,17 +78,18 @@ def main(argv: List) -> None:
         for command in command_objects:
             command.execute()
 
-        # temporary, print command results:
-        for command in command_objects:
-            print("===========================")
-            print(command.result)
-            print("===========================\n")
+        result_list: List[IDSValidationResult] = []
 
-        # Create xml output file
-        report_generator = ValidationResultGenerator(command.result)
-        report_generator.save_junit_xml(args.output)
-        # Create and print summary report
-        report_generator.save_junit_txt(args.output)
+        for command in command_objects:
+            result_list = result_list + command.result
+
+        report_generator = ValidationResultGenerator(result_list)
+        print(report_generator.txt)
+
+        report_generator.save_xml(args.output)
+        summary_filename = args.output if not args.output else f"{args.output}.summary"
+        report_generator.save_txt(summary_filename)
+
     except CommandNotRecognisedException:
         parser.print_help()
 

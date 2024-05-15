@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from xml.dom import minidom
 
 from ids_validator.validate.result import IDSValidationResult
@@ -9,31 +9,41 @@ from ids_validator.validate.result import IDSValidationResult
 class ValidationResultGenerator:
     """Class for generating report"""
 
-    _report_list: List[IDSValidationResult]
-    """List of IDSValidationResult"""
+    @property
+    def xml(self) -> str:
+        return self._junit_xml
 
-    _junit_xml: str
-    """content to write in xml file"""
-
-    _junit_txt: str
-    """content to wrinte in plain text file"""
+    @property
+    def txt(self) -> str:
+        return self._junit_txt
 
     def __init__(self, report_list: List[IDSValidationResult]):
         self._report_list = report_list
+        self._junit_xml: str = ""
+        self._junit_txt: str = ""
+        self.parse(self._report_list)
 
-    def save_junit_xml(self, file_name: str) -> None:
+    def parse(self, report_list: List[IDSValidationResult]) -> None:
         """
         Creation of output file structure in JUnit xml format.
 
         Args:
-            file_name : name of file
+            report_list: List[IDSValidationResult] - list of validation report results
 
         Return:
         """
+        self._parse_junit_xml(report_list)
+        self._parse_junit_txt(report_list)
 
-        if file_name is None:
-            today = datetime.now().strftime("%Y-%m-%d")
-            file_name = f"test_result_{today}"
+    def _parse_junit_xml(self, report_list: List[IDSValidationResult]) -> None:
+        """
+        Creation of output file structure in JUnit xml format.
+
+        Args:
+            report_list: List[IDSValidationResult] - list of validation report results
+
+        Return:
+        """
 
         cpt_test_in_testsuite: int = 0
         cpt_failure_in_testsuite: int = 0
@@ -47,10 +57,10 @@ class ValidationResultGenerator:
         testsuites = xml.createElement("testsuites")
         testsuites.setAttribute("id", "1")
         testsuites.setAttribute("name", "ids_validator")
-        testsuites.setAttribute("tests", str(len(self._report_list)))
+        testsuites.setAttribute("tests", str(len(report_list)))
 
         # Get failures tests cpt
-        cpt_failure_in_testsuite = sum(not item.success for item in self._report_list)
+        cpt_failure_in_testsuite = sum(not item.success for item in report_list)
         testsuites.setAttribute("failures", str(cpt_failure_in_testsuite))
         cpt_failure_in_testsuite = 0
 
@@ -58,8 +68,8 @@ class ValidationResultGenerator:
         xml.appendChild(testsuites)
 
         # Set testsuite balise
-        for i in range(len(self._report_list) - 1):
-            for tuple_item in self._report_list[i].idss:
+        for report in report_list:
+            for tuple_item in report.idss:
                 if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
                     ids_tmp = tuple_item[0] + "-" + str(tuple_item[1])
                     testsuite = xml.createElement("testsuite")
@@ -69,7 +79,7 @@ class ValidationResultGenerator:
 
         # Set Testcase and append to testsuite
         for testsuite_item in testsuite_array:
-            for ids_validation_item in self._report_list:
+            for ids_validation_item in report_list:
                 for tuple_item in ids_validation_item.idss:
                     if testsuite_item.getAttribute("name") == tuple_item[0] + "-" + str(
                         tuple_item[1]
@@ -119,51 +129,36 @@ class ValidationResultGenerator:
 
         # Write xml file
         self._junit_xml = testsuites.toprettyxml(indent="\t")
-        self.write_xml_file(file_name)
 
-    def write_xml_file(self, file_name: str) -> None:
+    def _parse_junit_txt(self, report_list: List[IDSValidationResult]) -> None:
         """
-        Write file xml
+        Creation of output file structure in plain text format.
 
         Args:
-            file_name : name of file
+            report_list: List[IDSValidationResult] - list of validation report results
 
         Return:
         """
-        file_name_extension = file_name + ".xml"
-        with open(file_name_extension, "w+") as f:
-            f.write(self._junit_xml)
-        print("Path file JUnit xml:", os.path.abspath(file_name_extension))
 
-    def save_junit_txt(self, file_name: str) -> None:
         self._junit_txt = ""
         ids_tmp: str = ""
 
-        if file_name is None:
-            today = datetime.now().strftime("%Y-%m-%d")
-            file_name = f"summary_report_{today}"
-        else:
-            file_name = "summary_report_" + file_name
-
-        cpt_test = len(self._report_list)
-        cpt_failure = sum(not item.success for item in self._report_list)
+        cpt_test = len(report_list)
+        cpt_failure = sum(not item.success for item in report_list)
         cpt_succesful = cpt_test - cpt_failure
 
-        self._junit_txt += "Summary Report : \n"
-        self._junit_txt += "Number of tests carried out : " + str(cpt_test) + "\n"
-        self._junit_txt += "Number of successful tests : " + str(cpt_succesful) + "\n"
-        self._junit_txt += "Number of failed tests : " + str(cpt_failure) + "\n"
-        self._junit_txt += "\n"
+        self._junit_txt = (
+            f"Summary Report : \n"
+            f"Number of tests carried out : {str(cpt_test)}\n"
+            f"Number of successful tests : {str(cpt_succesful)}\n"
+            f"Number of failed tests : {str(cpt_failure)}\n\n"
+        )
 
-        for ids_validation_item in self._report_list:
+        for ids_validation_item in report_list:
             for tuple_item in ids_validation_item.idss:
                 if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
                     self._junit_txt += (
-                        "IDS "
-                        + str(tuple_item[0])
-                        + " occurrence "
-                        + str(tuple_item[1])
-                        + "\n"
+                        f"IDS {str(tuple_item[0])} occurrence {str(tuple_item[1])}\n"
                     )
                     ids_tmp = str(tuple_item[0]) + "-" + str(tuple_item[1])
 
@@ -172,38 +167,54 @@ class ValidationResultGenerator:
                     last_tb = last_tb.replace("<", "")
                     last_tb = last_tb.replace(">", "")
                     self._junit_txt += (
-                        "\tTest with rule name : "
-                        + ids_validation_item.rule.name
-                        + ", is failed\n"
+                        f"\nTest with rule name : "
+                        f"{ids_validation_item.rule.name}, failed\n"
                     )
-                    self._junit_txt += "\t\tMessage : " + ids_validation_item.msg + "\n"
-                    self._junit_txt += "\t\tTraceback : " + last_tb + "\n"
+                    self._junit_txt += f"\t\tMessage : {ids_validation_item.msg}\n"
+                    self._junit_txt += f"\t\tTraceback : {last_tb}\n"
                     self._junit_txt += (
-                        "\t\tNodes_Dict : " + str(ids_validation_item.nodes_dict) + "\n"
+                        f"\t\tNodes_Dict : {ids_validation_item.nodes_dict}\n"
                     )
                 else:
                     self._junit_txt += (
-                        "\tTest with rule name : "
-                        + ids_validation_item.rule.name
-                        + ", is successful\n"
+                        f"\tTest with rule name : "
+                        f"{ids_validation_item.rule.name}, was successful\n"
                     )
 
-        # Print summary report
-        print("===========================")
-        print(self._junit_txt)
-        print("===========================")
-        self.write_plain_text_file(file_name)
-
-    def write_plain_text_file(self, file_name: str) -> None:
+    def save_xml(self, file_name: Optional[str] = None) -> None:
         """
-        Write plain text file
+        Save generated validation report as JUnit xml file
 
         Args:
-            file_name : name of file
+            file_name: Optional[str] - name of file to be saved.
+                If not provided, filename is generated based on current date.
 
         Return:
         """
-        file_name_extension = file_name + ".txt"
-        with open(file_name_extension, "w+") as f:
+        if not file_name:
+            today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+            file_name = f"test_result_{today}.xml"
+
+        with open(file_name, "w+") as f:
+            f.write(self._junit_xml)
+            print(f"Generated JUnit xml report saved as: {os.path.abspath(file_name)}")
+
+    def save_txt(self, file_name: Optional[str] = None) -> None:
+        """
+        Save generated validation report summary as plain text file
+
+        Args:
+            file_name: Optional[str] - name of file to be saved.
+                If not provided, filename is generated based on current date.
+
+        Return:
+        """
+        if not file_name:
+            today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+            file_name = f"summary_report_{today}.txt"
+
+        with open(file_name, "w+") as f:
             f.write(self._junit_txt)
-        print("Path file summary report:", os.path.abspath(file_name_extension))
+            print(
+                f"Generated JUnit summary report saved as: {os.path.abspath(file_name)}"
+            )
