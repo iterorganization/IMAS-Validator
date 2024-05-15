@@ -5,7 +5,7 @@ from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-from ids_validator.rapport.validationResultGenerator import ValidationResultGenerator
+from ids_validator.report.validationResultGenerator import ValidationResultGenerator
 from ids_validator.validate.result import IDSValidationResult
 
 
