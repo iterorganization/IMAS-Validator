@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from traceback import StackSummary
 from typing import List, Optional
 from xml.dom import minidom
 
