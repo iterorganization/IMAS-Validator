@@ -111,11 +111,6 @@ class ValidationResultGenerator:
                             # Add failure to testcase
                             testcase.appendChild(failure)
                         else:
-                            # Create, set msg and append to testcase
-                            if ids_validation_item.msg:
-                                msg = xml.createElement("msg")
-                                msg.setAttribute("message", ids_validation_item.msg)
-                                testcase.appendChild(msg)
                             # Add testcase to testSuite
                             testsuite_item.appendChild(testcase)
             testsuite_item.setAttribute("tests", str(cpt_test_in_testsuite))
