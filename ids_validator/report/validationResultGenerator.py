@@ -102,7 +102,7 @@ class ValidationResultGenerator:
                             failure.setAttribute("message", ids_validation_item.msg)
                             failure.setAttribute("type", "")
                             failure.setAttribute(
-                                "nodes dict", str(ids_validation_item.nodes_dict)
+                                "nodes_dict", str(ids_validation_item.nodes_dict)
                             )
                             last_tb = str(ids_validation_item.tb[-1])
                             last_tb = last_tb.replace("<", "")
