@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from traceback import StackSummary
 from typing import List, Optional
 from xml.dom import minidom
 
@@ -104,10 +105,8 @@ class ValidationResultGenerator:
                             failure.setAttribute(
                                 "nodes_dict", str(ids_validation_item.nodes_dict)
                             )
-                            last_tb = str(ids_validation_item.tb[-1])
-                            last_tb = last_tb.replace("<", "")
-                            last_tb = last_tb.replace(">", "")
-                            failure.appendChild(xml.createTextNode(last_tb))
+                            tb = "\n".join(ids_validation_item.tb.format())
+                            failure.appendChild(xml.createTextNode(tb))
                             # Add failure to testcase
                             testcase.appendChild(failure)
                         else:
