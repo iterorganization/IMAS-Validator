@@ -7,7 +7,7 @@ import os
 from operator import attrgetter
 from pathlib import Path
 from types import ModuleType
-from typing import List
+from typing import Dict, List
 
 from importlib_resources import files
 
@@ -37,7 +37,8 @@ def import_mod(name: str, mod_path: Path) -> ModuleType:
 def load_docs(
     result_collector: ResultCollector,
     validate_options: ValidateOptions,
-) -> List[IDSValidationRule]:
+    show_empty: bool = False,
+) -> Dict:
     """docstring"""
     defaults = {
         "folder": "No folder docstring available. Add an __init__.py file to your rule "
@@ -48,7 +49,7 @@ def load_docs(
     }
     ruleset_dirs = discover_rulesets(validate_options=validate_options)
     filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
-    docs = {}
+    docs: Dict[str, Dict] = {}
     for dir in filtered_dirs:
         rule_dir = str(dir.parts[-2])
         rule_set = str(dir.parts[-1])
@@ -83,14 +84,11 @@ def load_docs(
                     "docstring": inspect.getdoc(rule.func) or defaults["func"],
                 }
                 docs[rule_dir][rule_set][file_name][doc["name"]] = doc
-            if len(docs[rule_dir][rule_set][file_name].keys()) < 2:
-                print(docs[rule_dir][rule_set][file_name])
+            if not show_empty and len(docs[rule_dir][rule_set][file_name].keys()) < 2:
                 del docs[rule_dir][rule_set][file_name]
-        if len(docs[rule_dir][rule_set].keys()) < 2:
-            print(docs[rule_dir][rule_set])
+        if not show_empty and len(docs[rule_dir][rule_set].keys()) < 2:
             del docs[rule_dir][rule_set]
-            if len(docs[rule_dir].keys()) < 1:
-                print(docs[rule_dir])
+            if not show_empty and len(docs[rule_dir].keys()) < 1:
                 del docs[rule_dir]
     return docs
 
