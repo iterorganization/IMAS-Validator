@@ -3,14 +3,14 @@ This file describes the main function for the IMAS IDS validation tool
 """
 
 import logging
+from pathlib import Path
 
 from rich import print
 from rich.tree import Tree
-from pathlib import Path
 
-from ids_validator.validate_options import RuleFilter, ValidateOptions
 from ids_validator.rules.loading import load_docs
 from ids_validator.validate.result_collector import ResultCollector
+from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
 
@@ -39,36 +39,32 @@ def explore(
         show_empty=show_empty,
     )
     tree = Tree("[red]Explore Tool")
-    for rule_dir, rule_dir_dict in docs.items():
-        rule_dir_branch = tree.add(f"[red]{rule_dir}")
+    for rule_dir in docs.rule_dirs:
+        rule_dir_branch = tree.add(f"[red]{rule_dir.name}")
 
-        for rule_set, rule_set_dict in rule_dir_dict.items():
-            if rule_set == "docstring":
-                continue
-            rule_set_branch = rule_dir_branch.add(f"[red]{rule_set}")
-            rule_set_branch.add(f"[blue]{rule_set_dict['docstring']}")
+        for rule_set in rule_dir.rule_sets:
+            rule_set_branch = rule_dir_branch.add(f"[red]{rule_set.name}")
+            rule_set_branch.add(f"[blue]{rule_set.docstring}")
 
-            for file_name, file_name_dict in rule_set_dict.items():
-                if file_name == "docstring":
-                    continue
-                file_name_branch = rule_set_branch.add(f"[red]{file_name}")
-                file_name_branch.add(f"[blue]{file_name_dict['docstring']}")
+            for rule_file in rule_set.rule_files:
+                file_name_branch = rule_set_branch.add(f"[red]{rule_file.name}")
+                file_name_branch.add(f"[blue]{rule_file.docstring}")
 
-                for func_name, func_name_dict in file_name_dict.items():
-                    if func_name == "docstring":
-                        continue
-                    func_name_branch = file_name_branch.add(f"[red]{func_name}")
-                    func_name_branch.add(f"[dim white]Applies to IDSs: [/][green]{', '.join(func_name_dict['ids_names'])}")
+                for rule in rule_file.rules:
+                    func_name_branch = file_name_branch.add(f"[red]{rule.name}")
+                    ids_names = ", ".join(rule.ids_names)
+                    func_name_branch.add(
+                        f"[dim white]Applies to IDSs: [/][green]{ids_names}"
+                    )
                     if docstring_level == 0:
-                        ds = ''
+                        ds = ""
                     elif docstring_level == 1:
-                        beep = func_name_dict['docstring'].split('\n')[0]
+                        beep = rule.docstring.split("\n")[0]
                         ds = f"{beep}..."
                         func_name_branch.add(f"[blue]{ds}")
                     elif docstring_level == 2:
-                        ds = func_name_dict['docstring']
+                        ds = rule.docstring
                         func_name_branch.add(f"[blue]{ds}")
-
     print(tree)
 
 
@@ -86,5 +82,5 @@ if __name__ == "__main__":
     explore(
         validate_options=val_options,
         show_empty=True,
-        docstring_level=2,
+        docstring_level=1,
     )

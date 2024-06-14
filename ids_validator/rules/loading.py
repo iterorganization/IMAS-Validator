@@ -15,11 +15,27 @@ import ids_validator
 from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
+from ids_validator.rules.docs_dataclass import (
+    ExplorerData,
+    RuleData,
+    RuleDirData,
+    RuleFileData,
+    RuleSetData,
+)
 from ids_validator.rules.helpers import HELPER_DICT
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_FUNC_DOCSTRING = (
+    "No function docstring available. Add a docstring to your function."
+)
+DEFAULT_MODULE_DOCSTRING = (
+    "No function docstring available. Add a docstring at the top of your ruleset."
+)
+DEFAULT_FOLDER_DOCSTRING = "No function docstring available. Add an __init__.py file "
+"to your rule directory with a docstring."
 
 
 def import_mod(name: str, mod_path: Path) -> ModuleType:
@@ -38,59 +54,74 @@ def load_docs(
     result_collector: ResultCollector,
     validate_options: ValidateOptions,
     show_empty: bool = False,
-) -> Dict:
+) -> ExplorerData:
     """docstring"""
-    defaults = {
-        "folder": "No folder docstring available. Add an __init__.py file to your rule "
-        "directory with a docstring.",
-        "mod": "No module docstring available. Add a docstring at the top of your "
-        "ruleset.",
-        "func": "No function docstring available. Add a docstring to your function.",
-    }
     ruleset_dirs = discover_rulesets(validate_options=validate_options)
     filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
     docs: Dict[str, Dict] = {}
+    rule_dirs = []
     for dir in filtered_dirs:
-        rule_dir = str(dir.parts[-2])
-        rule_set = str(dir.parts[-1])
-        docs[rule_dir] = docs.get(rule_dir, {})
-        docs[rule_dir][rule_set] = docs[rule_dir].get(rule_set, {})
+        rule_dir_name = str(dir.parts[-2])
+        rule_set_name = str(dir.parts[-1])
+        docs[rule_dir_name] = docs.get(rule_dir_name, [])
         if Path.joinpath(dir, "__init__.py").exists():
             folder = import_mod("beep", Path.joinpath(dir, "__init__.py"))
-            docs[rule_dir][rule_set]["docstring"] = (
-                inspect.getdoc(folder) or defaults["folder"]
-            )
+            rule_set_doc = inspect.getdoc(folder)
         else:
-            docs[rule_dir][rule_set]["docstring"] = defaults["folder"]
+            rule_set_doc = DEFAULT_FOLDER_DOCSTRING
 
         paths = discover_rule_modules([dir])
-        for path in paths:
-            file_name = str(path.parts[-1])
-            docs[rule_dir][rule_set][file_name] = docs[rule_dir][rule_set].get(
-                file_name, {}
+        rule_files = fix_rule_files(
+            result_collector, validate_options, show_empty, paths
+        )
+        if show_empty or len(rule_files) > 0:
+            rule_set = RuleSetData(
+                name=rule_set_name,
+                docstring=rule_set_doc,
+                rule_files=rule_files,
             )
-            mod = import_mod("oop", path)
-            docs[rule_dir][rule_set][file_name]["docstring"] = (
-                inspect.getdoc(mod) or defaults["mod"]
+            docs[rule_dir_name].append(rule_set)
+    for rule_dir_name, rule_set_list in docs.items():
+        if show_empty or len(rule_set_list) > 1:
+            rule_dir = RuleDirData(
+                name=rule_dir_name,
+                rule_sets=rule_set_list,
             )
+            rule_dirs.append(rule_dir)
+    explorer = ExplorerData(rule_dirs=rule_dirs)
+    return explorer
 
-            rules = load_rules_from_path(path, result_collector)
-            rules = filter_rules(rules, validate_options)
-            for rule in rules:
-                doc = {
-                    "path": path,
-                    "name": rule.func.__name__,
-                    "ids_names": rule.ids_names,
-                    "docstring": inspect.getdoc(rule.func) or defaults["func"],
-                }
-                docs[rule_dir][rule_set][file_name][doc["name"]] = doc
-            if not show_empty and len(docs[rule_dir][rule_set][file_name].keys()) < 2:
-                del docs[rule_dir][rule_set][file_name]
-        if not show_empty and len(docs[rule_dir][rule_set].keys()) < 2:
-            del docs[rule_dir][rule_set]
-            if not show_empty and len(docs[rule_dir].keys()) < 1:
-                del docs[rule_dir]
-    return docs
+
+def fix_rule_files(
+    result_collector: ResultCollector,
+    validate_options: ValidateOptions,
+    show_empty: True,
+    paths: List[Path],
+) -> List[RuleFileData]:
+    """docstring"""
+    rule_files = []
+    for path in paths:
+        file_name = str(path.parts[-1])
+        mod = import_mod("oop", path)
+        rule_list = load_rules_from_path(path, result_collector)
+        rule_list = filter_rules(rule_list, validate_options)
+        rules = []
+        for rule in rule_list:
+            rule_data = RuleData(
+                name=rule.func.__name__,
+                docstring=inspect.getdoc(rule.func) or DEFAULT_FUNC_DOCSTRING,
+                path=path,
+                ids_names=rule.ids_names,
+            )
+            rules.append(rule_data)
+        if show_empty or len(rules) > 0:
+            rule_file = RuleFileData(
+                name=file_name,
+                docstring=inspect.getdoc(mod) or DEFAULT_MODULE_DOCSTRING,
+                rules=rules,
+            )
+            rule_files.append(rule_file)
+    return rule_files
 
 
 def load_rules(
