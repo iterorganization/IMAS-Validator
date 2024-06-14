@@ -4,7 +4,9 @@ import logging
 import os
 from operator import attrgetter
 from pathlib import Path
-from typing import List
+from typing import List, Callable
+import inspect
+import importlib.util
 
 from importlib_resources import files
 
@@ -16,6 +18,65 @@ from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
+
+
+def import_mod(name: str, mod_path: Path):
+    spec = importlib.util.spec_from_file_location(name, mod_path)
+    mod = importlib.util.module_from_spec(spec)
+    setattr(mod, "validator", lambda x: lambda y: y)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def get_docs(rule_path: Path, func: Callable):
+    """docstring"""
+    doc = {
+        "path": rule_path,
+        "folder": "No folder docstring available. Add an __init__.py file to your rule "
+        "directory with a docstring.",
+        "mod": "No module docstring available. Add a docstring at the top of your "
+        "ruleset.",
+        "func": "No function docstring available. Add a docstring to your function.",
+    }
+    if Path.joinpath(rule_path.parent, "__init__.py").exists():
+        folder = import_mod("beep", Path.joinpath(rule_path.parent, "__init__.py"))
+        folder_doc = inspect.getdoc(folder)
+        if folder_doc:
+            doc["folder"] = inspect.getdoc(folder)
+    mod = import_mod("oop", rule_path)
+    mod_doc = inspect.getdoc(mod)
+    if mod_doc:
+        doc["mod"] = inspect.getdoc(mod)
+    func_doc = inspect.getdoc(func)
+    if func_doc:
+        doc["func"] = inspect.getdoc(func)
+    print("PATH")
+    print(doc["path"])
+    print("FOLDER")
+    print(doc["folder"])
+    print("MOD")
+    print(doc["mod"])
+    print("FUNC")
+    print(doc["func"])
+    return doc
+
+
+def load_docs(
+    result_collector: ResultCollector,
+    validate_options: ValidateOptions,
+) -> List[IDSValidationRule]:
+    """docstring"""
+    ruleset_dirs = discover_rulesets(validate_options=validate_options)
+    filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
+    paths = discover_rule_modules(filtered_dirs)
+    docs = []
+    for path in paths:
+        rules = load_rules_from_path(path, result_collector)
+        rules = filter_rules(rules, validate_options)
+        for rule in rules:
+            doc = get_docs(path, rule.func)
+            docs.append(doc)
+    return docs
 
 
 def load_rules(
@@ -140,7 +201,7 @@ def discover_rule_modules(ruleset_dirs: List[Path]) -> List[Path]:
     rule_modules = []
     for ruleset_dir in ruleset_dirs:
         for path in ruleset_dir.iterdir():
-            if path.is_file():
+            if path.is_file() and path.parts[-1] not in ["__init__.py"]:
                 rule_modules.append(path)
     rule_modules = list(set(rule_modules))
     return rule_modules
@@ -181,7 +242,11 @@ def handle_entrypoints() -> List[Path]:
 
 
 def _get_child_dirs(dir: Path) -> List[Path]:
-    child_dirs = [path for path in dir.iterdir() if path.is_dir()]
+    child_dirs = [
+        path
+        for path in dir.iterdir()
+        if path.is_dir() and path.parts[-1] not in ["__pycache__"]
+    ]
     return child_dirs
 
 
