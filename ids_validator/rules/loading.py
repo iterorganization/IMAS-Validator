@@ -1,12 +1,13 @@
 """This file describes the functionality for discovering and loading validation rules"""
 
+import importlib.util
+import inspect
 import logging
 import os
 from operator import attrgetter
 from pathlib import Path
-from typing import List, Callable
-import inspect
-import importlib.util
+from types import ModuleType
+from typing import List
 
 from importlib_resources import files
 
@@ -14,51 +15,23 @@ import ids_validator
 from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
+from ids_validator.rules.helpers import HELPER_DICT
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
 
 
-def import_mod(name: str, mod_path: Path):
+def import_mod(name: str, mod_path: Path) -> ModuleType:
     spec = importlib.util.spec_from_file_location(name, mod_path)
     mod = importlib.util.module_from_spec(spec)
     setattr(mod, "validator", lambda x: lambda y: y)
+    for key, val in HELPER_DICT.items():
+        setattr(mod, key, val)
+
+    setattr(mod, "validator", lambda x: lambda y: y)
     spec.loader.exec_module(mod)
     return mod
-
-
-def get_docs(rule_path: Path, func: Callable):
-    """docstring"""
-    doc = {
-        "path": rule_path,
-        "folder": "No folder docstring available. Add an __init__.py file to your rule "
-        "directory with a docstring.",
-        "mod": "No module docstring available. Add a docstring at the top of your "
-        "ruleset.",
-        "func": "No function docstring available. Add a docstring to your function.",
-    }
-    if Path.joinpath(rule_path.parent, "__init__.py").exists():
-        folder = import_mod("beep", Path.joinpath(rule_path.parent, "__init__.py"))
-        folder_doc = inspect.getdoc(folder)
-        if folder_doc:
-            doc["folder"] = inspect.getdoc(folder)
-    mod = import_mod("oop", rule_path)
-    mod_doc = inspect.getdoc(mod)
-    if mod_doc:
-        doc["mod"] = inspect.getdoc(mod)
-    func_doc = inspect.getdoc(func)
-    if func_doc:
-        doc["func"] = inspect.getdoc(func)
-    print("PATH")
-    print(doc["path"])
-    print("FOLDER")
-    print(doc["folder"])
-    print("MOD")
-    print(doc["mod"])
-    print("FUNC")
-    print(doc["func"])
-    return doc
 
 
 def load_docs(
@@ -66,16 +39,59 @@ def load_docs(
     validate_options: ValidateOptions,
 ) -> List[IDSValidationRule]:
     """docstring"""
+    defaults = {
+        "folder": "No folder docstring available. Add an __init__.py file to your rule "
+        "directory with a docstring.",
+        "mod": "No module docstring available. Add a docstring at the top of your "
+        "ruleset.",
+        "func": "No function docstring available. Add a docstring to your function.",
+    }
     ruleset_dirs = discover_rulesets(validate_options=validate_options)
     filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
-    paths = discover_rule_modules(filtered_dirs)
-    docs = []
-    for path in paths:
-        rules = load_rules_from_path(path, result_collector)
-        rules = filter_rules(rules, validate_options)
-        for rule in rules:
-            doc = get_docs(path, rule.func)
-            docs.append(doc)
+    docs = {}
+    for dir in filtered_dirs:
+        rule_dir = str(dir.parts[-2])
+        rule_set = str(dir.parts[-1])
+        docs[rule_dir] = docs.get(rule_dir, {})
+        docs[rule_dir][rule_set] = docs[rule_dir].get(rule_set, {})
+        if Path.joinpath(dir, "__init__.py").exists():
+            folder = import_mod("beep", Path.joinpath(dir, "__init__.py"))
+            docs[rule_dir][rule_set]["docstring"] = (
+                inspect.getdoc(folder) or defaults["folder"]
+            )
+        else:
+            docs[rule_dir][rule_set]["docstring"] = defaults["folder"]
+
+        paths = discover_rule_modules([dir])
+        for path in paths:
+            file_name = str(path.parts[-1])
+            docs[rule_dir][rule_set][file_name] = docs[rule_dir][rule_set].get(
+                file_name, {}
+            )
+            mod = import_mod("oop", path)
+            docs[rule_dir][rule_set][file_name]["docstring"] = (
+                inspect.getdoc(mod) or defaults["mod"]
+            )
+
+            rules = load_rules_from_path(path, result_collector)
+            rules = filter_rules(rules, validate_options)
+            for rule in rules:
+                doc = {
+                    "path": path,
+                    "name": rule.func.__name__,
+                    "ids_names": rule.ids_names,
+                    "docstring": inspect.getdoc(rule.func) or defaults["func"],
+                }
+                docs[rule_dir][rule_set][file_name][doc["name"]] = doc
+            if len(docs[rule_dir][rule_set][file_name].keys()) < 2:
+                print(docs[rule_dir][rule_set][file_name])
+                del docs[rule_dir][rule_set][file_name]
+        if len(docs[rule_dir][rule_set].keys()) < 2:
+            print(docs[rule_dir][rule_set])
+            del docs[rule_dir][rule_set]
+            if len(docs[rule_dir].keys()) < 1:
+                print(docs[rule_dir])
+                del docs[rule_dir]
     return docs
 
 
