@@ -9,6 +9,7 @@ from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.loading import (
+    load_docs,
     discover_rule_modules,
     discover_rulesets,
     filter_rules,
@@ -285,3 +286,47 @@ def test_filter_rules(res_collector):
 def assert_filter_rules(rules, res, rule_filter):
     validate_options = ValidateOptions(rule_filter=rule_filter)
     assert len(filter_rules(rules, validate_options=validate_options)) == res
+
+
+def test_load_docs(res_collector):
+    rule_dirs = [
+        Path("tests/rulesets/base"),
+    ]
+    val_options = ValidateOptions(
+        rulesets=["test-ruleset"],
+        use_bundled_rulesets=False,
+        apply_generic=False,
+        extra_rule_dirs=rule_dirs,
+        rule_filter=RuleFilter(name=["common_ids"], ids=[]),
+    )
+    docs = load_docs(res_collector, val_options)
+    assert len(docs) == 1
+    assert docs[0]["path"] == Path("tests/rulesets/base/test-ruleset/common_ids.py")
+    assert docs[0]["folder"] == "Folder level docstring for validation tests"
+    assert docs[0]["mod"] == "Module level docstring for validation tests"
+    assert docs[0]["func"] == "Function level docstring for validation tests"
+
+
+def test_load_docs_no_docs(res_collector):
+    rule_dirs = [
+        Path("tests/rulesets/base"),
+    ]
+    val_options = ValidateOptions(
+        use_bundled_rulesets=False,
+        apply_generic=True,
+        extra_rule_dirs=rule_dirs,
+        rule_filter=RuleFilter(name=["common_ids"], ids=[]),
+    )
+    docs = load_docs(res_collector, val_options)
+    assert len(docs) == 1
+    assert docs[0]["path"] == Path("tests/rulesets/base/generic/common_ids.py")
+    assert docs[0]["folder"] == (
+        "No folder docstring available. Add an __init__.py file to your rule directory "
+        "with a docstring."
+    )
+    assert docs[0]["mod"] == (
+        "No module docstring available. Add a docstring at the top of your ruleset."
+    )
+    assert docs[0]["func"] == (
+        "No function docstring available. Add a docstring to your function."
+    )
