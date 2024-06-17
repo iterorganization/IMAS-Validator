@@ -50,6 +50,7 @@ dynamic = ["version"]
 dependencies = [
     "numpy>=1.15.4",
     "importlib_resources",
+    "rich",
     "packaging",
 ]
 
