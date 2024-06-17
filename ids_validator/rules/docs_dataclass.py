@@ -15,7 +15,7 @@ class RuleData:
     """Function level docstring"""
     path: Path = field(default_factory=Path)
     """Path to file in which validation function is defined"""
-    ids_names: Tuple[str] = field(default_factory=tuple)
+    ids_names: Tuple[str, ...] = field(default_factory=tuple)
     """IDS names that the validation function should be applied to"""
 
 

@@ -39,14 +39,29 @@ DEFAULT_FOLDER_DOCSTRING = "No function docstring available. Add an __init__.py 
 
 
 def import_mod(name: str, mod_path: Path) -> ModuleType:
+    """
+    Import module based on path
+
+    Args:
+        name: variable name under which to import module
+        mod_path: path to module to be imported
+
+    Returns:
+        imported module
+    """
+
     spec = importlib.util.spec_from_file_location(name, mod_path)
+    assert spec is not None  # needed for mypy
     mod = importlib.util.module_from_spec(spec)
+    assert mod is not None  # needed for mypy
     setattr(mod, "validator", lambda x: lambda y: y)
     for key, val in HELPER_DICT.items():
         setattr(mod, key, val)
 
     setattr(mod, "validator", lambda x: lambda y: y)
-    spec.loader.exec_module(mod)
+    loader = spec.loader
+    assert loader is not None  # needed for mypy
+    loader.exec_module(mod)
     return mod
 
 
@@ -55,24 +70,34 @@ def load_docs(
     validate_options: ValidateOptions,
     show_empty: bool = False,
 ) -> ExplorerData:
-    """docstring"""
+    """
+    Load docstrings for several rule dirs
+
+    Args:
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
+        validate_options: Dataclass for validate options
+        show_empty: Whether or not to show show empty directories and files
+
+    Returns:
+        ExploreData object with doctstrings and rule directory structure
+    """
     ruleset_dirs = discover_rulesets(validate_options=validate_options)
     filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
-    docs: Dict[str, Dict] = {}
+    docs: Dict[str, List] = {}
     rule_dirs = []
     for dir in filtered_dirs:
         rule_dir_name = str(dir.parts[-2])
         rule_set_name = str(dir.parts[-1])
         docs[rule_dir_name] = docs.get(rule_dir_name, [])
+        rule_set_doc = DEFAULT_FOLDER_DOCSTRING
         if Path.joinpath(dir, "__init__.py").exists():
             folder = import_mod("beep", Path.joinpath(dir, "__init__.py"))
-            rule_set_doc = inspect.getdoc(folder)
-        else:
-            rule_set_doc = DEFAULT_FOLDER_DOCSTRING
+            rule_set_doc = inspect.getdoc(folder) or rule_set_doc
 
         paths = discover_rule_modules([dir])
         rule_files = fix_rule_files(
-            result_collector, validate_options, show_empty, paths
+            result_collector, validate_options, paths, show_empty
         )
         if show_empty or len(rule_files) > 0:
             rule_set = RuleSetData(
@@ -95,10 +120,22 @@ def load_docs(
 def fix_rule_files(
     result_collector: ResultCollector,
     validate_options: ValidateOptions,
-    show_empty: True,
     paths: List[Path],
+    show_empty: bool = True,
 ) -> List[RuleFileData]:
-    """docstring"""
+    """
+    Load docstrings for several rule dirs
+
+    Args:
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
+        validate_options: Dataclass for validate options
+        paths: Paths in which validation rules were found
+        show_empty: Whether or not to show show empty directories and files
+
+    Returns:
+        List of RuleFileData objects
+    """
     rule_files = []
     for path in paths:
         file_name = str(path.parts[-1])
@@ -308,6 +345,7 @@ def filter_rules(
     Returns:
         List of directories corresponding to given rule sets
     """
+
     filtered_rules = [
         rule for rule in rules if validate_options.rule_filter.is_selected(rule)
     ]
