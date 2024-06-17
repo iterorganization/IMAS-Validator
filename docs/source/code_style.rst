@@ -103,5 +103,5 @@ Using isort
     $ isort ids_validator
 
 Napolean style docstrings
---------------
+-------------------------
 While not enforced, we recommend using `napoleon style docstrings <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/>`_
