@@ -59,8 +59,8 @@ def explore(
                     if docstring_level == 0:
                         ds = ""
                     elif docstring_level == 1:
-                        beep = rule.docstring.split("\n")[0]
-                        ds = f"{beep}..."
+                        ds = rule.docstring.split("\n")[0]
+                        ds = f"{ds}..."
                         func_name_branch.add(f"[blue]{ds}")
                     elif docstring_level == 2:
                         ds = rule.docstring

@@ -92,7 +92,7 @@ def load_docs(
         docs[rule_dir_name] = docs.get(rule_dir_name, [])
         rule_set_doc = DEFAULT_FOLDER_DOCSTRING
         if Path.joinpath(dir, "__init__.py").exists():
-            folder = import_mod("beep", Path.joinpath(dir, "__init__.py"))
+            folder = import_mod("_", Path.joinpath(dir, "__init__.py"))
             rule_set_doc = inspect.getdoc(folder) or rule_set_doc
 
         paths = discover_rule_modules([dir])
@@ -107,7 +107,7 @@ def load_docs(
             )
             docs[rule_dir_name].append(rule_set)
     for rule_dir_name, rule_set_list in docs.items():
-        if show_empty or len(rule_set_list) > 1:
+        if show_empty or len(rule_set_list) > 0:
             rule_dir = RuleDirData(
                 name=rule_dir_name,
                 rule_sets=rule_set_list,
@@ -139,7 +139,7 @@ def fix_rule_files(
     rule_files = []
     for path in paths:
         file_name = str(path.parts[-1])
-        mod = import_mod("oop", path)
+        mod = import_mod("_", path)
         rule_list = load_rules_from_path(path, result_collector)
         rule_list = filter_rules(rule_list, validate_options)
         rules = []
@@ -345,7 +345,6 @@ def filter_rules(
     Returns:
         List of directories corresponding to given rule sets
     """
-
     filtered_rules = [
         rule for rule in rules if validate_options.rule_filter.is_selected(rule)
     ]
