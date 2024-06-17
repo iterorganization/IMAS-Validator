@@ -32,10 +32,12 @@ DEFAULT_FUNC_DOCSTRING = (
     "No function docstring available. Add a docstring to your function."
 )
 DEFAULT_MODULE_DOCSTRING = (
-    "No function docstring available. Add a docstring at the top of your ruleset."
+    "No module docstring available. Add a docstring at the top of your ruleset."
 )
-DEFAULT_FOLDER_DOCSTRING = "No function docstring available. Add an __init__.py file "
-"to your rule directory with a docstring."
+DEFAULT_FOLDER_DOCSTRING = (
+    "No folder docstring available. Add an __init__.py file "
+    "to your rule directory with a docstring."
+)
 
 
 def import_mod(name: str, mod_path: Path) -> ModuleType:
