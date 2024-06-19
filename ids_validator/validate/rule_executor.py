@@ -101,12 +101,19 @@ class RuleExecutor:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         ids_list = self._get_ids_list()
         for ids_name, occurrence in ids_list:
-            idss = [(self.db_entry.get(ids_name, occurrence, autoconvert=False), ids_name, occurrence)]
+            idss = [
+                (
+                    self.db_entry.get(ids_name, occurrence, autoconvert=False),
+                    ids_name,
+                    occurrence,
+                )
+            ]
+            ids_version = Version(idss[0][0]._dd_version)
             filtered_rules = [
                 rule
                 for rule in self.rules
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
-                and Version(self.db_entry.dd_version) in SpecifierSet(rule.version)
+                and ids_version in SpecifierSet(rule.version)
             ]
             for rule in filtered_rules:
                 yield idss, rule
