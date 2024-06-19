@@ -174,8 +174,14 @@ Validation rules are defined inside the python files as follows:
       assert False, "No electron species found"
 
   @validator("core_profiles")
-  def validate_ion_charge(cp):
+  def validate_ion_charge(cp, version=">=3.38.0, <4.0.0"):
     """Validate that profiles_1d/ion/z_ion is defined."""
     for p1d in cp.profiles_1d:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
+
+.. note::
+
+  The dd_version formatting is done according to the
+  `packaging module specifiers<https://packaging.pypa.io/en/latest/specifiers.html>`_.
+  If a specific version number is required it is formatted as "==3.38.1"
