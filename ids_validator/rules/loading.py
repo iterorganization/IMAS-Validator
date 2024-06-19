@@ -71,7 +71,7 @@ def load_docs(
             rule_set_doc = glob.get("__doc__", rule_set_doc)
 
         paths = discover_rule_modules([dir])
-        rule_files = fix_rule_files(
+        rule_files = load_docs_from_rule_files(
             result_collector, validate_options, paths, show_empty
         )
         if show_empty or len(rule_files) > 0:
@@ -92,14 +92,14 @@ def load_docs(
     return explorer
 
 
-def fix_rule_files(
+def load_docs_from_rule_files(
     result_collector: ResultCollector,
     validate_options: ValidateOptions,
     paths: List[Path],
     show_empty: bool = True,
 ) -> List[RuleFileData]:
     """
-    Load docstrings for several rule dirs
+    Load docstrings for several rule files
 
     Args:
         result_collector: ResultCollector where the found tests will deposit their

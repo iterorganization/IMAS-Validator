@@ -84,6 +84,9 @@ def run_path(
         val_registry: ValidatorRegistry in which the found tests will be placed
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
+
+    Returns:
+        globals() object of given file
     """
     file_content = rule_path.read_text()
     new_code = rewrite_assert(file_content, str(rule_path))
