@@ -1,12 +1,10 @@
 """This file describes the functionality for discovering and loading validation rules"""
 
-import importlib.util
 import inspect
 import logging
 import os
 from operator import attrgetter
 from pathlib import Path
-from types import ModuleType
 from typing import Dict, List
 
 from importlib_resources import files
@@ -22,7 +20,6 @@ from ids_validator.rules.docs_dataclass import (
     RuleFileData,
     RuleSetData,
 )
-from ids_validator.rules.helpers import HELPER_DICT
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
@@ -38,33 +35,6 @@ DEFAULT_FOLDER_DOCSTRING = (
     "No folder docstring available. Add an __init__.py file "
     "to your rule directory with a docstring."
 )
-
-
-def import_mod(name: str, mod_path: Path) -> ModuleType:
-    """
-    Import module based on path
-
-    Args:
-        name: variable name under which to import module
-        mod_path: path to module to be imported
-
-    Returns:
-        imported module
-    """
-
-    spec = importlib.util.spec_from_file_location(name, mod_path)
-    assert spec is not None  # needed for mypy
-    mod = importlib.util.module_from_spec(spec)
-    assert mod is not None  # needed for mypy
-    setattr(mod, "validator", lambda x: lambda y: y)
-    for key, val in HELPER_DICT.items():
-        setattr(mod, key, val)
-
-    setattr(mod, "validator", lambda x: lambda y: y)
-    loader = spec.loader
-    assert loader is not None  # needed for mypy
-    loader.exec_module(mod)
-    return mod
 
 
 def load_docs(
@@ -94,8 +64,11 @@ def load_docs(
         docs[rule_dir_name] = docs.get(rule_dir_name, [])
         rule_set_doc = DEFAULT_FOLDER_DOCSTRING
         if Path.joinpath(dir, "__init__.py").exists():
-            folder = import_mod("_", Path.joinpath(dir, "__init__.py"))
-            rule_set_doc = inspect.getdoc(folder) or rule_set_doc
+            folder_path = Path.joinpath(dir, "__init__.py")
+            glob = run_path(
+                folder_path, ValidatorRegistry(folder_path), result_collector
+            )
+            rule_set_doc = glob.get("__doc__", rule_set_doc)
 
         paths = discover_rule_modules([dir])
         rule_files = fix_rule_files(
@@ -141,7 +114,7 @@ def fix_rule_files(
     rule_files = []
     for path in paths:
         file_name = str(path.parts[-1])
-        mod = import_mod("_", path)
+        glob = run_path(path, ValidatorRegistry(path), result_collector)
         rule_list = load_rules_from_path(path, result_collector)
         rule_list = filter_rules(rule_list, validate_options)
         rules = []
@@ -156,7 +129,7 @@ def fix_rule_files(
         if show_empty or len(rules) > 0:
             rule_file = RuleFileData(
                 name=file_name,
-                docstring=inspect.getdoc(mod) or DEFAULT_MODULE_DOCSTRING,
+                docstring=glob.get("__doc__", DEFAULT_MODULE_DOCSTRING),
                 rules=rules,
             )
             rule_files.append(rule_file)
