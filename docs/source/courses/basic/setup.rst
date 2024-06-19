@@ -2,10 +2,11 @@
 IDS validator 101: setup
 ========================
 
-bla bla bla
+For these training excercises you will need an installation of ids_validator and access to IMASPy.
+Have a look at the :ref:`installing` page for more details on installing IDS validator.
+To check if your installation worked, try
 
 .. code-block:: console
 
-    $ bla bla
-
-Have a look at the :ref:`installing` page for more details on installing IDS validator.
+    $ python -c 'import ids_validator; print(ids_validator.__version__)'
+    1.0.0
