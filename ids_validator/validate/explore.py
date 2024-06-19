@@ -3,7 +3,6 @@ This file describes the main function for the IMAS IDS validation tool
 """
 
 import logging
-from pathlib import Path
 
 from rich import print
 from rich.tree import Tree
