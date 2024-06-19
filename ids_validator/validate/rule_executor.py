@@ -9,6 +9,8 @@ from typing import Iterator, List, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
@@ -104,6 +106,7 @@ class RuleExecutor:
                 rule
                 for rule in self.rules
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
+                and Version(self.db_entry.dd_version) in SpecifierSet(rule.version)
             ]
             for rule in filtered_rules:
                 yield idss, rule
