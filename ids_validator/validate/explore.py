@@ -66,21 +66,3 @@ def explore(
                         ds = rule.docstring
                         func_name_branch.add(f"[blue]{ds}")
     print(tree)
-
-
-if __name__ == "__main__":
-
-    rule_dirs = [
-        Path("tests/rulesets/base"),
-    ]
-    val_options = ValidateOptions(
-        use_bundled_rulesets=True,
-        apply_generic=True,
-        extra_rule_dirs=rule_dirs,
-        # rule_filter=RuleFilter(name=["common_ids"], ids=[]),
-    )
-    explore(
-        validate_options=val_options,
-        show_empty=True,
-        docstring_level=1,
-    )
