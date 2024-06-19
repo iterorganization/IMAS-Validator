@@ -58,6 +58,7 @@ def dbentry():
     db.list_all_occurrences = Mock(wraps=list_all_occurrences)
     db.get = Mock(wraps=get)
     db.factory = IDSFactory("3.40.1")
+    db.dd_version = "3.40.1"
     return db
 
 
@@ -70,9 +71,10 @@ def rules():
         mock.__name__ = f"Mock func {i}"  # IDSValidationRule requires __name__
         mocks.append(mock)
     rules = [
-        IDSValidationRule(Path("t/all.py"), mocks[0], "*"),
+        IDSValidationRule(Path("t/all.py"), mocks[0], "*", version="==3.40.1"),
         IDSValidationRule(Path("t/core_profiles.py"), mocks[1], "core_profiles"),
         IDSValidationRule(Path("t/summary.py"), mocks[2], "summary"),
+        IDSValidationRule(Path("t/all.py"), mocks[0], "*", version="==3.40.0"),
     ]
     return rules
 
