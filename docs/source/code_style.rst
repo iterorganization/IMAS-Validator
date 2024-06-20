@@ -101,3 +101,7 @@ Using isort
 .. code-block:: console
 
     $ isort ids_validator
+
+Docstring style
+---------------
+While not enforced, we recommend using `napoleon style docstrings <https://sphinxcontrib-napoleon.readthedocs.io/en/latest/>`_
