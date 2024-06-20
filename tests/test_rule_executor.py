@@ -35,7 +35,7 @@ def check_expected_calls(func, expected_call_list):
 
 
 @lru_cache
-def get(ids_name: str, occurrence: int = 0):
+def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
     # Trying to get an IDS that isn't filled is an error:
     if occurrence not in list_all_occurrences(ids_name):
         raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
@@ -66,7 +66,7 @@ def dbentry():
 def rules():
     """get rules"""
     mocks = []
-    for i in range(3):
+    for i in range(4):
         mock = Mock()
         mock.__name__ = f"Mock func {i}"  # IDSValidationRule requires __name__
         mocks.append(mock)
@@ -74,7 +74,7 @@ def rules():
         IDSValidationRule(Path("t/all.py"), mocks[0], "*", version="==3.40.1"),
         IDSValidationRule(Path("t/core_profiles.py"), mocks[1], "core_profiles"),
         IDSValidationRule(Path("t/summary.py"), mocks[2], "summary"),
-        IDSValidationRule(Path("t/all.py"), mocks[0], "*", version="==3.40.0"),
+        IDSValidationRule(Path("t/all.py"), mocks[3], "*", version="==3.40.0"),
     ]
     return rules
 
@@ -95,10 +95,10 @@ def test_dbentry_mock(dbentry):
     with pytest.raises(DataEntryException):
         dbentry.get("summary")
 
-    cp = dbentry.get("core_profiles")
+    cp = dbentry.get("core_profiles", autoconvert=False)
     assert cp.ids_properties.comment == "Test IDS: core_profiles/0"
     assert cp.metadata.name == "core_profiles"
-    cp3 = dbentry.get("core_profiles", 3)
+    cp3 = dbentry.get("core_profiles", 3, autoconvert=False)
     assert cp3.ids_properties.comment == "Test IDS: core_profiles/3"
 
 
@@ -112,7 +112,7 @@ def test_apply_rules_to_data(rule_executor):
     expected_calls = {
         ids_name: [
             # Note: this works because `get` is cached:
-            get(ids_name, occurrence)
+            get(ids_name, occurrence, autoconvert=False)
             for occurrence in _occurrence_dict[ids_name]
         ]
         for ids_name in _occurrence_dict
@@ -127,10 +127,11 @@ def test_apply_rules_to_data(rule_executor):
     check_expected_calls(rules[1].func, expected_calls["core_profiles"])
     # Third rule applies to nothing in this DBEntry
     assert rules[2].func.call_count == 0
+    assert rules[3].func.call_count == 0
 
     # Also expect that get() was called exactly once per IDS/occurrence
     get_calls = [
-        call(ids_name, occurrence)
+        call(ids_name, occurrence, autoconvert=False)
         for ids_name in _occurrence_dict
         for occurrence in _occurrence_dict[ids_name]
     ]
@@ -169,7 +170,9 @@ def test_find_matching_rules(rule_executor):
     for ids_name in _occurrence_dict:
         for occurrence in _occurrence_dict[ids_name]:
             # every occurrence once for '*'
-            idss = [(get(ids_name, occurrence), ids_name, occurrence)]
+            idss = [
+                (get(ids_name, occurrence, autoconvert=False), ids_name, occurrence)
+            ]
             expected_result.append((idss, rules[0]))
             # all occurrences for 'core_profiles'
             if ids_name == "core_profiles":
@@ -182,7 +185,7 @@ def test_find_matching_rules(rule_executor):
 
 
 def test_apply_func(dbentry, rules):
-    ids = dbentry.get("core_profiles", 0)
+    ids = dbentry.get("core_profiles", 0, autoconvert=False)
     rule = rules[0]
     rule.apply_func([ids])
     rule.func.assert_called_once()
