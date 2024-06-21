@@ -107,3 +107,57 @@ def validate_errorbars(ids):
         assert (
             error_upper is not None and error_upper.has_value
         ), "No value found for error_upper, while the related error_lower is filled."
+
+
+@validator("*")
+def validate_density_range(ids):
+    """Validate that density values are positive and below 1e23
+    """
+    for node in Select(ids, ".*(?!error)", has_value=True):
+        if node.metadata.units == "m^-3":
+            assert (
+                node >=0 and node <= 1e23
+            ), "Value out of range (0-1e23 m-3) found for a density"
+
+
+@validator("*")
+def validate_temperature_range(ids):
+    """Validate that temperature and energy values are positive and below 5 MeV
+    """
+    for node in Select(ids, ".*(?!error)", has_value=True):
+        if node.metadata.units == "eV":
+            assert (
+                node >=0 and node <= 5e6
+            ), "Value out of range (0-5 MeV) found for a temperature or energy"
+
+@validator("*")
+def validate_ip_range(ids):
+    """Validate that plasma current absolute values are below 1e8 A
+    """
+    ip_max = 1e8
+    for node in Select(ids, "(^|/)ip$", has_value=True, leaf_only=False):
+        if hasattr(node.metadata, "structure_reference"):
+            # If the node is a structure or an AoS, specific leaves have to be validated
+            if node.metadata.structure_reference == "equilibrium_constraints_0D_ip_like":
+                assert (
+                    abs(node.measured) <= ip_max
+                    ), "Value out of range found for the plasma current"
+                assert (
+                    abs(node.reconstructed) <= ip_max
+                ), "Value out of range found for the plasma current"
+            elif node.metadata.structure_reference == "magnetics_methods_distinct":
+                assert (
+                    abs(node.data) <= ip_max
+                    ), "Value out of range found for the plasma current"
+            elif node.metadata.structure_reference == "pulse_schedule_reference_no_aos":
+                assert (
+                    abs(node.reference) <= ip_max
+                    ), "Value out of range found for the plasma current"
+            elif node.metadata.structure_reference == "summary_dynamic_flt_1d_root":
+                assert (
+                    abs(node.value) <= ip_max
+                    ), "Value out of range found for the plasma current"
+        else:
+            assert (
+                abs(node) <= ip_max
+            ), "Value out of range found for the plasma current"
