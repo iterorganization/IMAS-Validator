@@ -1,10 +1,11 @@
 """This file describes the functionality for discovering and loading validation rules"""
 
+import inspect
 import logging
 import os
 from operator import attrgetter
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from importlib_resources import files
 
@@ -12,10 +13,127 @@ import ids_validator
 from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import IDSValidationRule, ValidatorRegistry
+from ids_validator.rules.docs_dataclass import (
+    ExplorerData,
+    RuleData,
+    RuleDirData,
+    RuleFileData,
+    RuleSetData,
+)
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_FUNC_DOCSTRING = (
+    "No function docstring available. Add a docstring to your function."
+)
+DEFAULT_MODULE_DOCSTRING = (
+    "No module docstring available. Add a docstring at the top of your ruleset."
+)
+DEFAULT_FOLDER_DOCSTRING = (
+    "No folder docstring available. Add an __init__.py file "
+    "to your rule directory with a docstring."
+)
+
+
+def load_docs(
+    result_collector: ResultCollector,
+    validate_options: ValidateOptions,
+    show_empty: bool = False,
+) -> ExplorerData:
+    """
+    Load docstrings for several rule dirs
+
+    Args:
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
+        validate_options: Dataclass for validate options
+        show_empty: Whether or not to show show empty directories and files
+
+    Returns:
+        ExploreData object with doctstrings and rule directory structure
+    """
+    ruleset_dirs = discover_rulesets(validate_options=validate_options)
+    filtered_dirs = filter_rulesets(ruleset_dirs, validate_options=validate_options)
+    docs: Dict[str, List] = {}
+    rule_dirs = []
+    for dir in filtered_dirs:
+        rule_dir_name = str(dir.parts[-2])
+        rule_set_name = str(dir.parts[-1])
+        docs[rule_dir_name] = docs.get(rule_dir_name, [])
+        rule_set_doc = DEFAULT_FOLDER_DOCSTRING
+        if Path.joinpath(dir, "__init__.py").exists():
+            folder_path = Path.joinpath(dir, "__init__.py")
+            glob = run_path(
+                folder_path, ValidatorRegistry(folder_path), result_collector
+            )
+            rule_set_doc = glob.get("__doc__", rule_set_doc)
+
+        paths = discover_rule_modules([dir])
+        rule_files = load_docs_from_rule_files(
+            result_collector, validate_options, paths, show_empty
+        )
+        if show_empty or len(rule_files) > 0:
+            rule_set = RuleSetData(
+                name=rule_set_name,
+                docstring=rule_set_doc,
+                rule_files=rule_files,
+            )
+            docs[rule_dir_name].append(rule_set)
+    for rule_dir_name, rule_set_list in docs.items():
+        if show_empty or len(rule_set_list) > 0:
+            rule_dir = RuleDirData(
+                name=rule_dir_name,
+                rule_sets=rule_set_list,
+            )
+            rule_dirs.append(rule_dir)
+    explorer = ExplorerData(rule_dirs=rule_dirs)
+    return explorer
+
+
+def load_docs_from_rule_files(
+    result_collector: ResultCollector,
+    validate_options: ValidateOptions,
+    paths: List[Path],
+    show_empty: bool = True,
+) -> List[RuleFileData]:
+    """
+    Load docstrings for several rule files
+
+    Args:
+        result_collector: ResultCollector where the found tests will deposit their
+            results after being run
+        validate_options: Dataclass for validate options
+        paths: Paths in which validation rules were found
+        show_empty: Whether or not to show show empty directories and files
+
+    Returns:
+        List of RuleFileData objects
+    """
+    rule_files = []
+    for path in paths:
+        file_name = str(path.parts[-1])
+        glob = run_path(path, ValidatorRegistry(path), result_collector)
+        rule_list = load_rules_from_path(path, result_collector)
+        rule_list = filter_rules(rule_list, validate_options)
+        rules = []
+        for rule in rule_list:
+            rule_data = RuleData(
+                name=rule.func.__name__,
+                docstring=inspect.getdoc(rule.func) or DEFAULT_FUNC_DOCSTRING,
+                path=path,
+                ids_names=rule.ids_names,
+            )
+            rules.append(rule_data)
+        if show_empty or len(rules) > 0:
+            rule_file = RuleFileData(
+                name=file_name,
+                docstring=glob.get("__doc__", DEFAULT_MODULE_DOCSTRING),
+                rules=rules,
+            )
+            rule_files.append(rule_file)
+    return rule_files
 
 
 def load_rules(
@@ -140,7 +258,7 @@ def discover_rule_modules(ruleset_dirs: List[Path]) -> List[Path]:
     rule_modules = []
     for ruleset_dir in ruleset_dirs:
         for path in ruleset_dir.iterdir():
-            if path.is_file():
+            if path.is_file() and path.parts[-1] not in ["__init__.py"]:
                 rule_modules.append(path)
     rule_modules = list(set(rule_modules))
     return rule_modules
@@ -181,7 +299,11 @@ def handle_entrypoints() -> List[Path]:
 
 
 def _get_child_dirs(dir: Path) -> List[Path]:
-    child_dirs = [path for path in dir.iterdir() if path.is_dir()]
+    child_dirs = [
+        path
+        for path in dir.iterdir()
+        if path.is_dir() and path.parts[-1] not in ["__pycache__"]
+    ]
     return child_dirs
 
 

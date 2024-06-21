@@ -8,11 +8,19 @@ import pytest
 from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
 from ids_validator.rules.ast_rewrite import run_path
 from ids_validator.rules.data import ValidatorRegistry
+from ids_validator.rules.docs_dataclass import (
+    ExplorerData,
+    RuleData,
+    RuleDirData,
+    RuleFileData,
+    RuleSetData,
+)
 from ids_validator.rules.loading import (
     discover_rule_modules,
     discover_rulesets,
     filter_rules,
     filter_rulesets,
+    load_docs,
     load_rules_from_path,
 )
 from ids_validator.validate_options import RuleFilter, ValidateOptions
@@ -285,3 +293,88 @@ def test_filter_rules(res_collector):
 def assert_filter_rules(rules, res, rule_filter):
     validate_options = ValidateOptions(rule_filter=rule_filter)
     assert len(filter_rules(rules, validate_options=validate_options)) == res
+
+
+def test_load_docs(res_collector):
+    rule_dirs = [
+        Path("tests/rulesets/base"),
+    ]
+    val_options = ValidateOptions(
+        rulesets=["test-ruleset"],
+        use_bundled_rulesets=False,
+        apply_generic=False,
+        extra_rule_dirs=rule_dirs,
+        rule_filter=RuleFilter(name=["common_ids"], ids=[]),
+    )
+    docs = load_docs(res_collector, val_options)
+    rules = [
+        RuleData(
+            path=Path("tests/rulesets/base/test-ruleset/common_ids.py"),
+            name="common_ids_rule",
+            docstring="Function level docstring for validation tests",
+            ids_names=("*",),
+        )
+    ]
+    rule_files = [
+        RuleFileData(
+            name="common_ids.py",
+            docstring="Module level docstring for validation tests",
+            rules=rules,
+        )
+    ]
+    rule_sets = [
+        RuleSetData(
+            name="test-ruleset",
+            docstring="Folder level docstring for validation tests",
+            rule_files=rule_files,
+        )
+    ]
+    rule_dir_data_list = [RuleDirData(name="base", rule_sets=rule_sets)]
+    expected_docs = ExplorerData(rule_dir_data_list)
+    assert docs == expected_docs
+
+
+def test_load_docs_no_docs(res_collector):
+    rule_dirs = [
+        Path("tests/rulesets/base"),
+    ]
+    val_options = ValidateOptions(
+        use_bundled_rulesets=False,
+        apply_generic=True,
+        extra_rule_dirs=rule_dirs,
+        rule_filter=RuleFilter(name=["common_ids"], ids=[]),
+    )
+    docs = load_docs(res_collector, val_options)
+    rules = [
+        RuleData(
+            path=Path("tests/rulesets/base/generic/common_ids.py"),
+            name="common_ids_rule",
+            docstring=(
+                "No function docstring available. Add a docstring to your function."
+            ),
+            ids_names=("*",),
+        )
+    ]
+    rule_files = [
+        RuleFileData(
+            name="common_ids.py",
+            docstring=(
+                "No module docstring available. Add a docstring at the top of "
+                "your ruleset."
+            ),
+            rules=rules,
+        )
+    ]
+    rule_sets = [
+        RuleSetData(
+            name="generic",
+            docstring=(
+                "No folder docstring available. Add an __init__.py file to your "
+                "rule directory with a docstring."
+            ),
+            rule_files=rule_files,
+        )
+    ]
+    rule_dir_data_list = [RuleDirData(name="base", rule_sets=rule_sets)]
+    expected_docs = ExplorerData(rule_dir_data_list)
+    assert docs == expected_docs

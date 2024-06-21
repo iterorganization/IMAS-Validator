@@ -44,7 +44,7 @@ class Select:
             query: Regular expression to match the paths of child elements to. See also
                 :py:func:`imaspy.util.find_paths`.
 
-        Kwargs:
+        Keyword Args:
             has_value: When True, children without value are not included. Set to False
                 to include all child items (including those without a set value).
             leaf_only: When True, only leaf data nodes are included in the selection.
