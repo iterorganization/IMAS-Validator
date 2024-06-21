@@ -183,5 +183,5 @@ Validation rules are defined inside the python files as follows:
 .. note::
 
   The dd_version formatting is done according to the
-  `packaging module specifiers<https://packaging.pypa.io/en/latest/specifiers.html>`_.
+  `packaging module specifiers <https://packaging.pypa.io/en/latest/specifiers.html>`_.
   If a specific version number is required it is formatted as "==3.38.1"
