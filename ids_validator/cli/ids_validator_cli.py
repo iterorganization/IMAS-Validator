@@ -67,17 +67,13 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     explore_group = explore_parser.add_argument_group("Explore arguments")
 
     explore_group.add_argument(
-        "--verbose",
-        action="store_const",
-        const=2,
-        default=1,
-        help="show all rulesets"
+        "--verbose", action="store_const", const=2, default=1, help="show all rulesets"
     )
 
-    explore_group.add_argument (
+    explore_group.add_argument(
         "--empty",
         action="store_false",
-        help="Whether or not to show show empty directories and files"
+        help="Whether or not to show show empty directories and files",
     )
 
     explore_group.add_argument(
@@ -116,13 +112,13 @@ def main(argv: List) -> None:
         for command in command_objects:
             command.execute()
 
-        result_list: List[IDSValidationResult] = []      
+        result_list: List[IDSValidationResult] = []
         for command in command_objects:
             if command.result is not None:
                 result_list = result_list + command.result
 
-        if not result_list: 
-            return 
+        if not result_list:
+            return
 
         report_generator = ValidationResultGenerator(result_list)
         print(report_generator.txt)
