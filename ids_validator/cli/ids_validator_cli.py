@@ -62,6 +62,46 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
     validate_group.add_argument("--output", help="""Specify name of the output file""")
 
+    explore_parser = subparsers.add_parser("explore", help="explore existing rulesets")
+
+    explore_group = explore_parser.add_argument_group("Explore arguments")
+
+    explore_group.add_argument(
+        "--verbose",
+        action="store_const",
+        const=2,
+        default=1,
+        help="show all rulesets"
+    )
+
+    explore_group.add_argument (
+        "--empty",
+        action="store_false",
+        help="Whether or not to show show empty directories and files"
+    )
+
+    explore_group.add_argument(
+        "-e",
+        "--extra-rule-dirs",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="""Specify path to your custom ruleset. Subsequent usage of following
+                argument will overwrite previous occurrences of the argument""",
+    )
+
+    explore_group.add_argument(
+        "-r",
+        "--ruleset",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="""Specify with following argument one or more rulesets
+                available under RULESET_PATH variable.""",
+    )
+
     return parser
 
 
@@ -70,18 +110,19 @@ def main(argv: List) -> None:
     parser = configure_argument_parser()
     args = parser.parse_args(args=argv if argv else ["--help"])
 
-    if args.debug:
-        print("debug option enabled")
     try:
         command_parser = CommandParser()
         command_objects = command_parser.parse(args)
         for command in command_objects:
             command.execute()
 
-        result_list: List[IDSValidationResult] = []
-
+        result_list: List[IDSValidationResult] = []      
         for command in command_objects:
-            result_list = result_list + command.result
+            if command.result is not None:
+                result_list = result_list + command.result
+
+        if not result_list: 
+            return 
 
         report_generator = ValidationResultGenerator(result_list)
         print(report_generator.txt)
