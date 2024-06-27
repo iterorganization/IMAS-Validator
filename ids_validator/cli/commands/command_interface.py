@@ -21,6 +21,13 @@ class CommandNotRecognisedException(Exception):
     ...
 
 
+class IncorrectParameterUsageException(Exception):
+    """
+    Exception to be raised when user provides --no-docstring and --verbose
+    in the same command
+    """
+
+
 class CommandInterface(ABC):
 
     @property

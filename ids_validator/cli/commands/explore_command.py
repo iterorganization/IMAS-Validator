@@ -33,8 +33,14 @@ class ExploreCommand(GenericCommand):
                 else []
             ),
         )
-        self.show_empty = args.empty
-        self.docstring_level = args.verbose
+        self.show_empty = args.show_empty
+        self.docstring_level = 1
+
+        if args.no_docstring is not None:
+            self.docstring_level = args.no_docstring
+
+        if args.verbose is not None:
+            self.docstring_level = args.verbose
 
     def execute(self) -> None:
         super().execute()

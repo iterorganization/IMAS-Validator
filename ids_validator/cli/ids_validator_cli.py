@@ -57,7 +57,11 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     )
 
     validate_group.add_argument(
-        "-d", "--debug", action="store_true", help="drop into debugger if tests fails"
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="drop into debugger if tests fails",
     )
 
     validate_group.add_argument("--output", help="""Specify name of the output file""")
@@ -67,12 +71,15 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     explore_group = explore_parser.add_argument_group("Explore arguments")
 
     explore_group.add_argument(
-        "--verbose", action="store_const", const=2, default=1, help="show all rulesets"
+        "--verbose", action="store_const", const=2, help="show all rulesets"
     )
-
     explore_group.add_argument(
-        "--empty",
-        action="store_false",
+        "--no-docstring", action="store_const", const=0, help="hide all rulesets"
+    )
+    explore_group.add_argument(
+        "--show-empty",
+        action="store_true",
+        default=False,
         help="Whether or not to show show empty directories and files",
     )
 
