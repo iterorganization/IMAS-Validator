@@ -2,11 +2,7 @@ import argparse
 import logging
 from typing import List
 
-from .commands.command_interface import (
-    CommandInterface,
-    CommandNotRecognisedException,
-    IncorrectParameterUsageException,
-)
+from .commands.command_interface import CommandInterface, CommandNotRecognisedException
 from .commands.explore_command import ExploreCommand
 from .commands.validate_command import ValidateCommand
 
@@ -28,12 +24,7 @@ class CommandParser:
                 args.uri = [uri]
                 command_objs.append(ValidateCommand(args))
         elif command == "explore":
-            if args.verbose and args.no_docstring:
-                raise IncorrectParameterUsageException(
-                    "Forbiden to use --verbose and --no-docstring together"
-                )
-            else:
-                command_objs.append(ExploreCommand(args))
+            command_objs.append(ExploreCommand(args))
         else:
             raise CommandNotRecognisedException(
                 f"Command < {command} > not recognised, stopping execution."

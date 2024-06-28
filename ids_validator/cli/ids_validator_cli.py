@@ -70,12 +70,16 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
     explore_group = explore_parser.add_argument_group("Explore arguments")
 
-    explore_group.add_argument(
+    """ Add to existing CLI new group for exlusive arguments """
+    explore_group_exclusive = explore_group.add_mutually_exclusive_group()
+
+    explore_group_exclusive.add_argument(
         "--verbose", action="store_true", default=False, help="show all rulesets"
     )
-    explore_group.add_argument(
+    explore_group_exclusive.add_argument(
         "--no-docstring", action="store_true", default=False, help="hide all rulesets"
     )
+
     explore_group.add_argument(
         "--show-empty",
         action="store_true",
