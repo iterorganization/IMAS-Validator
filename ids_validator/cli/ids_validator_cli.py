@@ -15,7 +15,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(
         dest="command", description="subparsers for command"
     )
-    validate_parser = subparsers.add_parser("validate", help="validate command")
+    validate_parser = subparsers.add_parser("validate", help="validate IDS")
 
     validate_group = validate_parser.add_argument_group("Validator arguments")
 
@@ -24,7 +24,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         type=str,
         nargs="+",
         action="append",
-        help="uri for database entry",
+        help="URI for database entry",
     )
 
     validate_group.add_argument(
@@ -61,7 +61,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "--debug",
         action="store_true",
         default=False,
-        help="drop into debugger if tests fails",
+        help="Drop into debugger if tests fails",
     )
 
     validate_group.add_argument("--output", help="""Specify name of the output file""")
@@ -70,21 +70,21 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
     explore_group = explore_parser.add_argument_group("Explore arguments")
 
-    """ Add to existing CLI new group for exlusive arguments """
+    """ Add to existing CLI new group for exclusive arguments """
     explore_group_exclusive = explore_group.add_mutually_exclusive_group()
 
     explore_group_exclusive.add_argument(
-        "--verbose", action="store_true", default=False, help="show all rulesets"
+        "--verbose", action="store_true", default=False, help="Display detailed ruleset description"
     )
     explore_group_exclusive.add_argument(
-        "--no-docstring", action="store_true", default=False, help="hide all rulesets"
+        "--no-docstring", action="store_true", default=False, help="Display limited ruleset description"
     )
 
     explore_group.add_argument(
         "--show-empty",
         action="store_true",
         default=False,
-        help="Whether or not to show show empty directories and files",
+        help="Whether or not to show empty directories and files",
     )
 
     explore_group.add_argument(
