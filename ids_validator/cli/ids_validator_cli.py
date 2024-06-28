@@ -74,10 +74,16 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     explore_group_exclusive = explore_group.add_mutually_exclusive_group()
 
     explore_group_exclusive.add_argument(
-        "--verbose", action="store_true", default=False, help="Display detailed ruleset description"
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Display detailed ruleset description",
     )
     explore_group_exclusive.add_argument(
-        "--no-docstring", action="store_true", default=False, help="Display limited ruleset description"
+        "--no-docstring",
+        action="store_true",
+        default=False,
+        help="Display limited ruleset description",
     )
 
     explore_group.add_argument(
