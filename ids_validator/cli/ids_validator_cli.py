@@ -71,10 +71,10 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     explore_group = explore_parser.add_argument_group("Explore arguments")
 
     explore_group.add_argument(
-        "--verbose", action="store_const", const=2, help="show all rulesets"
+        "--verbose", action="store_true", default=False, help="show all rulesets"
     )
     explore_group.add_argument(
-        "--no-docstring", action="store_const", const=0, help="hide all rulesets"
+        "--no-docstring", action="store_true", default=False, help="hide all rulesets"
     )
     explore_group.add_argument(
         "--show-empty",

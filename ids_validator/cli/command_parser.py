@@ -28,8 +28,10 @@ class CommandParser:
                 args.uri = [uri]
                 command_objs.append(ValidateCommand(args))
         elif command == "explore":
-            if args.verbose is not None and args.no_docstring is not None:
-                raise IncorrectParameterUsageException
+            if args.verbose and args.no_docstring:
+                raise IncorrectParameterUsageException(
+                    "Forbiden to use --verbose and --no-docstring together"
+                )
             else:
                 command_objs.append(ExploreCommand(args))
         else:
