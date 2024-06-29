@@ -113,7 +113,7 @@ def validate_errorbars(ids):
 def validate_density_range(ids):
     """Validate that density values are positive and below 1e23
     """
-    for node in Select(ids, ".*(?!error)", has_value=True):
+    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "m^-3":
             assert (
                 node >=0 and node <= 1e23
@@ -124,7 +124,7 @@ def validate_density_range(ids):
 def validate_temperature_range(ids):
     """Validate that temperature and energy values are positive and below 5 MeV
     """
-    for node in Select(ids, ".*(?!error)", has_value=True):
+    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "eV":
             assert (
                 node >=0 and node <= 5e6
