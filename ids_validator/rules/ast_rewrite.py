@@ -5,6 +5,7 @@ This file describes the functions for ast rewriting
 import ast
 from pathlib import Path
 from types import CodeType
+from typing import Dict
 
 from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.rules.helpers import HELPER_DICT
@@ -73,7 +74,7 @@ def run_path(
     rule_path: Path,
     val_registry: ValidatorRegistry,
     result_collector: ResultCollector,
-) -> None:
+) -> Dict:
     """
     Run the file corresponding to the given path with rewritten assert statements.
     Any found validator tests will be added to the given ValidatorRegistry
@@ -83,6 +84,9 @@ def run_path(
         val_registry: ValidatorRegistry in which the found tests will be placed
         result_collector: ResultCollector where the found tests will deposit their
             results after being run
+
+    Returns:
+        globals() object of given file
     """
     file_content = rule_path.read_text()
     new_code = rewrite_assert(file_content, str(rule_path))
@@ -92,3 +96,4 @@ def run_path(
         **HELPER_DICT,
     }
     exec(new_code, glob)
+    return glob

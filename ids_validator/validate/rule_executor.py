@@ -9,6 +9,8 @@ from typing import Iterator, List, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
@@ -99,11 +101,19 @@ class RuleExecutor:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         ids_list = self._get_ids_list()
         for ids_name, occurrence in ids_list:
-            idss = [(self.db_entry.get(ids_name, occurrence), ids_name, occurrence)]
+            idss = [
+                (
+                    self.db_entry.get(ids_name, occurrence, autoconvert=False),
+                    ids_name,
+                    occurrence,
+                )
+            ]
+            ids_version = Version(idss[0][0]._dd_version)
             filtered_rules = [
                 rule
                 for rule in self.rules
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
+                and ids_version in SpecifierSet(rule.version)
             ]
             for rule in filtered_rules:
                 yield idss, rule

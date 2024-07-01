@@ -1,5 +1,4 @@
-# Generic rules applying to all IDSs
-
+"""Generic rules applying to all IDSs"""
 
 @validator("*")
 def validate_homogeneous_time(ids):
