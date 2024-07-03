@@ -191,7 +191,8 @@ def validate_electroneutrality_core_profiles(ids):
 
 @validator("core_profiles")
 def validate_z_ion_core_profiles(ids):
-    """Validate that the ion average charge z_ion is consistent with ion elements in the CORE_PROFILES IDS"""
+    """Validate that the ion average charge z_ion is consistent
+    with ion elements in the CORE_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].z_ion.has_value:
             continue
