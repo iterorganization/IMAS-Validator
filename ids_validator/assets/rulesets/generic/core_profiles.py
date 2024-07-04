@@ -27,4 +27,4 @@ def validate_z_ion_core_profiles(ids):
                 zi = sum(abs(element.z_n) * element.atoms_n for element in ion.element)
                 assert (
                     0 < abs(ion.z_ion) <= zi
-                ), "Average ion charge above the summed nuclear charge of all ion elements"
+                ), "Average ion charge above the summed nuclear charge of ion elements"
