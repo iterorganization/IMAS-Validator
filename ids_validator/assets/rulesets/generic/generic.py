@@ -109,68 +109,22 @@ def validate_errorbars(ids):
 
 
 @validator("*")
-def validate_density_range(ids):
-    """Validate that density values are positive and below 1e23"""
+def validate_density_positive(ids):
+    """Validate that density values are positive"""
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "m^-3":
             assert (
-                node >= 0 and node <= 1e23
-            ), "Value out of range (0-1e23 m-3) found for a density"
+                node >= 0 
+            ), "Negative value found for a density"
 
 
 @validator("*")
-def validate_temperature_range(ids):
-    """Validate that temperature and energy values are positive and below 5 MeV"""
+def validate_temperature_positive(ids):
+    """Validate that temperature and energy values are positive"""
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "eV":
             assert (
-                node >= 0 and node <= 5e6
-            ), "Value out of range (0-5 MeV) found for a temperature or energy"
+                node >= 0
+            ), "Negative value found for a temperature or energy"
 
 
-# Rules related to max(abs(Ip))
-IP_MAX = 1e8
-
-
-@validator("core_profiles")
-def validate_ip_range_cp(ids):
-    """Validate that plasma current absolute values are below IP_MAX in core_profiles"""
-    if ids.global_quantities.ip.has_value:
-        assert (
-            abs(ids.global_quantities.ip) <= IP_MAX
-        ), "Value out of range found for the plasma current"
-
-
-@validator("equilibrium")
-def validate_ip_range_eq(ids):
-    """Validate that plasma current absolute values are below IP_MAX in equilibrium"""
-    for time_slice in ids.time_slice:
-        if time_slice.constraints.ip.measured.has_value:
-            assert (
-                abs(time_slice.constraints.ip.measured) <= IP_MAX
-            ), "Value out of range found for the plasma current"
-        if time_slice.constraints.ip.reconstructed.has_value:
-            assert (
-                abs(time_slice.constraints.ip.reconstructed) <= IP_MAX
-            ), "Value out of range found for the plasma current"
-        if time_slice.global_quantities.ip.has_value:
-            assert (
-                abs(time_slice.global_quantities.ip) <= IP_MAX
-            ), "Value out of range found for the plasma current"
-
-
-@validator("magnetics")
-def validate_ip_range_magnetics(ids):
-    """Validate that plasma current absolute values are below IP_MAX in magnetics"""
-    for ip in ids.ip:
-        if ip.data.has_value:
-            assert ip.data <= IP_MAX, "Value out of range found for the plasma current"
-
-
-@validator("summary")
-def validate_ip_range_summary(ids):
-    """Validate that plasma current absolute values are below IP_MAX in summary"""
-    if ids.global_quantities.ip.value.has_value:
-        assert (
-            abs(ids.global_quantities.ip.value) <= IP_MAX
-        ), "Value out of range found for the plasma current"
