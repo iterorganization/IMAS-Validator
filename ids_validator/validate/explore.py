@@ -24,6 +24,7 @@ def explore(
 ) -> None:
     """
     Function used to get an overview of validation rules inside a rule folder.
+
     Args:
         validate_options: dataclass with options for validate function
         show_empty: whether or not to show folders and files without any found rules
