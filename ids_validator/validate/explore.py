@@ -1,5 +1,6 @@
 """
-This file describes the main function for the IMAS IDS validation tool
+This file describes ids_validator exploration tool used to get an overview of the data
+rules in a rule folder.
 """
 
 import logging
@@ -22,13 +23,12 @@ def explore(
     docstring_level: int = 1,
 ) -> None:
     """
-    Main function
-    Args:
-        imas_uri: url for DBEntry object
-        validate_options: dataclass with options for validate function
+    Function used to get an overview of validation rules inside a rule folder.
 
-    Returns:
-        List of IDSValidationResult objects
+    Args:
+        validate_options: dataclass with options for validate function
+        show_empty: whether or not to show folders and files without any found rules
+        docstring_level: 0 for no docstrings, 1 for shortened and 2 for full docstrings.
     """
 
     result_collector = ResultCollector(validate_options=validate_options)
