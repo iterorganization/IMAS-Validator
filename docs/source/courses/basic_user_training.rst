@@ -14,6 +14,6 @@ https://imas.iter.org. You can find any info for IDS validator you need in the `
     :maxdepth: 1
 
     basic/setup
-    basic/explore
     basic/run
+    basic/explore
     basic/write
