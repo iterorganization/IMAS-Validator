@@ -10,8 +10,7 @@ The only required argument is the imas_uri of the DBentry object.
 
 .. code-block:: console
 
-    $ bla bla
-    bla bla
+    $ ids_validator validate '.........'
 
 You can use the generic tests or custom built validation tests.
 We start with the generic tests.
@@ -22,7 +21,7 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator generic tests for the db_entry with url .................
+        Run the IDS validator generic tests for the db_entry with url .................
 
     .. md-tab-item:: Solution
 
@@ -31,7 +30,7 @@ Exercise 1
             $ bla bla
             bla bla
 
-Apart from the bundled tests you can use customly built tests by using the CLI arguments ................... 
+Apart from the bundled tests you can use customly built tests by using the CLI arguments (-e, --extra-rule-dirs)
 to determine in which ruleset folders the tool should look for IDS validation rules. 
 The structure of these rulesets folders is explained in :ref:`defining rules`.
 
@@ -55,9 +54,9 @@ Exercise 2
 If you only want to test specific rules you can filter on:
 - Rule name (....)
 - IDS name (....)
-- Rulesets (....)
+- Rulesets (-r, --ruleset)
 - Whether or not to use bundled rules (....)
-- Whether or not to use tests for all IDSs (....)
+- Whether or not to use tests for all IDSs (-g, --no-generic)
 
 Exercise 3
 .. md-tab-set::
@@ -78,7 +77,7 @@ Exercise 3
 
 # drop in using pdb
 Sometimes you want to take a closer look at the data when a test fails.
-You can use the ...... argument to drop into a debugger console when a test returns an assertion error.
+You can use the (-d, --debug) argument to drop into a debugger console when a test returns an assertion error.
 
 Exercise 4
 .. md-tab-set::
@@ -98,5 +97,5 @@ Exercise 4
 
 .. note::
 
-    If you want to run the IDS validator tool from a python script, you can do so by importing .............
+    If you want to run the IDS validator tool from a python script, you can do so by importing ``ids_validator.validate``
     The input arguments can be found in the :py:class:`documentation<ids_validator.validate.validate>`

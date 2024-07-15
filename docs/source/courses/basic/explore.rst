@@ -5,7 +5,11 @@ Exploring rulesets with IDS validator
 As more rules become available, we need a way to keep track of them.
 In this section of the training we look at the explore functionality of the IDS validator tool.
 
-The explore functionality can be called from the terminal by ...........................
+The explore functionality can be called from the terminal by 
+
+.. code-block:: console
+
+    $ ids_validator explore '.........'
 
 # Do first explore
 # Do explore with custom tests
@@ -29,8 +33,8 @@ Exercise 1
 # Change verbosity
 # Change whether to show empty folders/files
 Since the rule folders can contain a lot of tests and information, the explore function offers the possibility to change the verbosity.
-The ...... argument can be used to change the verbosity of the descriptions
-The ...... argument can be used to change whether or not folders/files without any found rules should be shown.
+The --verbose and --no-docstring arguments can be used to change the verbosity of the descriptions
+The --show-empty argument can be used to change whether or not folders/files without any found rules should be shown.
 
 Exercise 2
 .. md-tab-set::

@@ -99,7 +99,7 @@ Exercise 5
 
     .. md-tab-item:: Exercise
 
-        What happens if you add ``dd_version=..........`` to the ``@validator`` decorator?
+        What happens if you add ``version=..........`` to the ``@validator`` decorator?
         Why?
 
     .. md-tab-item:: Solution
