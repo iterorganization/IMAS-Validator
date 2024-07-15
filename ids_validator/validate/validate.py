@@ -6,7 +6,13 @@ import logging
 from typing import List
 
 from imaspy import DBEntry
-from imaspy.imas_interface import has_imas, ll_interface
+
+try:
+    from imaspy.imas_interface import has_imas, ll_interface
+except ImportError:
+    # Package is renamed in IMASPy 1.1
+    from imaspy.backends.imas_core.imas_interface import has_imas, ll_interface
+
 from packaging.version import Version
 
 from ids_validator.exceptions import IMASVersionError

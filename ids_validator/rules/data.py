@@ -21,6 +21,7 @@ class IDSValidationRule:
         rule_path: Path,
         func: Callable,
         *ids_names: str,
+        version: str = "",
         **kwfields: Dict[str, Any],
     ):
         """Initialize IDSValidationRule
@@ -35,6 +36,7 @@ class IDSValidationRule:
         # name: ruleset/file/func_name
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
         self.ids_names = tuple(ids_names)
+        self.version = version
         self.kwfields = kwfields
         # kwfields explicitly parsed
 
@@ -64,7 +66,7 @@ class ValidatorRegistry:
         self.validators: List[IDSValidationRule] = []
         self.rule_path: Path = rule_path
 
-    def validator(self, *ids_names: str) -> Callable:
+    def validator(self, *ids_names: str, version: str = "") -> Callable:
         """Decorator to register functions as validation rules
 
         The validation rule function will be called with the requested IDSs as
@@ -91,7 +93,8 @@ class ValidatorRegistry:
 
         # explicit kwfields
         def decorator(func: Callable) -> Callable:
-            self.validators.append(IDSValidationRule(self.rule_path, func, *ids_names))
+            rule = IDSValidationRule(self.rule_path, func, *ids_names, version=version)
+            self.validators.append(rule)
             return func
 
         return decorator

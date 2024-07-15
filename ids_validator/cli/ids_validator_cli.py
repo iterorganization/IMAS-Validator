@@ -15,7 +15,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(
         dest="command", description="subparsers for command"
     )
-    validate_parser = subparsers.add_parser("validate", help="validate command")
+    validate_parser = subparsers.add_parser("validate", help="validate IDS")
 
     validate_group = validate_parser.add_argument_group("Validator arguments")
 
@@ -24,7 +24,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         type=str,
         nargs="+",
         action="append",
-        help="uri for database entry",
+        help="URI for database entry",
     )
 
     validate_group.add_argument(
@@ -57,10 +57,63 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     )
 
     validate_group.add_argument(
-        "-d", "--debug", action="store_true", help="drop into debugger if tests fails"
+        "-d",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Drop into debugger if tests fails",
     )
 
     validate_group.add_argument("--output", help="""Specify name of the output file""")
+
+    explore_parser = subparsers.add_parser("explore", help="explore existing rulesets")
+
+    explore_group = explore_parser.add_argument_group("Explore arguments")
+
+    """ Add to existing CLI new group for exclusive arguments """
+    explore_group_exclusive = explore_group.add_mutually_exclusive_group()
+
+    explore_group_exclusive.add_argument(
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Display detailed ruleset description",
+    )
+    explore_group_exclusive.add_argument(
+        "--no-docstring",
+        action="store_true",
+        default=False,
+        help="Display limited ruleset description",
+    )
+
+    explore_group.add_argument(
+        "--show-empty",
+        action="store_true",
+        default=False,
+        help="Whether or not to show empty directories and files",
+    )
+
+    explore_group.add_argument(
+        "-e",
+        "--extra-rule-dirs",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="""Specify path to your custom ruleset. Subsequent usage of following
+                argument will overwrite previous occurrences of the argument""",
+    )
+
+    explore_group.add_argument(
+        "-r",
+        "--ruleset",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="""Specify with following argument one or more rulesets
+                available under RULESET_PATH variable.""",
+    )
 
     return parser
 
@@ -70,8 +123,6 @@ def main(argv: List) -> None:
     parser = configure_argument_parser()
     args = parser.parse_args(args=argv if argv else ["--help"])
 
-    if args.debug:
-        print("debug option enabled")
     try:
         command_parser = CommandParser()
         command_objects = command_parser.parse(args)
@@ -79,9 +130,12 @@ def main(argv: List) -> None:
             command.execute()
 
         result_list: List[IDSValidationResult] = []
-
         for command in command_objects:
-            result_list = result_list + command.result
+            if command.result is not None:
+                result_list = result_list + command.result
+
+        if not result_list:
+            return
 
         report_generator = ValidationResultGenerator(result_list)
         print(report_generator.txt)

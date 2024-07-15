@@ -1,5 +1,4 @@
-# Generic rules applying to all IDSs
-
+"""Generic rules applying to all IDSs"""
 
 @validator("*")
 def validate_homogeneous_time(ids):
@@ -107,3 +106,19 @@ def validate_errorbars(ids):
         assert (
             error_upper is not None and error_upper.has_value
         ), "No value found for error_upper, while the related error_lower is filled."
+
+
+@validator("*")
+def validate_density_positive(ids):
+    """Validate that density values are positive"""
+    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
+        if node.metadata.units == "m^-3":
+            assert node >= 0, "Negative value found for a density"
+
+
+@validator("*")
+def validate_temperature_positive(ids):
+    """Validate that temperature and energy values are positive"""
+    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
+        if node.metadata.units == "eV":
+            assert node >= 0, "Negative value found for a temperature or energy"

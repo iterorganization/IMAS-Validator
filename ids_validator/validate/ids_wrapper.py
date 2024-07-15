@@ -3,7 +3,7 @@ This file describes the overload class for the operators
 """
 
 import operator
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, Collection, List, Optional, Tuple
 
 import numpy as np
 from imaspy.ids_primitive import IDSPrimitive
@@ -69,6 +69,37 @@ class IDSWrapper:
         self._ids_nodes = ids_nodes or []
         if isinstance(obj, IDSPrimitive):
             self._ids_nodes = self._ids_nodes + [obj]
+
+    def __array_ufunc__(
+        self, ufunc: Any, method: Any, *args: Any, **kwargs: Any
+    ) -> Optional["IDSWrapper"]:
+        """Implement numpy protocol for universal functions."""
+        # types argument is currently ignored, so pass empty list
+        return self.__array_function__(getattr(ufunc, method), [], args, kwargs)
+
+    def __array_function__(
+        self, func: Any, types: Collection, args: Any, kwargs: Any
+    ) -> Optional["IDSWrapper"]:
+        """Implement numpy protocol for public API functions.
+
+        See numpy docs:
+        https://numpy.org/doc/stable/user/basics.interoperability.html#operating-on-foreign-objects-without-converting
+        https://numpy.org/doc/stable/user/basics.dispatch.html and
+        https://numpy.org/doc/stable/reference/arrays.classes.html#special-attributes-and-methods
+        """
+        # Unpack args:
+        unpacked_args = []
+        ids_nodes = []
+        for value in args:
+            if isinstance(value, IDSWrapper):
+                ids_nodes.extend(value._ids_nodes)
+                value = value._obj
+                if isinstance(value, IDSPrimitive):
+                    value = value.value
+            unpacked_args.append(value)
+        # Pass unpacked inputs to the function:
+        result = func(*unpacked_args, **kwargs)
+        return None if result is None else IDSWrapper(result, ids_nodes=ids_nodes)
 
     def __getattr__(self, attr: str) -> "IDSWrapper":
         if not attr.startswith("_"):
