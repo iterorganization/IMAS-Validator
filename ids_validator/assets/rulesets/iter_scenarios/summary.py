@@ -28,7 +28,6 @@ def validate_mandatory_values(ids):
     assert ids.global_quantities.tau_energy.value.has_value
     assert ids.global_quantities.v_loop.value.has_value
     assert ids.global_quantities.q_95.value.has_value
-    assert ids.global_quantities.power_loss.value.has_value
 
     # local
     assert ids.local.separatrix.n_e.value.has_value
