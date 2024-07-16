@@ -96,10 +96,3 @@ def validate_mandatory_values(ids):
 
                 # path of neutral velocity is ambiguous in the ref
                 assert state.velocity.has_value
-
-
-@validator("edge_profiles")
-def validate_vacuum_toroidal_field_b0(ids):
-    """Validate that vacuum_toroidal_field/b0(:) is b0 < 0."""
-
-    assert ids.vacuum_toroidal_field.b0 < 0.0
