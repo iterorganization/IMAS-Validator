@@ -79,9 +79,9 @@ folder structure as follows:
 
 .. note::
 
-  To make sure that anyone working with the tests or using the ``explore`` tool can 
-  properly understand your validation rules, make sure to add docstrings explaining
-  your tests. Docstrings are surrounded by triple quotes (``"""my explanation docstring"""``) and defined:
+  Make sure that anyone working with the tests or using the ``explore`` tool can 
+  properly understand your validation rules. Add docstrings explaining what kind of tests you have written.
+  Docstrings are surrounded by triple quotes (``"""my explanation docstring"""``) and are defined:
 
   - At rule level (under function definition)
   - At file level (top of validation rule file)
