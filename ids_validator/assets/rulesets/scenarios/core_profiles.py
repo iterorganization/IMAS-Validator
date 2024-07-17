@@ -1,4 +1,4 @@
-# https://confluence.iter.org/display/IMP/Required+fields+in+a+dataset+to+be+imported+in+a+scenario+database
+"""Validation rules of ITER scenario database for the ``core_profiles`` IDS."""
 
 
 @validator("core_profiles")

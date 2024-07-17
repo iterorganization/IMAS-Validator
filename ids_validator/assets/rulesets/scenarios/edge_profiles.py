@@ -1,9 +1,9 @@
-# https://confluence.iter.org/display/IMP/Required+fields+in+a+dataset+to+be+imported+in+a+scenario+database
+"""Validation rules of ITER scenario database for the ``edge_profiles`` IDS."""
 
 
 @validator("edge_profiles")
 def validate_mandatory_values(ids):
-    """Validate if the property exists by using has_value method in IMASPy."""
+    """Validate that mandatory quantities are provided."""
 
     # time
     assert ids.time.has_value
@@ -11,9 +11,6 @@ def validate_mandatory_values(ids):
     # vacuum_toroidal_field
     assert ids.vacuum_toroidal_field.r0.has_value
     assert ids.vacuum_toroidal_field.b0.has_value
-
-    # output_flag
-    # assert ids.output_flag.has_value
 
     # ggd
     assert ids.ggd.has_value

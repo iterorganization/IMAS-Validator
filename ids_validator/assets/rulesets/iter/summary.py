@@ -1,9 +1,9 @@
-# https://confluence.iter.org/display/IMP/Required+fields+in+a+dataset+to+be+imported+in+a+scenario+database
+"""ITER-specific validation rules for the ``summary`` IDS."""
 
 
 @validator("summary")
 def validate_mandatory_values(ids):
-    """Validate if the property exists by using has_value method in IMASPy."""
+    """Validate data in IDS/summary against rulesets for ITER scenario."""
 
     # global_quantities
     assert -8.0 <= ids.global_quantities.b0.value <= 0.0

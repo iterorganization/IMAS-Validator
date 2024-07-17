@@ -1,4 +1,4 @@
-# https://confluence.iter.org/display/IMP/Required+fields+in+a+dataset+to+be+imported+in+a+scenario+database
+"""ITER-specific validation rules for the ``equlibrium`` IDS."""
 
 
 @validator("equilibrium")

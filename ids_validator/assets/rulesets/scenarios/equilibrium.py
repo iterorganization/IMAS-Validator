@@ -1,9 +1,9 @@
-# https://confluence.iter.org/display/IMP/Required+fields+in+a+dataset+to+be+imported+in+a+scenario+database
+"""Validation rules of ITER scenario database for the ``equlibrium`` IDS."""
 
 
 @validator("equilibrium")
 def validate_mandatory_values(ids):
-    """Validate if the property exists by using has_value method in IMASPy."""
+    """Validate that mandatory quantities are provided."""
 
     # time_slice
     assert ids.time_slice.has_value
