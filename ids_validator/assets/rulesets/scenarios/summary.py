@@ -3,7 +3,7 @@
 
 @validator("summary")
 def validate_mandatory_values(ids):
-   """Validate that mandatory quantities are provided."""
+    """Validate that mandatory quantities are provided."""
 
     # time
     assert ids.time.has_value
