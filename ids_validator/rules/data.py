@@ -4,7 +4,7 @@ the validation tool
 """
 
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 from imaspy.ids_toplevel import IDSToplevel
 
@@ -35,7 +35,7 @@ class IDSValidationRule:
         self.func = func
         # name: ruleset/file/func_name
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}/{self.func.__name__}"
-        self.ids_names = tuple(ids_names)
+        self.ids_names, self.ids_occs = self.parse_ids_names(ids_names)
         self.version = version
         self.kwfields = kwfields
         # kwfields explicitly parsed
@@ -50,6 +50,31 @@ class IDSValidationRule:
             raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         args = [IDSWrapper(ids) for ids in ids_instances]
         self.func(*args)
+
+    def parse_ids_names(*ids_names: str) -> Tuple[List[str]]:
+        """Extract ids names and occurrences from ids_names input
+
+        Args:
+            ids_names: Names of ids instances to be validated
+
+        Returns:
+            Tuple of list of ids names and list of ids occurrence numbers
+        """
+        ids_names_list = []
+        ids_occs_list = []
+        for ids_name in ids_names:
+            name, sep, occ = ids_name.partition('/')
+            if sep and occ == int(occ):
+                raise ValueError(f"Occurrence number {occ} should be int")
+            ids_names_list.append(name)
+            ids_occs_list.append(occ)
+        if not (len(ids_names_list) == len(ids_occs_list) >= 1):
+            raise ValueError("Number of ids_names should be larger than zero")
+        if len(ids_occs_list) > 1 and any([x is None for x in ids_occs_list]):
+            raise ValueError(
+                "Occurence numbers should be added for multi ids validation"
+            )
+        return ids_names_list, ids_occs_list
 
 
 class ValidatorRegistry:
