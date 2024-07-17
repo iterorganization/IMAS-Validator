@@ -36,11 +36,18 @@ def res_collector():
 
 def test_load_bundled_rulesets():
     discovered_rulesets = discover_rulesets(ValidateOptions(use_bundled_rulesets=True))
-    assert len(discovered_rulesets) == 1
-    assert (
-        discovered_rulesets[0]
-        == discovered_rulesets[0].parents[2] / "assets" / "rulesets" / "generic"
-    )
+    # At least the `generic` ruleset is bundled, but possibly more
+    assert len(discovered_rulesets) >= 1
+    # Verify that all rulesets are in the "assets/rulesets" directory
+    ruleset_parents = set(ruleset.parent for ruleset in discovered_rulesets)
+    expected_parent = discovered_rulesets[0].parent
+    assert ruleset_parents == {expected_parent}
+    assert expected_parent.parents[1] / "assets" / "rulesets" == expected_parent
+    # Verify there is one generic ruleset bundled:
+    ruleset_names = [ruleset.name for ruleset in discovered_rulesets]
+    assert "generic" in ruleset_names
+    # Verify that all bundled rulesets have a unique name
+    assert len(set(ruleset_names)) == len(ruleset_names)
 
 
 def test_discover_rulesets_explicit(caplog):
