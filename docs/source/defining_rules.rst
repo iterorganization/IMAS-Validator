@@ -77,6 +77,17 @@ folder structure as follows:
           └── equilibrium.py
 
 
+.. note::
+
+  To make sure that anyone working with the tests or using the ``explore`` tool can 
+  properly understand your validation rules, make sure to add docstrings explaining
+  your tests. Docstrings are surrounded by triple quotes (``"""my explanation docstring"""``) and defined:
+
+  - At rule level (under function definition)
+  - At file level (top of validation rule file)
+  - At ruleset level (top of ``__init__.py`` file in ruleset folder)
+
+
 .. _`rule definition`:
 
 Rule definition
@@ -149,6 +160,7 @@ Validation rules are defined inside the python files as follows:
 
 .. code-block:: python
   :caption: Example rule file
+  """This validation rule file shows example cases of how to define IDS validation rules"""
 
   @validator("*")
   def validate_ids_plugins_metadata(ids):
