@@ -32,4 +32,3 @@ def validate_mandatory_values(ids):
         assert profiles_1d.pressure_thermal.has_value
         assert profiles_1d.q.has_value
         assert profiles_1d.zeff.has_value
- 
