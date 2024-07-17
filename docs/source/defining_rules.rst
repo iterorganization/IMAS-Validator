@@ -160,6 +160,7 @@ Validation rules are defined inside the python files as follows:
 
 .. code-block:: python
   :caption: Example rule file
+  
   """This validation rule file shows example cases of how to define IDS validation rules"""
 
   @validator("*")
