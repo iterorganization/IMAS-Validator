@@ -33,7 +33,9 @@ def test_non_existing_pulsefile(tmp_path):
 
     argv = ["validate", f"imas:hdf5?path={empty_db_dir}"]
 
-    with pytest.raises(imaspy.exception.LowlevelError):
+    # When using imas_core >= 5.2, this raises an ALException. In earlier AL versions
+    # IMASPy raises a LowlevelError.
+    with pytest.raises((imaspy.exception.LowlevelError, imaspy.exception.ALException)):
         ids_validator_cli.main(argv)
 
 
