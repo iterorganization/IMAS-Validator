@@ -1,9 +1,10 @@
 # https://confluence.iter.org/display/IMP/Required+fields+in+a+dataset+to+be+imported+in+a+scenario+database
 
 
- def validate_mandatory_values(ids):
-     """Validate if the property exists by using has_value method in IMASPy."""
- 
+@validator("summary")
+def validate_mandatory_values(ids):
+    """Validate if the property exists by using has_value method in IMASPy."""
+
     # time
     assert ids.time.has_value
 
