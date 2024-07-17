@@ -173,9 +173,9 @@ Validation rules are defined inside the python files as follows:
     else:
       assert False, "No electron species found"
 
-  @validator("core_profiles")
+  @validator("core_profiles/0")
   def validate_ion_charge(cp, version=">=3.38.0, <4.0.0"):
-    """Validate that profiles_1d/ion/z_ion is defined."""
+    """Validate that profiles_1d/ion/z_ion is defined in occurrence 0."""
     for p1d in cp.profiles_1d:
       for ion in p1d.ion:
         assert ion.z_ion.has_value

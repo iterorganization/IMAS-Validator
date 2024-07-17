@@ -55,15 +55,15 @@ See :ref:`rule definition` for more information.
 Examples
 ''''''''
 
-For the first example we make sure that all ``equilibrium`` IDSs have a comment.
-Add the following validation rule to your rule file. Select ``"equilibrium"`` in
+For the first example we make sure that the first occurrence of the ``equilibrium`` IDS has a comment.
+Add the following validation rule to your rule file. Select ``"equilibrium/0"`` in
 the ``@validator`` decorator, then check that ``ids_properties.comment`` is not
 empty:
 
 .. code-block:: python
   :caption: ``my_rulesets/my_ruleset/my_tests.py``
 
-  @validator("equilibrium")
+  @validator("equilibrium/0")
   def validate_comment(eq):
     """Validate that ids_properties.comment is filled."""
     assert eq.ids_properties.comment != ""
@@ -91,6 +91,12 @@ strictly increasing.
         # 1D time array:
         if time_quantity.metadata.ndim == 1:
             assert Increasing(time_quantity)
+
+
+.. note::
+
+  You can write tests that combine multiple IDSs by adding both in the ``@validator`` decorator.
+  In that case the occurrence numbers need to be explicitly added like ``@validator("summary/0", "core_profiles/0")``.
 
 
 Run the validations

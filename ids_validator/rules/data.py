@@ -100,14 +100,17 @@ class ValidatorRegistry:
         Args:
             ids_names: Names of ids instances to be validated, for example
                 ``"core_profiles"`` or ``"pf_active"``. Use a wildcard ``"*"`` to accept
-                any IDS.
+                any IDS. Add the occurrence number using ``"summary/2"``. Occurrence
+                number is required for multi-IDS validation.
 
         Example:
             .. code-block:: python
 
-                @validator("core_profiles")
+                @validator("core_profiles/2")
                 def rule_for_core_profiles(cp):
-                    \"\"\"Rule that applies to any core_profiles IDS.\"\"\"
+                    \"\"\"
+                    Rule that applies to first occurrence of any core_profiles IDS.
+                    \"\"\"
                     ... # Write rules
 
                 @validator("*")
