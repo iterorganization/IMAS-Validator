@@ -97,26 +97,37 @@ class RuleExecutor:
             tuple of ids_instances, ids_names, ids_occurrences, validation rule
         """
 
-        if any([len(rule.ids_names) > 1 for rule in self.rules]):
-            raise NotImplementedError("Multi-IDS validation rules not implemented yet")
         ids_list = self._get_ids_list()
         for ids_name, occurrence in ids_list:
-            idss = [
-                (
-                    self.db_entry.get(ids_name, occurrence, autoconvert=False),
-                    ids_name,
-                    occurrence,
-                )
-            ]
+            idss = []
+            idss.append(self._load_ids_instance(ids_name, occurrence))
             ids_version = Version(idss[0][0]._dd_version)
+            # match with first ids_name to prevent matching the same rule multiple
+            # times for multi-ids
             filtered_rules = [
                 rule
                 for rule in self.rules
                 if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
+                and (rule.ids_occs[0] == occurrence or rule.ids_occs[0] is None)
                 and ids_version in SpecifierSet(rule.version)
             ]
             for rule in filtered_rules:
+                # get rest of idss for multi-validation rules.
+                # unoptimized algorithm, change if performance ever becomes problem.
+                for name, occ in zip(rule.ids_names[1:], rule.ids_occs[1:]):
+                    assert occ is not None
+                    instance = self._load_ids_instance(name, occ)
+                    idss.append(instance)
+                if not len(idss) == len(rule.ids_names):
+                    raise ValueError("Number of inputs not the same as required")
                 yield idss, rule
+
+    def _load_ids_instance(self, ids_name: str, occurrence: int) -> IDSInstance:
+        return (
+            self.db_entry.get(ids_name, occurrence, autoconvert=False),
+            ids_name,
+            occurrence,
+        )
 
     def _get_ids_list(self) -> List[Tuple[str, int]]:
         """Get list of all ids occurrences combined with their corresponding names
