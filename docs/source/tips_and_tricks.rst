@@ -4,10 +4,15 @@ Tips and Tricks
 ===============
 
 1. To save typing and make your tests more readable, loop over array elements rather
-   than indices when possible. For example:
+   than indices when possible.
+   If you do also need the index, you can use :py:func:`enumerate` to get both without
+   having to loop explicitly.
+   For example:
+
 
   .. code-block:: python
 
+    # loop over elements
     for profiles_1d in ids.profiles_1d:
       assert profiles_1d.ion.has_value
       for ion in profiles_1d.ion:
@@ -15,11 +20,7 @@ Tips and Tricks
         for element in ion.element:
           assert element.a.has_value
 
-  If you do also need the index, you can use ``enumerate`` to get both without
-  having to loop explicitly:
-
-  .. code-block:: python
-
+    # loop over elements with index using enumerate
     for i, profiles_1d in enumerate(ids.profiles_1d):
       assert profiles_1d.ion.has_value
       ... # rest of code
