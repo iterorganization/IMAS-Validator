@@ -84,10 +84,10 @@ Rule definition
 
 Validation rules are defined inside the python files as follows:
 
-1. An ``@validator`` decorator indicates which IDS (and which occurrence) to 
-   apply the validator function. This is done like ``@validator('summary')``
-   or ``@validator('summary/0')``. More details on this decorator can be found 
-   in the API documentation:
+1. An ``@validator`` decorator indicates which IDSs (and optionally which occurrences) to 
+   apply the validator function to. This is done like ``@validator('summary')``,
+   ``@validator('summary/0')`` or ``@validator('summary/0', 'equilibrium/0')``.
+   More details on this decorator can be found in the API documentation:
    :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`.
 2. The ``@validator`` decorator is followed by a Python function definition:
    ``def <rule_name>(arguments...):``. This sets the name of the rule, which
