@@ -201,6 +201,12 @@ for single IDS validation, it is mandatory for multi-IDS validation.
 
   @validator("summary/0", "core_profiles/0")
   def cross_validate_summary_and_core_profiles(summary, core_profiles):
-      """Validate that quantities defined in both summary and core_profiles are in agreement"""
+      """
+      Validate that quantities defined in both 
+      summary and core_profiles are in agreement.
+      """
       assert Approx(summary.time, core_profiles.time)
-      assert Approx(summary.global_quantities.ip.value, core_profiles.global_quantities.ip)
+      assert Approx(
+        summary.global_quantities.ip.value,
+        core_profiles.global_quantities.ip
+      )

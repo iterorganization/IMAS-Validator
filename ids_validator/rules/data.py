@@ -116,6 +116,11 @@ class ValidatorRegistry:
         Example:
             .. code-block:: python
 
+                @validator("core_profiles")
+                def rule_for_core_profiles(cp):
+                    \"\"\"Rule that applies to any core_profiles IDS.\"\"\"
+                    ... # Write rules
+
                 @validator("*")
                 def rule_for_any_ids(ids):
                     \"\"\"Rule that applies to any IDS.\"\"\"
