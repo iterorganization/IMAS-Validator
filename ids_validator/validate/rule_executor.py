@@ -99,9 +99,8 @@ class RuleExecutor:
 
         ids_list = self._get_ids_list()
         for ids_name, occurrence in ids_list:
-            idss = []
-            idss.append(self._load_ids_instance(ids_name, occurrence))
-            ids_version = Version(idss[0][0]._dd_version)
+            ids_instance = self._load_ids_instance(ids_name, occurrence)
+            ids_version = Version(ids_instance[0]._dd_version)
             # match with first ids_name to prevent matching the same rule multiple
             # times for multi-ids
             filtered_rules = [
@@ -112,6 +111,7 @@ class RuleExecutor:
                 and ids_version in SpecifierSet(rule.version)
             ]
             for rule in filtered_rules:
+                idss = [ids_instance]
                 # get rest of idss for multi-validation rules.
                 # unoptimized algorithm, change if performance ever becomes problem.
                 for name, occ in zip(rule.ids_names[1:], rule.ids_occs[1:]):

@@ -197,47 +197,21 @@ def test_apply_func(dbentry, rules):
 def test_parse_ids_names(dbentry):
     mock = Mock()
     mock.__name__ = "Mock func"  # IDSValidationRule requires __name__
+    # fmt: off
     inputs = [
         (["*"], ("*",), (None,)),
         (["*/2"], ("*",), (2,)),
         (["summary"], ("summary",), (None,)),
         (["summary/0"], ("summary",), (0,)),
-        (
-            ["summary/0", "core_profiles/0"],
-            (
-                "summary",
-                "core_profiles",
-            ),
-            (
-                0,
-                0,
-            ),
-        ),
+        (["summary/0", "core_profiles/0"], ("summary", "core_profiles",), (0, 0,)),
         (
             ["summary/0", "core_profiles/0", "equilibrium/1"],
-            (
-                "summary",
-                "core_profiles",
-                "equilibrium",
-            ),
-            (
-                0,
-                0,
-                1,
-            ),
+            ("summary", "core_profiles", "equilibrium",),
+            (0, 0, 1,)
         ),
-        (
-            ["*/0", "core_profiles/0"],
-            (
-                "*",
-                "core_profiles",
-            ),
-            (
-                0,
-                0,
-            ),
-        ),
+        (["*/0", "core_profiles/0"], ("*", "core_profiles",), (0, 0,)),
     ]
+    # fmt: on
     for ids_names, expected_names, expected_occs in inputs:
         rule = IDSValidationRule(Path("t/my_path.py"), mock, *ids_names)
         assert rule.ids_names == expected_names
