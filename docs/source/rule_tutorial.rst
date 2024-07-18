@@ -55,15 +55,15 @@ See :ref:`rule definition` for more information.
 Examples
 ''''''''
 
-For the first example we make sure that the first occurrence of the ``equilibrium`` IDS has a comment.
-Add the following validation rule to your rule file. Select ``"equilibrium/0"`` in
+For the first example we make sure that all ``equilibrium`` IDSs have a comment.
+Add the following validation rule to your rule file. Select ``"equilibrium"`` in
 the ``@validator`` decorator, then check that ``ids_properties.comment`` is not
 empty:
 
 .. code-block:: python
   :caption: ``my_rulesets/my_ruleset/my_tests.py``
 
-  @validator("equilibrium/0")
+  @validator("equilibrium")
   def validate_comment(eq):
     """Validate that ids_properties.comment is filled."""
     assert eq.ids_properties.comment != ""
@@ -93,10 +93,17 @@ strictly increasing.
             assert Increasing(time_quantity)
 
 
-.. note::
+You can write tests that combine multiple IDSs by adding both in the ``@validator`` decorator.
+In that case the occurrence numbers need to be explicitly added like ``@validator("summary/0", "core_profiles/0")``.
 
-  You can write tests that combine multiple IDSs by adding both in the ``@validator`` decorator.
-  In that case the occurrence numbers need to be explicitly added like ``@validator("summary/0", "core_profiles/0")``.
+.. code-block:: python
+  :caption: ``my_rulesets/my_ruleset/my_tests.py``
+
+  @validator("summary/0", "core_profiles/0")
+  def cross_validate_summary_and_core_profiles(summary, core_profiles):
+      """Validate that quantities defined in both summary and core_profiles are in agreement"""
+      assert Approx(summary.time, core_profiles.time)
+      assert Approx(summary.global_quantities.ip.value, core_profiles.global_quantities.ip)
 
 
 Run the validations

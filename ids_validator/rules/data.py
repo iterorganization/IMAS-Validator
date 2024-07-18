@@ -58,21 +58,30 @@ class IDSValidationRule:
             ids_names: Names of ids instances to be validated
 
         Returns:
-            Tuple of list of ids names and list of ids occurrence numbers
+            Parsed IDS names and occurrence numbers.
         """
         ids_names_list = []
         ids_occs_list = []
         for ids_name in ids_names:
             name, sep, occ = ids_name.partition("/")
             if sep and not occ.isnumeric():
-                raise ValueError(f"Occurrence number {occ} should be int")
+                raise ValueError(
+                    f"Cannot parse '{name}': the occurrence number {occ} should be an "
+                    "integer"
+                )
             ids_names_list.append(name)
             ids_occs_list.append(None if not sep else int(occ))
         if not (len(ids_names_list) == len(ids_occs_list) >= 1):
-            raise ValueError("Number of ids_names should be larger than zero")
+            raise ValueError(
+                "No IDS names provided to '@validator'. Provide at least one IDS name "
+                "that the validation rule applies to."
+            )
         if len(ids_occs_list) > 1 and any([x is None for x in ids_occs_list]):
             raise ValueError(
-                "Occurence numbers should be added for multi ids validation"
+                "No occurence numbers provided to '@validator' for multi-IDS "
+                "validation. For more information, visit: "
+                "https://sharepoint.iter.org/departments/POP/CM/IMDesign/"
+                "Code%20Documentation/IDS-Validator/defining_rules.html"
             )
         return tuple(ids_names_list), tuple(ids_occs_list)
 
@@ -100,18 +109,12 @@ class ValidatorRegistry:
         Args:
             ids_names: Names of ids instances to be validated, for example
                 ``"core_profiles"`` or ``"pf_active"``. Use a wildcard ``"*"`` to accept
-                any IDS. Add the occurrence number using ``"summary/2"``. Occurrence
-                number is required for multi-IDS validation.
+                any IDS. Add the occurrence number by appending the ids name with
+                an integer `>=0` like ``"summary/2"``. Occurrence number is required
+                for multi-IDS validation.
 
         Example:
             .. code-block:: python
-
-                @validator("core_profiles/2")
-                def rule_for_core_profiles(cp):
-                    \"\"\"
-                    Rule that applies to first occurrence of any core_profiles IDS.
-                    \"\"\"
-                    ... # Write rules
 
                 @validator("*")
                 def rule_for_any_ids(ids):

@@ -84,9 +84,10 @@ Rule definition
 
 Validation rules are defined inside the python files as follows:
 
-1. An ``@validator`` decorator indicates which IDS to apply the validator
-   function. More details on this decorator can be found in the API
-   documentation:
+1. An ``@validator`` decorator indicates which IDS (and which occurrence) to 
+   apply the validator function. This is done like ``@validator('summary')``
+   or ``@validator('summary/0')``. More details on this decorator can be found 
+   in the API documentation:
    :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`.
 2. The ``@validator`` decorator is followed by a Python function definition:
    ``def <rule_name>(arguments...):``. This sets the name of the rule, which
@@ -173,15 +174,33 @@ Validation rules are defined inside the python files as follows:
     else:
       assert False, "No electron species found"
 
-  @validator("core_profiles/0")
+  @validator("core_profiles")
   def validate_ion_charge(cp, version=">=3.38.0, <4.0.0"):
-    """Validate that profiles_1d/ion/z_ion is defined in occurrence 0."""
+    """Validate that profiles_1d/ion/z_ion is defined."""
     for p1d in cp.profiles_1d:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
+
+  @validator("equilibrium/0")
+  def validate_has_comment(eq):
+    """Validate that first occurrence of equilibrium has a comment."""
+    assert eq.ids_properties.comment != ''
 
 .. note::
 
   The dd_version formatting is done according to the
   `packaging module specifiers <https://packaging.pypa.io/en/latest/specifiers.html>`_.
   If a specific version number is required it is formatted as "==3.38.1"
+
+It is also possible to write rules that cross-validate multiple IDSs.
+This is done by specifying all the necessary IDS names in the ``@validator`` decorator.
+While specifying the occurrence number in the ``@validator`` decorator is optional 
+for single IDS validation, it is mandatory for multi-IDS validation.
+
+.. code-block:: python
+
+  @validator("summary/0", "core_profiles/0")
+  def cross_validate_summary_and_core_profiles(summary, core_profiles):
+      """Validate that quantities defined in both summary and core_profiles are in agreement"""
+      assert Approx(summary.time, core_profiles.time)
+      assert Approx(summary.global_quantities.ip.value, core_profiles.global_quantities.ip)
