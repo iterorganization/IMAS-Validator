@@ -10,7 +10,7 @@ Tips and Tricks
    For example:
 
 
-  .. code-block:: python
+   .. code-block:: python
 
     # loop over elements
     for profiles_1d in ids.profiles_1d:
@@ -29,6 +29,6 @@ Tips and Tricks
    without building a loop. This is more efficient because it uses ``numpy``
    optimized C code in the background.
 
-  .. code-block:: python
+   .. code-block:: python
 
     assert -1.7e7 < ids.global_quantities.ip <= 0
