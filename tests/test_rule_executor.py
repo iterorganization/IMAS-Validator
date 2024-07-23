@@ -73,8 +73,9 @@ def rules():
     rules = [
         IDSValidationRule(Path("t/all.py"), mocks[0], "*", version="==3.40.1"),
         IDSValidationRule(Path("t/core_profiles.py"), mocks[1], "core_profiles"),
-        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary"),
+        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary/1"),
         IDSValidationRule(Path("t/all.py"), mocks[3], "*", version="==3.40.0"),
+        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary/0", "equilibrium/2"),
     ]
     return rules
 
@@ -191,3 +192,38 @@ def test_apply_func(dbentry, rules):
     rule.func.assert_called_once()
     assert isinstance(rule.func.call_args_list[0][0][0], IDSWrapper)
     assert rule.func.call_args_list[0][0][0]._obj == ids
+
+
+def test_parse_ids_names(dbentry):
+    mock = Mock()
+    mock.__name__ = "Mock func"  # IDSValidationRule requires __name__
+    # fmt: off
+    inputs = [
+        (["*"], ("*",), (None,)),
+        (["*/2"], ("*",), (2,)),
+        (["summary"], ("summary",), (None,)),
+        (["summary/0"], ("summary",), (0,)),
+        (["summary/0", "core_profiles/0"], ("summary", "core_profiles",), (0, 0,)),
+        (
+            ["summary/0", "core_profiles/0", "equilibrium/1"],
+            ("summary", "core_profiles", "equilibrium",),
+            (0, 0, 1,)
+        ),
+        (["*/0", "core_profiles/0"], ("*", "core_profiles",), (0, 0,)),
+    ]
+    # fmt: on
+    for ids_names, expected_names, expected_occs in inputs:
+        rule = IDSValidationRule(Path("t/my_path.py"), mock, *ids_names)
+        assert rule.ids_names == expected_names
+        assert rule.ids_occs == expected_occs
+
+    inputs = [
+        ["summary", "core_profiles"],
+        ["summary", "core_profiles/0"],
+        ["summary/0", "core_profiles"],
+        ["summary", "core_profiles/*"],
+        ["summary/*"],
+    ]
+    for ids_names in inputs:
+        with pytest.raises(ValueError):
+            rule = IDSValidationRule(Path("/my_path.py"), mock, *ids_names)

@@ -61,13 +61,8 @@ class AssertTransformer(ast.NodeTransformer):
                 args=args,
                 keywords=[],
             ),
-            # Copy information of the source location:
-            lineno=node.lineno,
-            end_lineno=node.end_lineno,
-            col_offset=node.col_offset,
-            end_col_offset=node.end_col_offset,
         )
-        return replacement
+        return ast.copy_location(replacement, node)
 
 
 def run_path(
