@@ -1,6 +1,5 @@
 """Validation rules of ITER scenario database for the ``summary`` IDS."""
 
-
 @validator("summary")
 def validate_mandatory_values(ids):
     """Validate that mandatory quantities are provided."""

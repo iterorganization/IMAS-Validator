@@ -1,6 +1,5 @@
 """ITER-specific validation rules for the ``equlibrium`` IDS."""
 
-
 @validator("equilibrium")
 def validate_global_quantities_ip(ids):
     """Validate that time_slice(:)/global_quantities/ip is -17 MA <= ip <= 0 MA"""

@@ -1,6 +1,5 @@
 """ITER-specific validation rules for the ``core_profiles`` IDS."""
 
-
 @validator("core_profiles")
 def validate_global_quantities_ip(ids):
     """Validate that -17 MA <= global_quantities.ip <= 0"""

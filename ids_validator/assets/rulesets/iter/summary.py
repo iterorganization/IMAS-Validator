@@ -1,6 +1,5 @@
 """ITER-specific validation rules for the ``summary`` IDS."""
 
-
 @validator("summary")
 def validate_mandatory_values(ids):
     """Validate data in IDS/summary against rulesets for ITER scenario."""
