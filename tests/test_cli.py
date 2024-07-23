@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 
-import imas
 import imaspy
 import pytest
 
@@ -42,7 +41,7 @@ def test_existing_pulsefile(tmp_path):
     db_dir.mkdir()
 
     uri = f"imas:hdf5?path={db_dir}"
-    entry = imas.DBEntry(uri=uri, mode="x")
+    entry = imaspy.DBEntry(uri=uri, mode="x")
     entry.close()
 
     argv = ["validate", uri]
