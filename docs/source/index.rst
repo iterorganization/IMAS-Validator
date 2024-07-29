@@ -27,6 +27,7 @@ Manual
    defining_rules
    usage
    filter_rules
+   tips_and_tricks
 
 .. toctree::
    :caption: Tutorials

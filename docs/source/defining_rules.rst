@@ -77,6 +77,17 @@ folder structure as follows:
           └── equilibrium.py
 
 
+.. note::
+
+  Make sure that anyone working with the tests or using the ``explore`` tool can 
+  properly understand your validation rules. Add docstrings explaining what kind of tests you have written.
+  Docstrings are surrounded by triple quotes (``"""my explanation docstring"""``) and are defined:
+
+  - At rule level (under function definition)
+  - At file level (top of validation rule file)
+  - At ruleset level (top of ``__init__.py`` file in ruleset folder)
+
+
 .. _`rule definition`:
 
 Rule definition
@@ -84,9 +95,10 @@ Rule definition
 
 Validation rules are defined inside the python files as follows:
 
-1. An ``@validator`` decorator indicates which IDS to apply the validator
-   function. More details on this decorator can be found in the API
-   documentation:
+1. An ``@validator`` decorator indicates which IDSs (and optionally which occurrences) to 
+   apply the validator function to. This is done like ``@validator('summary')``,
+   ``@validator('summary/0')`` or ``@validator('summary/0', 'equilibrium/0')``.
+   More details on this decorator can be found in the API documentation:
    :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`.
 2. The ``@validator`` decorator is followed by a Python function definition:
    ``def <rule_name>(arguments...):``. This sets the name of the rule, which
@@ -149,6 +161,8 @@ Validation rules are defined inside the python files as follows:
 
 .. code-block:: python
   :caption: Example rule file
+  
+  """This validation rule file shows example cases of how to define IDS validation rules"""
 
   @validator("*")
   def validate_ids_plugins_metadata(ids):
@@ -180,8 +194,32 @@ Validation rules are defined inside the python files as follows:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
 
+  @validator("equilibrium/0")
+  def validate_has_comment(eq):
+    """Validate that first occurrence of equilibrium has a comment."""
+    assert eq.ids_properties.comment != ''
+
 .. note::
 
   The dd_version formatting is done according to the
   `packaging module specifiers <https://packaging.pypa.io/en/latest/specifiers.html>`_.
   If a specific version number is required it is formatted as "==3.38.1"
+
+It is also possible to write rules that cross-validate multiple IDSs.
+This is done by specifying all the necessary IDS names in the ``@validator`` decorator.
+While specifying the occurrence number in the ``@validator`` decorator is optional 
+for single IDS validation, it is mandatory for multi-IDS validation.
+
+.. code-block:: python
+
+  @validator("summary/0", "core_profiles/0")
+  def cross_validate_summary_and_core_profiles(summary, core_profiles):
+      """
+      Validate that quantities defined in both 
+      summary and core_profiles are in agreement.
+      """
+      assert Approx(summary.time, core_profiles.time)
+      assert Approx(
+        summary.global_quantities.ip.value,
+        core_profiles.global_quantities.ip
+      )
