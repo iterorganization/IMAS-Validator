@@ -41,7 +41,7 @@ def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
         raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
 
     ids = IDSFactory("3.40.1").new(ids_name)
-    ids.ids_properties.comment = f"Test IDS: {ids_name}/{occurrence}"
+    ids.ids_properties.comment = f"Test IDS: {ids_name}:{occurrence}"
     ids.ids_properties.homogeneous_time = 1
     # TODO: if needed, we can fill IDSs with specific data
     return ids
