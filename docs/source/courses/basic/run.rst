@@ -65,7 +65,8 @@ Exercise 3
 
         Call the IDS validator including custom tests for the db_entry with url .................
         The custom rules are defined in the ................. folder.
-        Run only the ..... tests
+        Run only the ..... tests.
+        Try out all the filtering options.
 
     .. md-tab-item:: Solution
 

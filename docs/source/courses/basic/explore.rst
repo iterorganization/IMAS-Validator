@@ -11,6 +11,7 @@ The explore functionality can be called from the terminal by
 
     $ ids_validator explore '.........'
 
+It can use the same filtering flags as the validate module.
 # Do first explore
 # Do explore with custom tests
 # Filter functions explore
@@ -33,7 +34,7 @@ Exercise 1
 # Change verbosity
 # Change whether to show empty folders/files
 Since the rule folders can contain a lot of tests and information, the explore function offers the possibility to change the verbosity.
-The --verbose and --no-docstring arguments can be used to change the verbosity of the descriptions
+The --verbose and --no-docstring arguments can be used to change the verbosity of the descriptions.
 The --show-empty argument can be used to change whether or not folders/files without any found rules should be shown.
 
 Exercise 2
@@ -43,6 +44,7 @@ Exercise 2
 
         Call the IDS validator explore tool filtering out the empty folders and files.
         Call the IDS validator explore tool for different verbosity levels
+        What are the differences?
 
     .. md-tab-item:: Solution
 
