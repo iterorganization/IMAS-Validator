@@ -21,6 +21,7 @@ def test_error_result() -> None:
         traceback.extract_stack(),
         {},
         exc=RuntimeError("Dummy exception"),
+        imas_uri="my_cool_uri",
     )
     result_generator = ValidationResultGenerator([result])
 
@@ -66,6 +67,7 @@ def test_successful_assert() -> None:
         traceback.extract_stack(),
         {("core_profiles", 0): ["a", "b", "c"]},
         exc=None,
+        imas_uri="my_cool_uri",
     )
     result_generator = ValidationResultGenerator([result])
     assert result_generator._junit_xml == (
@@ -96,6 +98,7 @@ def test_failed_assert() -> None:
         traceback.extract_stack(),
         {("core_profiles", 0): ["a", "b", "c"]},
         exc=None,
+        imas_uri="my_cool_uri",
     )
     result_generator = ValidationResultGenerator([result])
 

@@ -55,11 +55,15 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
 
 .. code-block:: python
 
+  from imaspy import DBEntry
+
   from ids_validator.validate_options import ValidateOptions, RuleFilter
   from ids_validator.rules.loading import load_rules
   from ids_validator.validate.result import ResultCollector
 
 
+  imas_uri = "imas:hdf5?path=path/to/data/entry"
+  dbentry = DBEntry(imas_uri, "r")
   validate_options = ValidateOptions(
     rulesets = ['ITER-MD', 'MyCustomRules'],
     extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
@@ -67,5 +71,5 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
     use_pdb = False,
     rule_filter = RuleFilter(name = ['time'], ids = ['core_profile']),
   )
-  result_collector = ResultCollector(validate_options=validate_options)
+  result_collector = ResultCollector(validate_options=validate_options, db_entry=dbentry)
   rules_list = load_rules(validate_options=validate_options)

@@ -5,6 +5,7 @@ rules in a rule folder.
 
 import logging
 
+from imaspy import DBEntry
 from rich import print
 from rich.tree import Tree
 
@@ -31,7 +32,10 @@ def explore(
         docstring_level: 0 for no docstrings, 1 for shortened and 2 for full docstrings.
     """
 
-    result_collector = ResultCollector(validate_options=validate_options)
+    dbentry = DBEntry("", "r")
+    result_collector = ResultCollector(
+        validate_options=validate_options, db_entry=dbentry
+    )
     docs = load_docs(
         result_collector=result_collector,
         validate_options=validate_options,

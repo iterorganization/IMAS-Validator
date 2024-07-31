@@ -82,7 +82,9 @@ def rules():
 
 @pytest.fixture
 def rule_executor(dbentry, rules):
-    result_collector = ResultCollector(validate_options=ValidateOptions())
+    result_collector = ResultCollector(
+        validate_options=ValidateOptions(), db_entry=dbentry
+    )
     rule_executor = RuleExecutor(
         dbentry, rules, result_collector, validate_options=ValidateOptions()
     )

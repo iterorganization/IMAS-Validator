@@ -7,6 +7,7 @@ import logging
 import traceback
 from typing import Any, Dict, List, Tuple
 
+from imaspy import DBEntry
 from imaspy.ids_primitive import IDSPrimitive
 
 from ids_validator.exceptions import InternalValidateDebugException
@@ -21,7 +22,11 @@ logger = logging.getLogger(__name__)
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
-    def __init__(self, validate_options: ValidateOptions) -> None:
+    def __init__(
+        self,
+        validate_options: ValidateOptions,
+        db_entry: DBEntry,
+    ) -> None:
         """
         Initialize ResultCollector
 
@@ -30,6 +35,7 @@ class ResultCollector:
         """
         self.results: List[IDSValidationResult] = []
         self.validate_options = validate_options
+        self.db_entry = db_entry
 
     def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
         """Set which rule and IDSs should be stored in results
@@ -66,6 +72,7 @@ class ResultCollector:
             tb,
             {},
             exc=exc,
+            imas_uri=self.db_entry.uri,
         )
         self.results.append(result)
 
@@ -94,6 +101,7 @@ class ResultCollector:
             tb,
             nodes_dict,
             exc=None,
+            imas_uri=self.db_entry.uri,
         )
         self.results.append(result)
         # raise exception for debugging traceback

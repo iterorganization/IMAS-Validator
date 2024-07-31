@@ -29,5 +29,7 @@ class IDSValidationResult:
     Set of nodes that have contributed in this result, identified by a combination of
     the ids name and occurence
     """
+    imas_uri: str
+    """URI of dbentry being tested"""
     exc: Optional[Exception] = None
     """Exception that was encountered while running validation test"""
