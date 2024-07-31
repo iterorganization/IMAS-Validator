@@ -97,7 +97,7 @@ Validation rules are defined inside the python files as follows:
 
 1. An ``@validator`` decorator indicates which IDSs (and optionally which occurrences) to 
    apply the validator function to. This is done like ``@validator('summary')``,
-   ``@validator('summary/0')`` or ``@validator('summary/0', 'equilibrium/0')``.
+   ``@validator('summary:0')`` or ``@validator('summary:0', 'equilibrium:0')``.
    More details on this decorator can be found in the API documentation:
    :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`.
 2. The ``@validator`` decorator is followed by a Python function definition:
@@ -194,7 +194,7 @@ Validation rules are defined inside the python files as follows:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
 
-  @validator("equilibrium/0")
+  @validator("equilibrium:0")
   def validate_has_comment(eq):
     """Validate that first occurrence of equilibrium has a comment."""
     assert eq.ids_properties.comment != ''
@@ -212,7 +212,7 @@ for single IDS validation, it is mandatory for multi-IDS validation.
 
 .. code-block:: python
 
-  @validator("summary/0", "core_profiles/0")
+  @validator("summary:0", "core_profiles:0")
   def cross_validate_summary_and_core_profiles(summary, core_profiles):
       """
       Validate that quantities defined in both 

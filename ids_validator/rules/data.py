@@ -63,7 +63,7 @@ class IDSValidationRule:
         ids_names_list = []
         ids_occs_list = []
         for ids_name in ids_names:
-            name, sep, occ = ids_name.partition("/")
+            name, sep, occ = ids_name.partition(":")
             if sep and not occ.isnumeric():
                 raise ValueError(
                     f"Cannot parse '{name}': the occurrence number {occ} should be an "
@@ -110,7 +110,7 @@ class ValidatorRegistry:
             ids_names: Names of ids instances to be validated, for example
                 ``"core_profiles"`` or ``"pf_active"``. Use a wildcard ``"*"`` to accept
                 any IDS. Add the occurrence number by appending the ids name with
-                an integer `>=0` like ``"summary/2"``. Occurrence number is required
+                an integer `>=0` like ``"summary:2"``. Occurrence number is required
                 for multi-IDS validation.
 
         Example:
