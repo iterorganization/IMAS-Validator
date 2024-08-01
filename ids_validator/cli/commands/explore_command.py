@@ -24,6 +24,7 @@ class ExploreCommand(GenericCommand):
                 Path(element)
                 for element in flatten_2d_list_or_return_empty(args.extra_rule_dirs)
             ],
+            use_bundled_rulesets=not args.no_bundled,  # invert logic
         )
 
         # prepare --filer, --filter_name and --filter_ids options to be passed

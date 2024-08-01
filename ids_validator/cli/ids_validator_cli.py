@@ -152,6 +152,14 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     )
 
     explore_group.add_argument(
+        "-b",
+        "--no-bundled",
+        action="store_true",
+        default=False,
+        help="Disable rulesets bundled with ids_validator.",
+    )
+
+    explore_group.add_argument(
         "-f",
         "--filter",
         type=str,
