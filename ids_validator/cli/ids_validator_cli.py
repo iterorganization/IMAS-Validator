@@ -64,6 +64,42 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         help="Drop into debugger if tests fails",
     )
 
+    validate_group.add_argument(
+        "-b",
+        "--no-bundled",
+        action="store_true",
+        default=False,
+        help="Disable rulesets bundled with ids_validator.",
+    )
+
+    validate_group.add_argument(
+        "-f",
+        "--filter",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="Combined list of rule names and ids names that should be present in rule",
+    )
+
+    validate_group.add_argument(
+        "--filter_name",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="List of strings that should be present in rule name",
+    )
+
+    validate_group.add_argument(
+        "--filter_ids",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="List of strings that should be present in rule ids names",
+    )
+
     validate_group.add_argument("--output", help="""Specify name of the output file""")
 
     explore_parser = subparsers.add_parser("explore", help="explore existing rulesets")
