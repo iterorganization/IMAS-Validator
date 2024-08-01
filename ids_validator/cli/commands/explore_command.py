@@ -2,6 +2,10 @@ import argparse
 import logging
 from pathlib import Path
 
+from ids_validator.common.utils import (
+    flatten_2d_list_or_return_empty,
+    get_all_ids_names,
+)
 from ids_validator.validate.explore import explore
 from ids_validator.validate_options import ValidateOptions
 
@@ -15,24 +19,34 @@ class ExploreCommand(GenericCommand):
     def __init__(self, args: argparse.Namespace) -> None:
         super(ExploreCommand, self).__init__(args)
         self.validate_options = ValidateOptions(
-            # List comprehension for flattening 2D list into 1D.
-            # CLI After providing -r option passes this argument as [['ruleset' ...]]
-            rulesets=[
-                ruleset for given_rulesets in args.ruleset for ruleset in given_rulesets
+            rulesets=flatten_2d_list_or_return_empty(args.ruleset),
+            extra_rule_dirs=[
+                Path(element)
+                for element in flatten_2d_list_or_return_empty(args.extra_rule_dirs)
             ],
-            # List comprehension for flattening 2D list into 1D.
-            # CLI After providing -r option passes this argument as [['ruleset' ...]]
-            # If empty return empty list
-            extra_rule_dirs=(
-                [
-                    Path(extra_ruleset)
-                    for given_extra_rulesets in args.extra_rule_dirs
-                    for extra_ruleset in given_extra_rulesets
-                ]
-                if args.extra_rule_dirs
-                else []
-            ),
         )
+
+        # prepare --filer, --filter_name and --filter_ids options to be passed
+        self.validate_options.rule_filter.name.extend(
+            flatten_2d_list_or_return_empty(args.filter_name)
+        )
+        self.validate_options.rule_filter.ids.extend(
+            flatten_2d_list_or_return_empty(args.filter_ids)
+        )
+
+        # Filter ids names and ruleset names from combined args.filter parameter:
+        filter_ids_names = list(
+            set(flatten_2d_list_or_return_empty(args.filter)).intersection(
+                get_all_ids_names()
+            )
+        )
+        filter_rule_names = list(
+            set(flatten_2d_list_or_return_empty(args.filter)) - set(filter_ids_names)
+        )
+
+        self.validate_options.rule_filter.name.extend(filter_rule_names)
+        self.validate_options.rule_filter.ids.extend(filter_ids_names)
+
         self.show_empty = args.show_empty
         self.docstring_level = 1
 

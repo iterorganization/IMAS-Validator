@@ -151,6 +151,34 @@ def configure_argument_parser() -> argparse.ArgumentParser:
                 available under RULESET_PATH variable.""",
     )
 
+    explore_group.add_argument(
+        "-f",
+        "--filter",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="Combined list of rule names and ids names that should be present in rule",
+    )
+
+    explore_group.add_argument(
+        "--filter_name",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="List of strings that should be present in rule name",
+    )
+
+    explore_group.add_argument(
+        "--filter_ids",
+        type=str,
+        action="append",
+        nargs="+",
+        default=[],
+        help="List of strings that should be present in rule ids names",
+    )
+
     return parser
 
 
