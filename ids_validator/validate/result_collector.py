@@ -15,7 +15,10 @@ from imaspy.ids_toplevel import IDSToplevel
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
-from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result import (
+    IDSValidationResult,
+    IDSValidationResultCollection,
+)
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
@@ -165,3 +168,10 @@ class ResultCollector:
                 "overlap": len(visited & filled),
             }
         return coverage_dict
+
+    def result_collection(self) -> IDSValidationResultCollection:
+        return IDSValidationResultCollection(
+            results=self.results,
+            coverage_dict=self.coverage_dict(),
+            validate_options=self.validate_options,
+        )

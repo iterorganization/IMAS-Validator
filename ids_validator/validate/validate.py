@@ -3,7 +3,6 @@ This file describes the main function for the IMAS IDS validation tool
 """
 
 import logging
-from typing import List
 
 from imaspy import DBEntry
 
@@ -17,7 +16,7 @@ from packaging.version import Version
 
 from ids_validator.exceptions import IMASVersionError
 from ids_validator.rules.loading import load_rules
-from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result import IDSValidationResultCollection
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.rule_executor import RuleExecutor
 from ids_validator.validate_options import ValidateOptions
@@ -30,7 +29,7 @@ default_val_opts = ValidateOptions()
 def validate(
     imas_uri: str,
     validate_options: ValidateOptions = default_val_opts,
-) -> List[IDSValidationResult]:
+) -> IDSValidationResultCollection:
     """
     Main function
     Args:
@@ -54,9 +53,9 @@ def validate(
         dbentry, rules, result_collector, validate_options=validate_options
     )
     rule_executor.apply_rules_to_data()
-    results = result_collector.results
-    logger.info(f"{len(results)} results obtained")
-    return results
+    results_collection = result_collector.result_collection()
+    logger.info(f"{len(results_collection.results)} results obtained")
+    return results_collection
 
 
 def _check_imas_version() -> None:

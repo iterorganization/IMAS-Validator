@@ -1,16 +1,17 @@
 import argparse
 from abc import abstractmethod
-from typing import List
 
-from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result import IDSValidationResultCollection
 
 from .command_interface import CommandInterface, CommandNotExecutedException
 
 
 class GenericCommand(CommandInterface):
 
+    _result: IDSValidationResultCollection
+
     @property
-    def result(self) -> List[IDSValidationResult]:
+    def result(self) -> IDSValidationResultCollection:
         if not self.executed():
             additional_info = str(self)
             raise CommandNotExecutedException(
@@ -22,7 +23,6 @@ class GenericCommand(CommandInterface):
 
     def __init__(self, args: argparse.Namespace) -> None:
         self._executed = False
-        self._result: List[IDSValidationResult] = []
 
     @abstractmethod
     def __str__(self) -> str:
