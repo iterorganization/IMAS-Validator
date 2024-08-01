@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Set, Tuple
 import imaspy.util
 from imaspy import DBEntry
 from imaspy.ids_primitive import IDSPrimitive
+from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
@@ -38,15 +39,19 @@ class ResultCollector:
         self.results: List[IDSValidationResult] = []
         self.validate_options = validate_options
         self.db_entry = db_entry
+        self.visited_nodes_dict: NODES_DICT = {}
+        self.filled_nodes_dict: NODES_DICT = {}
 
-    def set_context(self, rule: IDSValidationRule, idss: List[Tuple[str, int]]) -> None:
+    def set_context(
+        self, rule: IDSValidationRule, idss: List[Tuple[IDSToplevel, str, int]]
+    ) -> None:
         """Set which rule and IDSs should be stored in results
 
         Args:
             rule: Rule to apply to IDS data
-            idss: Tuple of ids_names and occurrences
+            idss: Tuple of ids_instances, ids_names and occurrences
         """
-        unique_ids_names = set(ids[0] for ids in idss)
+        unique_ids_names = set(ids[1] for ids in idss)
         if len(unique_ids_names) != len(idss):
             raise NotImplementedError(
                 "Two occurrence of one IDS in a single validation rule is not supported"
@@ -70,13 +75,14 @@ class ResultCollector:
             False,
             "",
             self._current_rule,
-            self._current_idss,
+            [(x[1], x[2]) for x in self._current_idss],
             tb,
             {},
             exc=exc,
             imas_uri=self.db_entry.uri,
         )
         self.results.append(result)
+        self.append_nodes_dict({}, self._current_idss)
 
     def assert_(self, test: Any, msg: str = "") -> None:
         """
@@ -99,13 +105,14 @@ class ResultCollector:
             res_bool,
             msg,
             self._current_rule,
-            self._current_idss,
+            [(x[1], x[2]) for x in self._current_idss],
             tb,
             nodes_dict,
             exc=None,
             imas_uri=self.db_entry.uri,
         )
         self.results.append(result)
+        self.append_nodes_dict(nodes_dict, self._current_idss)
         # raise exception for debugging traceback
         if self.validate_options.use_pdb and not res_bool:
             raise InternalValidateDebugException()
@@ -117,60 +124,44 @@ class ResultCollector:
         Args:
             ids_nodes: List of IDSPrimitive nodes that have been touched in this test
         """
-        nodes_dict: NODES_DICT = {key: set() for key in self._current_idss}
-        occ_dict = {key[0]: key for key in self._current_idss}
+        nodes_dict: NODES_DICT = {
+            (name, occ): set() for _, name, occ in self._current_idss
+        }
+        occ_dict = {name: (name, occ) for _, name, occ in self._current_idss}
         for node in ids_nodes:
             ids_name = node._toplevel.metadata.name
             ids_result = nodes_dict[occ_dict[ids_name]]
             ids_result.add(node._path)
         return nodes_dict
 
-    def visited_nodes_dict(self) -> NODES_DICT:
-        nodes_dict: NODES_DICT = {}
-        for result in self.results:
-            for key, value in result.nodes_dict.items():
-                if key not in nodes_dict.keys():
-                    nodes_dict[key] = set()
-                nodes_dict[key] |= value
-        return nodes_dict
-
-    def db_entry_nodes_dict(self) -> Tuple[NODES_DICT, NODES_DICT]:
-        filled_nodes_dict: NODES_DICT = {}
-        total_nodes_dict: NODES_DICT = {}
-        for ids_name in self.db_entry.factory.ids_names():
-            occurrence_list = self.db_entry.list_all_occurrences(ids_name)
-            for occurrence in occurrence_list:
-                ids = self.db_entry.get(ids_name, occurrence, autoconvert=False)
-                filled_set = set()
-                total_set = set()
-                imaspy.util.visit_children(
-                    lambda x: filled_set.add(x._toplevel.metadata.name),
-                    ids,
-                    leaf_only=True,
-                    visit_empty=False,
-                )
-                imaspy.util.visit_children(
-                    lambda x: total_set.add(x._toplevel.metadata.name),
-                    ids,
-                    leaf_only=True,
-                    visit_empty=True,
-                )
-                filled_nodes_dict[(ids_name, occurrence)] = filled_set
-                total_nodes_dict[(ids_name, occurrence)] = total_set
-        return filled_nodes_dict, total_nodes_dict
+    def append_nodes_dict(
+        self, nodes_dict: NODES_DICT, idss: List[Tuple[IDSToplevel, str, int]]
+    ) -> None:
+        for key, value in nodes_dict.items():
+            if key not in self.visited_nodes_dict.keys():
+                self.visited_nodes_dict[key] = set()
+            self.visited_nodes_dict[key] |= value
+        for ids_instance, name, occ in idss:
+            key = (name, occ)
+            if key not in self.filled_nodes_dict.keys():
+                self.filled_nodes_dict[key] = set()
+            imaspy.util.visit_children(
+                lambda node: self.filled_nodes_dict[key].add(node._path),
+                ids_instance,
+                leaf_only=True,
+                visit_empty=False,
+            )
 
     def coverage_dict(self) -> Dict[Tuple[str, int], Dict[str, float]]:
         coverage_dict: Dict[Tuple[str, int], Dict[str, float]] = {}
-        visited_nodes_dict = self.visited_nodes_dict()
-        filled_nodes_dict, total_nodes_dict = self.db_entry_nodes_dict()
-        for key in total_nodes_dict.keys():
+        visited_nodes_dict = self.visited_nodes_dict
+        filled_nodes_dict = self.filled_nodes_dict
+        for key in filled_nodes_dict.keys():
             filled = filled_nodes_dict[key]
-            total = total_nodes_dict[key]
             visited = visited_nodes_dict[key]
-            unfilled = total - filled
             coverage_dict[key] = {
-                "filled": len(filled & visited) / len(filled),
-                "unfilled": len(unfilled & visited) / len(unfilled),
-                "total": len(total & visited) / len(total),
+                "filled": len(filled),
+                "visited": len(visited),
+                "overlap": len(visited & filled),
             }
         return coverage_dict

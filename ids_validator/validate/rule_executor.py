@@ -54,7 +54,7 @@ class RuleExecutor:
         for ids_instances, rule in self.find_matching_rules():
             ids_toplevels = [ids[0] for ids in ids_instances]
             idss = [(ids[1], ids[2]) for ids in ids_instances]
-            self.result_collector.set_context(rule, idss)
+            self.result_collector.set_context(rule, ids_instances)
             idss_str = ", ".join(
                 sorted(f"{ids_name}:{ids_occ}" for ids_name, ids_occ in idss)
             )
