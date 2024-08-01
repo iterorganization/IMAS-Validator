@@ -64,42 +64,6 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         help="Drop into debugger if tests fails",
     )
 
-    validate_group.add_argument(
-        "-b",
-        "--no-bundled",
-        action="store_true",
-        default=False,
-        help="Disable rulesets bundled with ids_validator.",
-    )
-
-    validate_group.add_argument(
-        "-f",
-        "--filter",
-        type=str,
-        action="append",
-        nargs="+",
-        default=[],
-        help="Combined list of rule names and ids names that should be present in rule",
-    )
-
-    validate_group.add_argument(
-        "--filter_name",
-        type=str,
-        action="append",
-        nargs="+",
-        default=[],
-        help="List of strings that should be present in rule name",
-    )
-
-    validate_group.add_argument(
-        "--filter_ids",
-        type=str,
-        action="append",
-        nargs="+",
-        default=[],
-        help="List of strings that should be present in rule ids names",
-    )
-
     validate_group.add_argument("--output", help="""Specify name of the output file""")
 
     explore_parser = subparsers.add_parser("explore", help="explore existing rulesets")
@@ -151,41 +115,44 @@ def configure_argument_parser() -> argparse.ArgumentParser:
                 available under RULESET_PATH variable.""",
     )
 
-    explore_group.add_argument(
-        "-b",
-        "--no-bundled",
-        action="store_true",
-        default=False,
-        help="Disable rulesets bundled with ids_validator.",
-    )
+    # Options common for validate and explore commands
+    for group in [validate_group, explore_group]:
+        group.add_argument(
+            "-b",
+            "--no-bundled",
+            action="store_true",
+            default=False,
+            help="Disable rulesets bundled with ids_validator.",
+        )
 
-    explore_group.add_argument(
-        "-f",
-        "--filter",
-        type=str,
-        action="append",
-        nargs="+",
-        default=[],
-        help="Combined list of rule names and ids names that should be present in rule",
-    )
+        group.add_argument(
+            "-f",
+            "--filter",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Specify combined list of rule names and ids names"
+            " that should be present in rule",
+        )
 
-    explore_group.add_argument(
-        "--filter_name",
-        type=str,
-        action="append",
-        nargs="+",
-        default=[],
-        help="List of strings that should be present in rule name",
-    )
+        group.add_argument(
+            "--filter_name",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Specify list of strings that should be present in rule name",
+        )
 
-    explore_group.add_argument(
-        "--filter_ids",
-        type=str,
-        action="append",
-        nargs="+",
-        default=[],
-        help="List of strings that should be present in rule ids names",
-    )
+        group.add_argument(
+            "--filter_ids",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Specify list of strings that should be present in rule ids names",
+        )
 
     return parser
 

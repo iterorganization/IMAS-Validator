@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ids_validator.common.utils import (
     flatten_2d_list_or_return_empty,
-    get_all_ids_names,
+    prepare_rule_filter_object,
 )
 from ids_validator.validate.validate import validate
 from ids_validator.validate_options import ValidateOptions
@@ -28,28 +28,8 @@ class ValidateCommand(GenericCommand):
             apply_generic=args.no_generic,
             use_pdb=args.debug,
             use_bundled_rulesets=not args.no_bundled,  # invert logic
+            rule_filter=prepare_rule_filter_object(args),
         )
-
-        # prepare --filer, --filter_name and --filter_ids options to be passed
-        self.validate_options.rule_filter.name.extend(
-            flatten_2d_list_or_return_empty(args.filter_name)
-        )
-        self.validate_options.rule_filter.ids.extend(
-            flatten_2d_list_or_return_empty(args.filter_ids)
-        )
-
-        # Filter ids names and ruleset names from combined args.filter parameter:
-        filter_ids_names = list(
-            set(flatten_2d_list_or_return_empty(args.filter)).intersection(
-                get_all_ids_names()
-            )
-        )
-        filter_rule_names = list(
-            set(flatten_2d_list_or_return_empty(args.filter)) - set(filter_ids_names)
-        )
-
-        self.validate_options.rule_filter.name.extend(filter_rule_names)
-        self.validate_options.rule_filter.ids.extend(filter_ids_names)
 
     def execute(self) -> None:
         super().execute()
