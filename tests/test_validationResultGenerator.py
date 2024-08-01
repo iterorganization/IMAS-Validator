@@ -112,7 +112,7 @@ def test_failed_assert() -> None:
         f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
         f'<testcase id="1.1.1" name="to/rule.py/dummy_rule_function">\n\t\t\t'
         f'<failure message="Optional message" type="" '
-        f"nodes_dict=\"{{('core_profiles', 0): ['a', 'b', 'c']}}\">"
+        f"nodes_dict=\"{{('core_profiles', 0): {'a', 'b', 'c'}}}\">"
         f"{str_to_compare}"
         f"</failure>\n\t\t"
         f"</testcase>\n\t"
@@ -132,5 +132,5 @@ def test_failed_assert() -> None:
         f"Test with rule name : to/rule.py/dummy_rule_function, failed\n\t\t"
         f"Message : Optional message\n\t\t"
         f"Traceback : {str(last_tb)}\n\t\t"
-        f"Nodes_Dict : {{('core_profiles', 0): ['a', 'b', 'c']}}\n"
+        f"Nodes_Dict : {{('core_profiles', 0): {'a', 'b', 'c'}}}\n"
     )

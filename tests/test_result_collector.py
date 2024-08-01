@@ -92,8 +92,8 @@ def test_list_nodes(res_collector, rule, test_data_core_profiles, test_data_wave
     waves_time = test_data_waves.ids_properties.homogeneous_time
     rule.func(cp_time == waves_time)
     assert res_collector.results[0].nodes_dict == {
-        ("core_profiles", 0): ["ids_properties/homogeneous_time"],
-        ("waves", 1): ["ids_properties/homogeneous_time"],
+        ("core_profiles", 0): {"ids_properties/homogeneous_time"},
+        ("waves", 1): {"ids_properties/homogeneous_time"},
     }
 
 
@@ -130,3 +130,10 @@ def test_rewritten_rule(res_collector, rewritten_rule):
     assert val_result.idss == [("core_profiles", 0)]
     assert val_result.tb[-1].lineno == 5
     assert val_result.exc is None
+
+
+# def test_visited_nodes_dict(res_collector):
+
+# def test_db_entry_nodes_dict():
+
+# def test_coverage_dict():
