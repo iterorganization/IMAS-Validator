@@ -41,7 +41,7 @@ def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
         raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
 
     ids = IDSFactory("3.40.1").new(ids_name)
-    ids.ids_properties.comment = f"Test IDS: {ids_name}/{occurrence}"
+    ids.ids_properties.comment = f"Test IDS: {ids_name}:{occurrence}"
     ids.ids_properties.homogeneous_time = 1
     # TODO: if needed, we can fill IDSs with specific data
     return ids
@@ -73,9 +73,9 @@ def rules():
     rules = [
         IDSValidationRule(Path("t/all.py"), mocks[0], "*", version="==3.40.1"),
         IDSValidationRule(Path("t/core_profiles.py"), mocks[1], "core_profiles"),
-        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary/1"),
+        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary:1"),
         IDSValidationRule(Path("t/all.py"), mocks[3], "*", version="==3.40.0"),
-        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary/0", "equilibrium/2"),
+        IDSValidationRule(Path("t/summary.py"), mocks[2], "summary:0", "equilibrium:2"),
     ]
     return rules
 
@@ -97,10 +97,10 @@ def test_dbentry_mock(dbentry):
         dbentry.get("summary")
 
     cp = dbentry.get("core_profiles", autoconvert=False)
-    assert cp.ids_properties.comment == "Test IDS: core_profiles/0"
+    assert cp.ids_properties.comment == "Test IDS: core_profiles:0"
     assert cp.metadata.name == "core_profiles"
     cp3 = dbentry.get("core_profiles", 3, autoconvert=False)
-    assert cp3.ids_properties.comment == "Test IDS: core_profiles/3"
+    assert cp3.ids_properties.comment == "Test IDS: core_profiles:3"
 
 
 def test_apply_rules_to_data(rule_executor):
@@ -149,7 +149,7 @@ def test_apply_rules_to_data_logging(rule_executor, caplog):
     rule_executor.apply_rules_to_data()
     info_log_calls = [
         "Started executing rules",
-        "Running t/all.py/Mock func 0 on magnetics/1",
+        "Running t/all.py/Mock func 0 on magnetics:1",
     ]
     fix_assert_str = (
         "Make sure the validation test is testing something with an assert statement."
@@ -200,16 +200,16 @@ def test_parse_ids_names(dbentry):
     # fmt: off
     inputs = [
         (["*"], ("*",), (None,)),
-        (["*/2"], ("*",), (2,)),
+        (["*:2"], ("*",), (2,)),
         (["summary"], ("summary",), (None,)),
-        (["summary/0"], ("summary",), (0,)),
-        (["summary/0", "core_profiles/0"], ("summary", "core_profiles",), (0, 0,)),
+        (["summary:0"], ("summary",), (0,)),
+        (["summary:0", "core_profiles:0"], ("summary", "core_profiles",), (0, 0,)),
         (
-            ["summary/0", "core_profiles/0", "equilibrium/1"],
+            ["summary:0", "core_profiles:0", "equilibrium:1"],
             ("summary", "core_profiles", "equilibrium",),
             (0, 0, 1,)
         ),
-        (["*/0", "core_profiles/0"], ("*", "core_profiles",), (0, 0,)),
+        (["*:0", "core_profiles:0"], ("*", "core_profiles",), (0, 0,)),
     ]
     # fmt: on
     for ids_names, expected_names, expected_occs in inputs:
@@ -219,10 +219,10 @@ def test_parse_ids_names(dbentry):
 
     inputs = [
         ["summary", "core_profiles"],
-        ["summary", "core_profiles/0"],
-        ["summary/0", "core_profiles"],
-        ["summary", "core_profiles/*"],
-        ["summary/*"],
+        ["summary", "core_profiles:0"],
+        ["summary:0", "core_profiles"],
+        ["summary", "core_profiles:*"],
+        ["summary:*"],
     ]
     for ids_names in inputs:
         with pytest.raises(ValueError):

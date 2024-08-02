@@ -94,12 +94,12 @@ strictly increasing.
 
 
 You can write tests that combine multiple IDSs by adding both in the ``@validator`` decorator.
-In that case the occurrence numbers need to be explicitly added like ``@validator("summary/0", "core_profiles/0")``.
+In that case the occurrence numbers need to be explicitly added like ``@validator("summary:0", "core_profiles:0")``.
 
 .. code-block:: python
   :caption: ``my_rulesets/my_ruleset/my_tests.py``
 
-  @validator("summary/0", "core_profiles/0")
+  @validator("summary:0", "core_profiles:0")
   def cross_validate_summary_and_core_profiles(summary, core_profiles):
       """Validate that quantities defined in both summary and core_profiles are in agreement"""
       assert Approx(summary.time, core_profiles.time)
