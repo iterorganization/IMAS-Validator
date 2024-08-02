@@ -49,7 +49,7 @@ Manual
    ci_config
 
 .. toctree::
-   :caption: training
+   :caption: Training
    :maxdepth: 1
 
    courses/basic_user_training
