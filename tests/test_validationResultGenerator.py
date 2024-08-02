@@ -65,7 +65,7 @@ def test_successful_assert() -> None:
         IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
         [("core_profiles", 0)],
         traceback.extract_stack(),
-        {("core_profiles", 0): ["a", "b", "c"]},
+        {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
         imas_uri="my_cool_uri",
     )
@@ -96,7 +96,7 @@ def test_failed_assert() -> None:
         IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
         [("core_profiles", 0)],
         traceback.extract_stack(),
-        {("core_profiles", 0): ["a", "b", "c"]},
+        {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
         imas_uri="my_cool_uri",
     )

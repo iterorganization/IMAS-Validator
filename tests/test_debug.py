@@ -15,7 +15,9 @@ def validate_options():
 
 @pytest.fixture
 def res_collector(validate_options):
-    res_col = ResultCollector(validate_options=validate_options, db_entry=Mock)
+    dbentry_mock = Mock
+    dbentry_mock.uri = ""
+    res_col = ResultCollector(validate_options=validate_options, db_entry=dbentry_mock)
     return res_col
 
 
@@ -58,41 +60,47 @@ def assert_last_tb(tbi, res):
     assert tbi.tb_frame.f_code.co_name == res
 
 
-def test_debug_true(rule, rule_executor, res_collector):
+def test_debug_true(rule, rule_executor, res_collector, test_data_core_profiles):
     my_pdb = Mock()
 
     with patch(
         "ids_validator.validate.rule_executor.pdb",
         post_mortem=my_pdb,
     ):
-        res_collector.set_context(rule, [("core_profiles", 0)])
+        res_collector.set_context(
+            rule, [(test_data_core_profiles._obj, "core_profiles", 0)]
+        )
         rule_executor.run(rule, [True])
         assert len(res_collector.results) == 1
         assert my_pdb.call_count == 0
 
 
-def test_debug_false(rule, rule_executor, res_collector):
+def test_debug_false(rule, rule_executor, res_collector, test_data_core_profiles):
     my_pdb = Mock()
 
     with patch(
         "ids_validator.validate.rule_executor.pdb",
         post_mortem=my_pdb,
     ):
-        res_collector.set_context(rule, [("core_profiles", 0)])
+        res_collector.set_context(
+            rule, [(test_data_core_profiles._obj, "core_profiles", 0)]
+        )
         rule_executor.run(rule, [False])
         assert len(res_collector.results) == 1
         assert my_pdb.call_count == 1
         assert_last_tb(my_pdb.call_args_list[0][0][0], "cool_func_name")
 
 
-def test_debug_error(rule_error, rule_executor, res_collector):
+def test_debug_error(rule_error, rule_executor, res_collector, test_data_core_profiles):
     my_pdb = Mock()
 
     with patch(
         "ids_validator.validate.rule_executor.pdb",
         post_mortem=my_pdb,
     ):
-        res_collector.set_context(rule_error, [("core_profiles", 0)])
+        res_collector.set_context(
+            rule_error, [(test_data_core_profiles._obj, "core_profiles", 0)]
+        )
         rule_executor.run(rule_error, [1])
         assert len(res_collector.results) == 1
         assert my_pdb.call_count == 1
