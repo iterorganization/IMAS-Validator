@@ -48,6 +48,12 @@ Manual
    code_style
    ci_config
 
+.. toctree::
+   :caption: training
+   :maxdepth: 1
+
+   courses/basic_user_training
+
 
 
 LICENSE

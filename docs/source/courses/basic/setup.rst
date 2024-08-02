@@ -1,4 +1,5 @@
 .. _`basic/setup`:
+
 IDS validator 101: setup
 ========================
 

@@ -1,4 +1,5 @@
 .. _`basic/explore`:
+
 Exploring rulesets with IDS validator
 =====================================
 
@@ -12,10 +13,8 @@ The explore functionality can be called from the terminal by
     $ ids_validator explore
 
 It can use the same filtering flags as the validate module.
-# Do first explore
-# Do explore with custom tests
-# Filter functions explore
 Exercise 1
+
 .. md-tab-set::
 
     .. md-tab-item:: Exercise
@@ -32,13 +31,12 @@ Exercise 1
             $ ids_validator explore -e ids_validator/assets/rulesets/ -r custom_ruleset
             $ ids_validator explore -f errorbars
 
-# Change verbosity
-# Change whether to show empty folders/files
 Since the rule folders can contain a lot of tests and information, the explore function offers the possibility to change the verbosity.
 The --verbose and --no-docstring arguments can be used to change the verbosity of the descriptions.
 The --show-empty argument can be used to change whether or not folders/files without any found rules should be shown.
 
 Exercise 2
+
 .. md-tab-set::
 
     .. md-tab-item:: Exercise
