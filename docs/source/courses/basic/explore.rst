@@ -21,15 +21,16 @@ Exercise 1
     .. md-tab-item:: Exercise
 
         Call the IDS validator explore tool.
-        Call the IDS validator explore tool including the custom tests in ......................
-        Call the IDS validator explore tool filtering only for tests using ..................
+        Call the IDS validator explore tool including the custom tests in 'ids_validator/assets/rulesets/training_custom'
+        Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ bla bla
-            bla bla
+            $ ids_validator explore
+            $ ids_validator explore -e ids_validator/assets/rulesets/ -r custom_ruleset
+            $ ids_validator explore -f errorbars
 
 # Change verbosity
 # Change whether to show empty folders/files
@@ -42,7 +43,7 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator explore tool filtering out the empty folders and files.
+        Call the IDS validator explore tool showing the empty folders and files.
         Call the IDS validator explore tool for different verbosity levels
         What are the differences?
 
@@ -50,5 +51,6 @@ Exercise 2
 
         .. code-block:: console
 
-            $ bla bla
-            bla bla
+            $ ids_validator explore --show-empty
+            $ ids_validator explore --verbose
+            $ ids_validator explore --no_docstring
