@@ -1,6 +1,8 @@
 import argparse
 from typing import Any, List
 
+import imaspy
+
 from ids_validator.validate_options import RuleFilter
 
 
@@ -8,20 +10,7 @@ def get_all_ids_names() -> List[str]:
     """
     Returns list of strings representing all IDSs from Data Dictionary
     """
-    try:
-        from data_dictionary import idsinfo  # type: ignore
-
-        return idsinfo.IDSInfo().get_ids_names()
-    except ImportError:
-        try:
-            from data_dictionary.idsdef import IDSDef  # type: ignore
-
-            ids_def = IDSDef()
-            return ids_def.get_ids_names()
-        except ImportError:
-            import imas  # type: ignore
-
-            return [ids.value for ids in list(imas.IDSName)]
+    return imaspy.IDSFactory().ids_names()
 
 
 def flatten_2d_list_or_return_empty(list_2d: List[List[Any]]) -> List[Any]:
