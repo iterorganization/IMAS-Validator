@@ -3,14 +3,12 @@ Running validations with IDS validator
 ======================================
 
 In this section we start with the core functionality of the IDS validator: running tests on IDS data.
-Some DBentry objects were built specifically for this training course that we will use. You can access them by ............
-
 The easiest way of using the IDS validator is by using the CLI from your terminal.
 The only required argument is the imas_uri of the DBentry object.
 
 .. code-block:: console
 
-    $ ids_validator validate '.........'
+    $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good'
 
 You can use the generic tests or custom built validation tests.
 We start with the generic tests.
@@ -21,17 +19,17 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Run the IDS validator generic tests for the db_entry with url .................
+        Run the IDS validator generic tests for the db_entry with url 'imas:hdf5?path=ids-validator-course/good'
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ bla bla
-            bla bla
+            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good'
 
-Apart from the bundled tests you can use customly built tests by using the CLI arguments (-e, --extra-rule-dirs)
+Apart from the bundled tests you can use customly built tests by using the CLI arguments
 to determine in which ruleset folders the tool should look for IDS validation rules. 
+You can find custom rule folders with (-e, --extra-rule-dirs) and define rulesets with (-r, --ruleset)
 The structure of these rulesets folders is explained in :ref:`defining rules`.
 
 # run local custom test
@@ -40,22 +38,20 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator including custom tests for the db_entry with url .................
-        The custom rules are defined in the ................. folder.
+        Call the IDS validator including custom tests for the db_entry with url 'imas:hdf5?path=ids-validator-course/good'
+        The custom rules are defined in the 'ids_validator/assets/rulesets/training_custom' ruleset folder.
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ bla bla
-            bla bla
+            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids_validator/assets/rulesets/ -r custom_ruleset
 
 # filter rules/rulesets
 If you only want to test specific rules you can filter on:
-- Rule name (....)
-- IDS name (....)
-- Rulesets (-r, --ruleset)
-- Whether or not to use bundled rules (....)
+- Rule name (-f, --filter, --filter_name)
+- IDS name (-f, --filter, --filter_ids)
+- Whether or not to use bundled rules (-b, --no-bundled)
 - Whether or not to use tests for all IDSs (-g, --no-generic)
 
 Exercise 3
@@ -63,17 +59,19 @@ Exercise 3
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator including custom tests for the db_entry with url .................
-        The custom rules are defined in the ................. folder.
-        Run only the ..... tests.
+        Call the IDS validator including custom tests for the db_entry with url 'imas:hdf5?path=ids-validator-course/good'
+        The custom rules are defined in the 'ids_validator/assets/rulesets/training_custom' folder.
+        Run only the custom tests.
         Try out all the filtering options.
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ bla bla
-            bla bla
+            # no bundled
+            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids_validator/assets/rulesets/ -r custom_ruleset -g
+            # filter both name and ids on 'homogeneous'
+            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids_validator/assets/rulesets/ -r custom_ruleset -f homogeneous
 
 
 # drop in using pdb
@@ -85,7 +83,7 @@ Exercise 4
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator bundled tests for the db_entry with url ................. with the debugger argument. 
+        Call the IDS validator bundled tests for the db_entry with url 'imas:hdf5?path=ids-validator-course/bad' with the debugger argument. 
         What is the problem with this DBentry?
         
 
@@ -93,8 +91,8 @@ Exercise 4
 
         .. code-block:: console
 
-            $ bla bla
-            bla bla
+            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -d
+            Time axis at toplevel is decreasing.
 
 .. note::
 

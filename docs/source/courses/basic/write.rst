@@ -16,13 +16,13 @@ For a quick reminder of the ruleset structure look at :ref:`defining rules`.
 Read through :ref:`defining rules` and :ref:`rule tutorual` for information about writing IDS validation rules.
 
 # write obvious test, then write test with optional message
-Exercise 1
+Exercise x
 .. md-tab-set::
 
     .. md-tab-item:: Exercise
 
-        Write a simple test to determine whether all ``equilibrium`` IDSs have a comment in their ``ids_properties`` attribute.
-        Does the DBentry for ............ pass the test?
+        Write a simple test to determine whether all ``core_profiles`` IDSs have a comment in their ``ids_properties`` attribute.
+        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
         .. note::
             If the assert statement is clear on its own, no need to add a custom message.
             Better to use those if the problem is not immediately recognizable from the test/code.
@@ -35,14 +35,47 @@ Exercise 1
             bla bla
 
 # go through available helper funcs (also imaspy has_value)
-Exercise 2
+Exercise x
+.. md-tab-set::
+
+    .. md-tab-item:: Exercise
+
+        Write a test for ``core_profiles`` IDSs to determine whether the ``time`` array is strictly increasing.
+        Use the :py:class:`~ids_validator.rules.helpers.Increasing` helper function.
+        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+
+    .. md-tab-item:: Solution
+
+        .. code-block:: console
+
+            $ bla bla
+            bla bla
+
+Exercise x
+.. md-tab-set::
+
+    .. md-tab-item:: Exercise
+
+        Write a test for ``waves`` IDSs to determine whether the ... is approximately the same as ....
+        Use the :py:class:`~ids_validator.rules.helpers.Approx` helper function.
+        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        What if you use a comparison operator ``==`` instead of the ``Approx`` helper function?
+
+    .. md-tab-item:: Solution
+
+        .. code-block:: console
+
+            $ bla bla
+            bla bla
+
+Exercise x
 .. md-tab-set::
 
     .. md-tab-item:: Exercise
 
         Write a test for all IDSs to determine whether any ``_error_lower`` values are positive.
         Use the :py:class:`~ids_validator.rules.helpers.Select` helper function.
-        Does the DBentry for ............ pass the test?
+        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
 
         .. hint::
             :collapsible:
@@ -55,7 +88,7 @@ Exercise 2
             $ bla bla
             bla bla
 
-Exercise 3
+Exercise x
 .. md-tab-set::
 
     .. md-tab-item:: Exercise
@@ -63,7 +96,7 @@ Exercise 3
         Write a test for all IDSs to determine whether any case where a ``_min`` and its corresponding ``_max``
         value both exist, the ``_min`` is lower than the ``_max``.
         Use the :py:class:`~ids_validator.rules.helpers.Parent` helper function.
-        Does the DBentry for ............ pass the test?
+        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
 
         .. hint::
             :collapsible:
@@ -77,24 +110,8 @@ Exercise 3
             $ bla bla
             bla bla
 
-Exercise 4
-.. md-tab-set::
-
-    .. md-tab-item:: Exercise
-
-        Write a test for all IDSs to determine whether any ``_time`` arrays are strictly increasing.
-        Use the :py:class:`~ids_validator.rules.helpers.Increasing` helper function.
-        Does the DBentry for ............ pass the test?
-
-    .. md-tab-item:: Solution
-
-        .. code-block:: console
-
-            $ bla bla
-            bla bla
-
 # write test that only works for specific db_entry version
-Exercise 5
+Exercise x
 .. md-tab-set::
 
     .. md-tab-item:: Exercise

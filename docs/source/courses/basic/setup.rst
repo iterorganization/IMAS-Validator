@@ -10,3 +10,10 @@ To check if your installation worked, try
 
     $ python -c 'import ids_validator; print(ids_validator.__version__)'
     1.0.0
+
+Some IMASpy DBEntry objects were built specifically for this training course that we will use.
+You can build them by running
+
+.. code-block:: console
+
+    $ python -m ids_validator.training.create_db_entry

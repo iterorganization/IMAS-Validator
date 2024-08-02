@@ -9,7 +9,7 @@ The explore functionality can be called from the terminal by
 
 .. code-block:: console
 
-    $ ids_validator explore '.........'
+    $ ids_validator explore
 
 It can use the same filtering flags as the validate module.
 # Do first explore
