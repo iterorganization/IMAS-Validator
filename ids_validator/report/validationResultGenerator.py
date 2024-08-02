@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from typing import List, Optional
 from xml.dom import minidom
+from pathlib import Path
 
 from ids_validator.validate.result import IDSValidationResult
 
@@ -186,7 +187,11 @@ class ValidationResultGenerator:
         """
         if not file_name:
             today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            file_name = f"test_result_{today}.xml"
+            dir_path = Path('validate_reports')
+            if not dir_path.is_dir():
+                dir_path.mkdir(parents=False, exist_ok=False)
+            file_name = Path.joinpath(dir_path, f"test_result_{today}.xml")
+
 
         with open(file_name, "w+") as f:
             f.write(self._junit_xml)
@@ -203,8 +208,11 @@ class ValidationResultGenerator:
         Return:
         """
         if not file_name:
+            dir_path = Path('validate_reports')
+            if not dir_path.is_dir():
+                dir_path.mkdir(parents=False, exist_ok=False)
             today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            file_name = f"summary_report_{today}.txt"
+            file_name = Path.joinpath(dir_path, f"summary_report_{today}.txt")
 
         with open(file_name, "w+") as f:
             f.write(self._junit_txt)
