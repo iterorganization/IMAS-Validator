@@ -163,13 +163,6 @@ def test_rewritten_rule(res_collector, rewritten_rule, test_data_core_profiles):
     assert val_result.exc is None
 
 
-# def test_visited_nodes_dict(res_collector):
-
-# def test_db_entry_nodes_dict():
-
-# def test_coverage_dict():
-
-
 def test_nodes_dicts(res_collector, rule, test_data_core_profiles, test_data_waves):
     for i in range(2):
         res_collector.set_context(
@@ -182,6 +175,7 @@ def test_nodes_dicts(res_collector, rule, test_data_core_profiles, test_data_wav
         cp_time = test_data_core_profiles.ids_properties.homogeneous_time
         waves_time = test_data_waves.ids_properties.homogeneous_time
         rule.func(cp_time == waves_time)
+    # test visited nodes
     assert res_collector.visited_nodes_dict == {
         ("core_profiles", 0): {"ids_properties/homogeneous_time"},
         ("core_profiles", 1): {"ids_properties/homogeneous_time"},
@@ -189,6 +183,7 @@ def test_nodes_dicts(res_collector, rule, test_data_core_profiles, test_data_wav
         ("waves", 1): {"ids_properties/homogeneous_time"},
     }
 
+    # test filled nodes
     assert {
         key: len(value) for key, value in res_collector.filled_nodes_dict.items()
     } == {
@@ -198,6 +193,7 @@ def test_nodes_dicts(res_collector, rule, test_data_core_profiles, test_data_wav
         ("waves", 1): 6,
     }
 
+    # test coverage_dict
     expected_dict = {
         ("core_profiles", i): CoverageMap(
             filled=9,
