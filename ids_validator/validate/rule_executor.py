@@ -82,7 +82,7 @@ class RuleExecutor:
                 pdb.post_mortem(tb)
         finally:
             if len(self.result_collector.results) == res_num:
-                logger.warning(
+                logger.info(
                     f"No assertions in {rule.name}. "
                     "Make sure the validation test is testing something "
                     "with an assert statement."

@@ -6,13 +6,14 @@ import pytest
 from ids_validator.rules.ast_rewrite import rewrite_assert
 from ids_validator.rules.data import ValidatorRegistry
 from ids_validator.validate.ids_wrapper import IDSWrapper
+from ids_validator.validate.result import CoverageMap
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate_options import ValidateOptions
 
 
 @pytest.fixture
 def res_collector():
-    res_col = ResultCollector(validate_options=ValidateOptions(), db_entry="")
+    res_col = ResultCollector(validate_options=ValidateOptions(), imas_uri="")
     return res_col
 
 
@@ -60,7 +61,7 @@ def check_attrs(val_result, success):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == "cool_func_name"
     assert val_result.idss == [("core_profiles", 0)]
-    assert val_result.tb[-1].lineno == 27
+    assert val_result.tb[-1].lineno == 24
     assert val_result.exc is None
 
 
@@ -69,7 +70,7 @@ def check_attrs_error(val_result):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == val_result.tb[-1].name == "func_error"
     assert val_result.idss == [("core_profiles", 0)]
-    assert val_result.tb[-1].lineno == 38
+    assert val_result.tb[-1].lineno == 35
     assert isinstance(val_result.exc, ZeroDivisionError)
 
 
@@ -198,18 +199,18 @@ def test_nodes_dicts(res_collector, rule, test_data_core_profiles, test_data_wav
     }
 
     expected_dict = {
-        ("core_profiles", i): {
-            "filled": 9,
-            "visited": 1,
-            "overlap": 1,
-        }
+        ("core_profiles", i): CoverageMap(
+            filled=9,
+            visited=1,
+            overlap=1,
+        )
         for i in range(2)
     } | {
-        ("waves", i): {
-            "filled": 6,
-            "visited": 1,
-            "overlap": 1,
-        }
+        ("waves", i): CoverageMap(
+            filled=6,
+            visited=1,
+            overlap=1,
+        )
         for i in range(2)
     }
     assert res_collector.coverage_dict() == expected_dict

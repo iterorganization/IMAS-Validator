@@ -15,7 +15,7 @@ def validate_options():
 
 @pytest.fixture
 def res_collector(validate_options):
-    res_col = ResultCollector(validate_options=validate_options, db_entry="")
+    res_col = ResultCollector(validate_options=validate_options, imas_uri="")
     return res_col
 
 

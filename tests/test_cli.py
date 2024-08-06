@@ -59,6 +59,10 @@ def test_validate_command_str_cast():
         extra_rule_dirs=[[""]],
         no_generic=True,
         debug=False,
+        no_bundled=False,
+        filter_name=[],
+        filter_ids=[],
+        filter=[["homogeneous_time", "core_profiles"]],
     )
 
     command_object = validate_command.ValidateCommand(args)
@@ -68,8 +72,8 @@ def test_validate_command_str_cast():
     assert command_object.validate_options.extra_rule_dirs == [Path(".")]
     assert command_object.validate_options.apply_generic
     assert not command_object.validate_options.use_pdb
-    assert command_object.validate_options.rule_filter.name == []
-    assert command_object.validate_options.rule_filter.ids == []
+    assert command_object.validate_options.rule_filter.name == ["homogeneous_time"]
+    assert command_object.validate_options.rule_filter.ids == ["core_profiles"]
 
 
 def test_explore_command():
