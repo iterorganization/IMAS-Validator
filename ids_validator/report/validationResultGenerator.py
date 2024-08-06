@@ -186,7 +186,7 @@ class ValidationResultGenerator:
         Return:
         """
         if not file_name:
-            file_name = self.gen_default_file_path("test_resut", "xml")
+            file_name = self.gen_default_file_path("test_result", "xml")
 
         with open(file_name, "w+") as f:
             f.write(self._junit_xml)
