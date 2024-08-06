@@ -5,7 +5,7 @@ validation tool
 
 import logging
 import traceback
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Tuple
 
 import imaspy.util
 from imaspy.ids_primitive import IDSPrimitive
@@ -17,11 +17,11 @@ from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import (
     IDSValidationResult,
     IDSValidationResultCollection,
+    NodesDict
 )
 from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
-NODES_DICT = Dict[Tuple[str, int], Set[str]]
 
 
 class ResultCollector:
@@ -41,8 +41,8 @@ class ResultCollector:
         self.results: List[IDSValidationResult] = []
         self.validate_options = validate_options
         self.imas_uri = imas_uri
-        self.visited_nodes_dict: NODES_DICT = {}
-        self.filled_nodes_dict: NODES_DICT = {}
+        self.visited_nodes_dict: NodesDict = {}
+        self.filled_nodes_dict: NodesDict = {}
 
     def set_context(
         self, rule: IDSValidationRule, idss: List[Tuple[IDSToplevel, str, int]]
@@ -81,7 +81,6 @@ class ResultCollector:
             tb,
             {},
             exc=exc,
-            imas_uri=self.imas_uri,
         )
         self.results.append(result)
         self.append_nodes_dict({}, self._current_idss)
@@ -111,7 +110,6 @@ class ResultCollector:
             tb,
             nodes_dict,
             exc=None,
-            imas_uri=self.imas_uri,
         )
         self.results.append(result)
         self.append_nodes_dict(nodes_dict, self._current_idss)
@@ -119,14 +117,14 @@ class ResultCollector:
         if self.validate_options.use_pdb and not res_bool:
             raise InternalValidateDebugException()
 
-    def create_nodes_dict(self, ids_nodes: List[IDSPrimitive]) -> NODES_DICT:
+    def create_nodes_dict(self, ids_nodes: List[IDSPrimitive]) -> NodesDict:
         """
         Create dict with list of touched nodes for the IDSValidationResult object
 
         Args:
             ids_nodes: List of IDSPrimitive nodes that have been touched in this test
         """
-        nodes_dict: NODES_DICT = {
+        nodes_dict: NodesDict = {
             (name, occ): set() for _, name, occ in self._current_idss
         }
         occ_dict = {name: (name, occ) for _, name, occ in self._current_idss}
@@ -137,8 +135,15 @@ class ResultCollector:
         return nodes_dict
 
     def append_nodes_dict(
-        self, nodes_dict: NODES_DICT, idss: List[Tuple[IDSToplevel, str, int]]
+        self, nodes_dict: NodesDict, idss: List[Tuple[IDSToplevel, str, int]]
     ) -> None:
+        """
+        Add touched nodes and filled nodes to nodes_dicts during assert
+
+        Args:
+            nodes_dict: dict of touched nodes during validation process
+            idss: Tuple of ids_instances, ids_names and occurrences
+        """
         for key, value in nodes_dict.items():
             if key not in self.visited_nodes_dict.keys():
                 self.visited_nodes_dict[key] = set()
@@ -155,6 +160,10 @@ class ResultCollector:
             )
 
     def coverage_dict(self) -> Dict[Tuple[str, int], Dict[str, float]]:
+        """
+        Return a dictionary of IDSs showing how many nodes per IDS are covered in
+        different categories
+        """
         coverage_dict: Dict[Tuple[str, int], Dict[str, float]] = {}
         visited_nodes_dict = self.visited_nodes_dict
         filled_nodes_dict = self.filled_nodes_dict
@@ -169,6 +178,9 @@ class ResultCollector:
         return coverage_dict
 
     def result_collection(self) -> IDSValidationResultCollection:
+        """
+        Return object detailing the final results of validation process
+        """
         return IDSValidationResultCollection(
             results=self.results,
             coverage_dict=self.coverage_dict(),

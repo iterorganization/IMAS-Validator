@@ -10,6 +10,8 @@ from typing import Dict, List, Optional, Set, Tuple
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate_options import ValidateOptions
 
+NodesDict = Dict[Tuple[str, int], Set[str]]
+
 
 @dataclass
 class IDSValidationResult:
@@ -25,13 +27,11 @@ class IDSValidationResult:
     """Tuple of ids_names and occurrences"""
     tb: traceback.StackSummary
     """A stack of traceback frames"""
-    nodes_dict: Dict[Tuple[str, int], Set[str]]
+    nodes_dict: NodesDict
     """
     Set of nodes that have contributed in this result, identified by a combination of
     the ids name and occurence
     """
-    imas_uri: str
-    """URI of dbentry being tested"""
     exc: Optional[Exception] = None
     """Exception that was encountered while running validation test"""
 
