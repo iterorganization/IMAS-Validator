@@ -5,7 +5,7 @@ validation tool
 
 import logging
 import traceback
-from typing import Any, Dict, List, Tuple
+from typing import Any, List, Tuple
 
 import imaspy.util
 from imaspy.ids_primitive import IDSPrimitive
@@ -15,9 +15,11 @@ from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
 from ids_validator.validate.result import (
+    CoverageDict,
+    CoverageMap,
     IDSValidationResult,
     IDSValidationResultCollection,
-    NodesDict
+    NodesDict,
 )
 from ids_validator.validate_options import ValidateOptions
 
@@ -159,22 +161,22 @@ class ResultCollector:
                 visit_empty=False,
             )
 
-    def coverage_dict(self) -> Dict[Tuple[str, int], Dict[str, float]]:
+    def coverage_dict(self) -> CoverageDict:
         """
         Return a dictionary of IDSs showing how many nodes per IDS are covered in
         different categories
         """
-        coverage_dict: Dict[Tuple[str, int], Dict[str, float]] = {}
+        coverage_dict: CoverageDict = {}
         visited_nodes_dict = self.visited_nodes_dict
         filled_nodes_dict = self.filled_nodes_dict
         for key in filled_nodes_dict.keys():
             filled = filled_nodes_dict[key]
             visited = visited_nodes_dict[key]
-            coverage_dict[key] = {
-                "filled": len(filled),
-                "visited": len(visited),
-                "overlap": len(visited & filled),
-            }
+            coverage_dict[key] = CoverageMap(
+                filled=len(filled),
+                visited=len(visited),
+                overlap=len(visited & filled),
+            )
         return coverage_dict
 
     def result_collection(self) -> IDSValidationResultCollection:

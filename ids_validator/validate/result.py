@@ -37,12 +37,27 @@ class IDSValidationResult:
 
 
 @dataclass
+class CoverageMap:
+    """Class for tracking coverage of given IDSTopLevel"""
+
+    filled: int
+    """Number of filled nodes in validation process"""
+    visited: int
+    """Number of visited nodes in validation process"""
+    overlap: int
+    """Number of nodes both filled and visited in validation process"""
+
+
+CoverageDict = Dict[Tuple[str, int], CoverageMap]
+
+
+@dataclass
 class IDSValidationResultCollection:
     """Class for collection of all results of validation run"""
 
     results: List[IDSValidationResult]
     """List of result objects"""
-    coverage_dict: Dict[Tuple[str, int], Dict[str, float]]
+    coverage_dict: CoverageDict
     """Dict with number of filled, visited and overlapping nodes per ids/occ"""
     validate_options: ValidateOptions
     """Options which with validation run was started"""
