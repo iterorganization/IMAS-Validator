@@ -7,7 +7,7 @@ from ids_validator.validate.validate import validate
 
 
 @pytest.mark.skipif(
-    imaspy.__version__ < Version("1.1"),
+    Version(imaspy.__version__) < Version("1.1"),
     reason="fill_consistent needs arg leave_empty",
 )
 @pytest.mark.parametrize("ids_name", imaspy.IDSFactory().ids_names())
