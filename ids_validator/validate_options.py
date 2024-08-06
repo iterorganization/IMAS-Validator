@@ -15,7 +15,7 @@ class RuleFilter:
     name: List[str] = field(default_factory=list)
     """List of strings that should be present in rule name"""
     ids: List[str] = field(default_factory=list)
-    """List of strings that should be present rule ids_names"""
+    """List of strings that should be present in rule ids_names"""
 
     def is_selected(self, rule: IDSValidationRule) -> bool:
         """Check whether rule should be applied or not

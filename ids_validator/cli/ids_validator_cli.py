@@ -115,6 +115,45 @@ def configure_argument_parser() -> argparse.ArgumentParser:
                 available under RULESET_PATH variable.""",
     )
 
+    # Options common for validate and explore commands
+    for group in [validate_group, explore_group]:
+        group.add_argument(
+            "-b",
+            "--no-bundled",
+            action="store_true",
+            default=False,
+            help="Disable rulesets bundled with ids_validator.",
+        )
+
+        group.add_argument(
+            "-f",
+            "--filter",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Specify combined list of rule names and ids names"
+            " that should be present in rule",
+        )
+
+        group.add_argument(
+            "--filter_name",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Specify list of strings that should be present in rule name",
+        )
+
+        group.add_argument(
+            "--filter_ids",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Specify list of strings that should be present in rule ids names",
+        )
+
     return parser
 
 
