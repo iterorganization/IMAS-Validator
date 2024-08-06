@@ -43,7 +43,7 @@ def validate(
     _check_imas_version()
     dbentry = DBEntry(imas_uri, "r")
     result_collector = ResultCollector(
-        validate_options=validate_options, db_entry=dbentry
+        validate_options=validate_options, imas_uri=imas_uri
     )
     rules = load_rules(
         result_collector=result_collector,

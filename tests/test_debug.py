@@ -15,9 +15,7 @@ def validate_options():
 
 @pytest.fixture
 def res_collector(validate_options):
-    dbentry_mock = Mock
-    dbentry_mock.uri = ""
-    res_col = ResultCollector(validate_options=validate_options, db_entry=dbentry_mock)
+    res_col = ResultCollector(validate_options=validate_options, db_entry="")
     return res_col
 
 

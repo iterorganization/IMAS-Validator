@@ -8,7 +8,6 @@ import traceback
 from typing import Any, Dict, List, Set, Tuple
 
 import imaspy.util
-from imaspy import DBEntry
 from imaspy.ids_primitive import IDSPrimitive
 from imaspy.ids_toplevel import IDSToplevel
 
@@ -31,7 +30,7 @@ class ResultCollector:
     def __init__(
         self,
         validate_options: ValidateOptions,
-        db_entry: DBEntry,
+        imas_uri: str,
     ) -> None:
         """
         Initialize ResultCollector
@@ -41,7 +40,7 @@ class ResultCollector:
         """
         self.results: List[IDSValidationResult] = []
         self.validate_options = validate_options
-        self.db_entry = db_entry
+        self.imas_uri = imas_uri
         self.visited_nodes_dict: NODES_DICT = {}
         self.filled_nodes_dict: NODES_DICT = {}
 
@@ -82,7 +81,7 @@ class ResultCollector:
             tb,
             {},
             exc=exc,
-            imas_uri=self.db_entry.uri,
+            imas_uri=self.imas_uri,
         )
         self.results.append(result)
         self.append_nodes_dict({}, self._current_idss)
@@ -112,7 +111,7 @@ class ResultCollector:
             tb,
             nodes_dict,
             exc=None,
-            imas_uri=self.db_entry.uri,
+            imas_uri=self.imas_uri,
         )
         self.results.append(result)
         self.append_nodes_dict(nodes_dict, self._current_idss)
@@ -174,4 +173,5 @@ class ResultCollector:
             results=self.results,
             coverage_dict=self.coverage_dict(),
             validate_options=self.validate_options,
+            imas_uri=self.imas_uri,
         )

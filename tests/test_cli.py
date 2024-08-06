@@ -70,3 +70,9 @@ def test_validate_command_str_cast():
     assert not command_object.validate_options.use_pdb
     assert command_object.validate_options.rule_filter.name == []
     assert command_object.validate_options.rule_filter.ids == []
+
+
+def test_explore_command():
+    argv = ["explore"]
+
+    ids_validator_cli.main(argv)

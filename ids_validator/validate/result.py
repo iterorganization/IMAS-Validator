@@ -46,3 +46,5 @@ class IDSValidationResultCollection:
     """Dict with number of filled, visited and overlapping nodes per ids/occ"""
     validate_options: ValidateOptions
     """Options which with validation run was started"""
+    imas_uri: str
+    """URI of dbentry being tested"""

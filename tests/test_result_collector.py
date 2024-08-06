@@ -12,11 +12,7 @@ from ids_validator.validate_options import ValidateOptions
 
 @pytest.fixture
 def res_collector():
-    db_entry_mock = Mock
-    db_entry_mock.uri = ""
-    res_col = ResultCollector(
-        validate_options=ValidateOptions(), db_entry=db_entry_mock
-    )
+    res_col = ResultCollector(validate_options=ValidateOptions(), db_entry="")
     return res_col
 
 
