@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import List, Optional
 from xml.dom import minidom
 
@@ -185,8 +186,7 @@ class ValidationResultGenerator:
         Return:
         """
         if not file_name:
-            today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            file_name = f"test_result_{today}.xml"
+            file_name = self.gen_default_file_path("test_result", "xml")
 
         with open(file_name, "w+") as f:
             f.write(self._junit_xml)
@@ -203,11 +203,18 @@ class ValidationResultGenerator:
         Return:
         """
         if not file_name:
-            today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            file_name = f"summary_report_{today}.txt"
+            file_name = self.gen_default_file_path("summary_report", "txt")
 
         with open(file_name, "w+") as f:
             f.write(self._junit_txt)
             print(
                 f"Generated JUnit summary report saved as: {os.path.abspath(file_name)}"
             )
+
+    def gen_default_file_path(self, def_file_name: str, suffix: str) -> str:
+        dir_path = Path("validate_reports")
+        if not dir_path.is_dir():
+            dir_path.mkdir(parents=False, exist_ok=False)
+        today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        file_name = str(dir_path / f"{def_file_name}_{today}.{suffix}")
+        return file_name
