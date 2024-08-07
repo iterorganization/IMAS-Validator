@@ -2,6 +2,10 @@ import argparse
 import logging
 from pathlib import Path
 
+from ids_validator.common.utils import (
+    flatten_2d_list_or_return_empty,
+    prepare_rule_filter_object,
+)
 from ids_validator.validate.validate import validate
 from ids_validator.validate_options import ValidateOptions
 
@@ -16,25 +20,15 @@ class ValidateCommand(GenericCommand):
         super(ValidateCommand, self).__init__(args)
         self.uri = args.uri[0]
         self.validate_options = ValidateOptions(
-            # List comprehension for flattening 2D list into 1D.
-            # CLI After providing -r option passes this argument as [['ruleset' ...]]
-            rulesets=[
-                ruleset for given_rulesets in args.ruleset for ruleset in given_rulesets
+            rulesets=flatten_2d_list_or_return_empty(args.ruleset),
+            extra_rule_dirs=[
+                Path(element)
+                for element in flatten_2d_list_or_return_empty(args.extra_rule_dirs)
             ],
-            # List comprehension for flattening 2D list into 1D.
-            # CLI After providing -r option passes this argument as [['ruleset' ...]]
-            # If empty return empty list
-            extra_rule_dirs=(
-                [
-                    Path(extra_ruleset)
-                    for given_extra_rulesets in args.extra_rule_dirs
-                    for extra_ruleset in given_extra_rulesets
-                ]
-                if args.extra_rule_dirs
-                else []
-            ),
             apply_generic=args.no_generic,
             use_pdb=args.debug,
+            use_bundled_rulesets=not args.no_bundled,  # invert logic
+            rule_filter=prepare_rule_filter_object(args),
         )
 
     def execute(self) -> None:
