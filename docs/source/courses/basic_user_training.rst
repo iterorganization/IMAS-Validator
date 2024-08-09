@@ -8,7 +8,7 @@ the IDS validator. You will need some basic familiarity with Python. For a refre
 the `Python tutorial <https://docs.python.org/3/tutorial/>`_. We also assume
 some basic knowledge of the `ITER IMAS infrastructure <https://imas.iter.org>`_.
 You can find any info for IDS validator you need in the
-`IDS validator documentation<https://git.iter.org/projects/IMEX/repos/ids-validator/browse>`_.
+:ref:`IDS validator documentation <index>`.
 
 .. toctree::
     :caption: Training contents
@@ -16,5 +16,6 @@ You can find any info for IDS validator you need in the
 
     basic/setup
     basic/run
+    basic/debug
     basic/explore
     basic/write

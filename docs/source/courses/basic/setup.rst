@@ -18,3 +18,5 @@ You can build them by running
 .. code-block:: console
 
     $ python -m ids_validator.training.create_db_entry
+
+These are then generated into a folder 'ids-validator-course' in your current working directory.

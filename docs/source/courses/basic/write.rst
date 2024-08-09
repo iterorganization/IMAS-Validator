@@ -16,7 +16,8 @@ For a quick reminder of the ruleset structure look at :ref:`defining rules`.
 
 Read through :ref:`defining rules` and :ref:`rule tutorial` for information about writing IDS validation rules.
 
-Exercise x
+Exercise 1
+----------
 
 .. md-tab-set::
 
@@ -40,8 +41,8 @@ Exercise x
                 """Test whether the comments are filled in for all core_profiles IDSs"""
                 assert cp.ids_properties.comment is not None
 
-
-Exercise x
+Exercise 2
+----------
 
 .. md-tab-set::
 
@@ -62,7 +63,8 @@ Exercise x
                 """Test whether the core_profiles base level time arrays are strictly increasing"""
                 assert Increasing(cp.time)
 
-Exercise x
+Exercise 3
+----------
 
 .. md-tab-set::
 
@@ -70,7 +72,7 @@ Exercise x
 
         Write a test for ``core_profiles`` IDSs to determine whether the profiles follow electroneutrality.
         Use the :py:class:`~ids_validator.rules.helpers.Approx` helper function.
-        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
         What if you use a comparison operator ``==`` instead of the ``Approx`` helper function?
 
     .. md-tab-item:: Tip
@@ -95,7 +97,8 @@ Exercise x
                     ni_zi = sum(ion.density * ion.z_ion for ion in profiles_1d.ion)
                     assert Approx(profiles_1d.electrons.density, ni_zi)
 
-Exercise x
+Exercise 4
+----------
 
 .. md-tab-set::
 
@@ -103,7 +106,7 @@ Exercise x
 
         Write a test for all IDSs to determine whether any ``_error_lower`` values are positive.
         Use the :py:class:`~ids_validator.rules.helpers.Select` helper function.
-        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
 
     .. md-tab-item:: Tip
 
@@ -123,7 +126,8 @@ Exercise x
                     for error_lower in Select(ids, "_error_lower$", has_value=True):
                         assert error_lower >= 0
 
-Exercise x
+Exercise 5
+----------
 
 .. md-tab-set::
 
@@ -132,7 +136,7 @@ Exercise x
         Write a test for all IDSs to determine whether in any case where a ``_min`` and its corresponding ``_max``
         value both exist, the ``_min`` is lower than the ``_max``.
         Use the :py:class:`~ids_validator.rules.helpers.Parent` helper function.
-        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
 
     .. md-tab-item:: Tip
 
@@ -156,7 +160,8 @@ Exercise x
                     if quantity_max is not None and quantity_max.has_value:
                         assert quantity_min <= quantity_max
 
-Exercise x
+Exercise 6
+----------
 
 .. md-tab-set::
 
@@ -172,7 +177,8 @@ Exercise x
             bla bla
             bla bla
 
-Exercise x
+Exercise 7
+----------
 
 .. md-tab-set::
 
@@ -183,7 +189,7 @@ Exercise x
         Keep in mind that the occurrence number of an IDS needs to be specified for multi-ids validation.
         You can specify the occurrence number by writing the ids name like
         ``core_profiles:0`` in the ``@validator`` decorator.
-        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
         What happens if you do not specify the occurrence number?
 
     .. md-tab-item:: Solution

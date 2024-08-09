@@ -1,3 +1,5 @@
+.. _`index`:
+
 .. 
    Main "index". This will be converted to a landing index.html by sphinx. We
    define TOC here, but it'll be put in the sidebar by the theme
