@@ -32,7 +32,7 @@ Exercise 1
 # TODO: explain how to interpret the summary report
 
 You might want to develop or simply use your own custom tests in addition to the standard
-bundled validation tests. You can use customly built tests by adding CLI arguments
+bundled validation tests. You can add customly built tests to the validation process by adding CLI flags
 to determine in which ruleset folders the tool should look for IDS validation rules. 
 You can find custom rule folders with the (-e, --extra-rule-dirs) flag and define rulesets
 with the (-r, --ruleset) flag.
@@ -53,8 +53,7 @@ Exercise 2
     .. md-tab-item:: Exercise
 
         Call the IDS validator including custom tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/good``
-        The custom rules are defined in the 'ids-validator-training-rulesets/training_custom' ruleset folder.
-        # TODO: copy ruledir to cwd in setup?
+        The custom rules are defined in the 'ids-validator-training-rulesets/custom-rulesets' ruleset folder.
 
     .. md-tab-item:: Solution
 

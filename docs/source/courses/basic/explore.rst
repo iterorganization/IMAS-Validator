@@ -23,7 +23,7 @@ Exercise 1
 
         Call the IDS validator explore tool.
 
-        Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/training_custom'
+        Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/custom-rulesets'
 
         Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name
 
@@ -38,8 +38,9 @@ Exercise 1
             $ ids_validator explore -f errorbars
 
 Since the rule folders can contain a lot of tests and information, the explore function offers the possibility to change the verbosity.
-The --verbose and --no-docstring flags can be used to change the verbosity of the descriptions.
-The --show-empty flag can be used to change whether or not folders/files without any found rules should be shown.
+
+- The --verbose and --no-docstring flags can be used to change the verbosity of the descriptions.
+- The --show-empty flag can be used to change whether or not folders/files without any found rules should be shown.
 
 Exercise 2
 ----------

@@ -20,4 +20,4 @@ You can build them by running
 
     $ python -m ids_validator.training.training_setup
 
-These are then generated into a 'ids-validator-course' and a 'ids-validator-training-rulesets' folder in your current working directory.
+These are then generated into a ``ids-validator-course`` and a ``ids-validator-training-rulesets`` folder in your current working directory.

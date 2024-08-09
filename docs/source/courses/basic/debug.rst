@@ -62,4 +62,5 @@ Exercise 2
         .. code-block:: console
 
             $ ids_validator validate 'imas:hdf5?path=ids-validator-course/bad' -f increasing_time -d
-            Time axis at toplevel is decreasing instead of increasing.
+
+        Time axis at toplevel is decreasing instead of increasing.
