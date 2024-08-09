@@ -62,7 +62,7 @@ def test_validate_command_str_cast():
         no_bundled=False,
         filter_name=[],
         filter_ids=[],
-        filter=[["homogeneous_time", "core_profiles"]]
+        filter=[["homogeneous_time", "core_profiles"]],
     )
 
     command_object = validate_command.ValidateCommand(args)

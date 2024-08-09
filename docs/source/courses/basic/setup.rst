@@ -13,10 +13,11 @@ To check if your installation worked, try
     1.0.0
 
 Some IMASpy DBEntry objects were built specifically for this training course that we will use.
+We also have some custom validation rulesets that we will use.
 You can build them by running
 
 .. code-block:: console
 
-    $ python -m ids_validator.training.create_db_entry
+    $ python -m ids_validator.training.training_setup
 
-These are then generated into a folder 'ids-validator-course' in your current working directory.
+These are then generated into a 'ids-validator-course' and a 'ids-validator-training-rulesets' folder in your current working directory.

@@ -23,7 +23,7 @@ Exercise 1
 
         Call the IDS validator explore tool.
 
-        Call the IDS validator explore tool including the custom tests in 'ids_validator/assets/rulesets/training_custom'
+        Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/training_custom'
 
         Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name
 
@@ -33,7 +33,7 @@ Exercise 1
 
             $ ids_validator explore
 
-            $ ids_validator explore -e ids_validator/assets/rulesets/ -r custom_ruleset
+            $ ids_validator explore -e ids-validator-training-rulesets/ -r custom_ruleset
 
             $ ids_validator explore -f errorbars
 

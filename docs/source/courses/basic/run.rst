@@ -53,14 +53,14 @@ Exercise 2
     .. md-tab-item:: Exercise
 
         Call the IDS validator including custom tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/good``
-        The custom rules are defined in the 'ids_validator/assets/rulesets/training_custom' ruleset folder.
+        The custom rules are defined in the 'ids-validator-training-rulesets/training_custom' ruleset folder.
         # TODO: copy ruledir to cwd in setup?
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids_validator/assets/rulesets/ -r custom_ruleset
+            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids-validator-training-rulesets/ -r custom_ruleset
             
 Exercise 3
 ----------

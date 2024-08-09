@@ -2,13 +2,16 @@
 This file describes the functions needed for the training course
 """
 
+import os
+import shutil
+from pathlib import Path
+
 import imaspy
 import numpy
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 
-# function for good db_entry
-# function for bad db_entry
+from ids_validator import get_project_root
 
 
 def training_core_profiles() -> IDSToplevel:
@@ -96,5 +99,16 @@ def create_training_db_entries() -> None:
         print(entry.uri)
 
 
+def copy_training_tests_to_cwd() -> None:
+    training_rule_dir = (
+        get_project_root() / "ids_validator" / "assets" / "rulesets" / "custom_ruleset"
+    )
+    shutil.copytree(
+        training_rule_dir,
+        Path(os.getcwd()) / "ids-validator-training-rulesets" / "custom_ruleset",
+    )
+
+
 if __name__ == "__main__":
     create_training_db_entries()
+    copy_training_tests_to_cwd()
