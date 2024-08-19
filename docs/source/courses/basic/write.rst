@@ -10,11 +10,29 @@ For a quick reminder of the ruleset structure look at :ref:`defining rules`.
 .. hint::
     :collapsible:
 
+    To create a new relu set ``my_ruleset`` with one (empty) rule file, run
+
     .. code-block:: console
 
-        $ mkdir -p tmp/my_ruledir/my_ruleset/my_rulefile.py
+        $ mkdir -p tmp/my_ruledir/my_ruleset/
+        $ touch tmp/my_ruledir/my_ruleset/my_rulefile.py
 
-Read through :ref:`defining rules` and :ref:`rule tutorial` for information about writing IDS validation rules.
+Read through :ref:`defining rules` for information about writing IDS validation rules.
+
+If you have your new empty rule file, we need to define validation rules inside.
+These are python functions structured like:
+
+1. :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`
+   decorator specifying which IDSs to target with the function.
+2. Function definition accepting IDS instances as arguments.
+3. Docstring with a short description of the tests.
+4. The tests, which can use standard python logic, IMASPy IDSs and predefined
+   :py:class:`helper methods<ids_validator.rules.helpers>`. Assert statements
+   describe which conditions should be adhered to.
+
+See :ref:`rule definition` for more information.
+
+.. note:: There is no need to separately import the helper functions and validator decorator.
 
 Exercise 1
 ----------
@@ -24,15 +42,20 @@ Exercise 1
     .. md-tab-item:: Exercise
 
         Write a simple test to determine whether all ``core_profiles`` IDSs have a comment in their ``ids_properties`` attribute.
-        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
 
         .. note::
             If the assert statement is clear on its own, no need to add a custom message.
-            Better to use those if the problem is not immediately recognizable from the test/code.
+            Better to use those if the problem is not immediately recognizable from the test and/or code.
+
+    .. md-tab-item:: Tip
+
+        Add ``core_profiles`` in the ``@validator`` decorator to make sure the test is run against all ``core_profiles`` IDSs.
 
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             """Very informative docstring for the rule file"""
             
@@ -50,11 +73,12 @@ Exercise 2
 
         Write a test for ``core_profiles`` IDSs to determine whether the ``time`` array is strictly increasing.
         Use the :py:class:`~ids_validator.rules.helpers.Increasing` helper function.
-        Does the DBentry for 'imas:hdf5?path=ids-validator-course/good' pass the test?
+        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
 
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             """Very informative docstring for the rule file"""
             
@@ -85,6 +109,7 @@ Exercise 3
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             """Very informative docstring for the rule file"""
 
@@ -117,6 +142,7 @@ Exercise 4
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             """Very informative docstring for the rule file"""
 
@@ -146,6 +172,7 @@ Exercise 5
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             """Very informative docstring for the rule file"""
 
@@ -173,9 +200,13 @@ Exercise 6
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             bla bla
             bla bla
+
+You can write tests that combine multiple IDSs by adding both in the ``@validator`` decorator.
+In that case the occurrence numbers need to be explicitly added like ``@validator("summary:0", "core_profiles:0")``.
 
 Exercise 7
 ----------
@@ -195,6 +226,7 @@ Exercise 7
     .. md-tab-item:: Solution
 
         .. code-block:: python
+            :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
             """Very informative docstring for the rule file"""
 

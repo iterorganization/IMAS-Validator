@@ -32,12 +32,6 @@ Manual
    tips_and_tricks
 
 .. toctree::
-   :caption: Tutorials
-   :maxdepth: 1
-
-   rule_tutorial
-
-.. toctree::
    :caption: API docs
    :maxdepth: 1
 

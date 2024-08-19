@@ -12,8 +12,7 @@ To check if your installation worked, try
     $ python -c 'import ids_validator; print(ids_validator.__version__)'
     1.0.0
 
-Some IMASpy DBEntry objects were built specifically for this training course that we will use.
-We also have some custom validation rulesets that we will use.
+Some IMASpy DBEntry objects and custom validation rulesets were built specifically for this training course.
 You can build them by running
 
 .. code-block:: console

@@ -11,6 +11,12 @@ The only required argument is the imas_uri of the DBentry object you want to val
 
     $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good'
 
+.. note::
+
+  The validator will need to load all data in the supplied data entry. Depending
+  on the size of your data entry it may take some time to load this data and
+  execute the rules.
+
 You can use the generic tests or custom built validation tests.
 We start with the generic tests.
 
@@ -52,8 +58,8 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator including custom tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/good``
-        The custom rules are defined in the 'ids-validator-training-rulesets/custom-rulesets' ruleset folder.
+        Call the IDS validator including custom tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/good``.
+        The custom rules are defined in the ``ids-validator-training-rulesets/custom-rulesets`` ruleset folder.
 
     .. md-tab-item:: Solution
 
@@ -68,7 +74,7 @@ Exercise 3
 
     .. md-tab-item:: Exercise
 
-        What happens if you run the tests with ``imas:hdf5?path=ids-validator-course/bad``?
+        What happens if you run the tests with the ``imas:hdf5?path=ids-validator-course/bad`` url?
 
     .. md-tab-item:: Solution
 
@@ -81,4 +87,6 @@ Exercise 3
     You can also run the IDS validator tool from a python script. This might be helpful if you want to automatically run your
     data through the validation tool after it is measured/generated.
     You can do so by importing and running ``ids_validator.validate`` in your python script.
-    The input arguments can be found in the :py:class:`documentation<ids_validator.validate.validate>`
+    The input arguments can be found in the :py:class:`documentation<ids_validator.validate.validate.validate>`
+    TODO: explain ValidateOptions
+    TODO: fix validate import to no longer be ids_validator.validate.validate.validate
