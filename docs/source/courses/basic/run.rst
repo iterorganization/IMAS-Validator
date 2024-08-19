@@ -87,6 +87,6 @@ Exercise 3
     You can also run the IDS validator tool from a python script. This might be helpful if you want to automatically run your
     data through the validation tool after it is measured/generated.
     You can do so by importing and running ``ids_validator.validate`` in your python script.
-    The input arguments can be found in the :py:class:`documentation<ids_validator.validate.validate.validate>`
-    TODO: explain ValidateOptions
+    The input arguments can be found in the :py:class:`documentation<ids_validator.validate.validate.validate>`.
+    See also the explanation of the :py:class:`ValidateOptions<ids_validator.validate_options.ValidateOptions>` argument.
     TODO: fix validate import to no longer be ids_validator.validate.validate.validate

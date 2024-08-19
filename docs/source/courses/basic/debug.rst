@@ -37,10 +37,10 @@ Exercise 1
 
             $ ids_validator validate 'imas:hdf5?path=ids-validator-course/bad' -f increasing_time
 
-
 Sometimes you want to take a closer look at the data when a test fails.
-You can use the (-d, --debug) flag to drop into a debugger console when a test returns an assertion error.
-# TODO: more explanation pdb and how to use it
+You can use the (-d, --debug) flag to drop into a python debugger (`pdb <https://docs.python.org/3/library/pdb.html>`_) console when a test returns an assertion error.
+This gives you access in the terminal to the stack traces and local variables in the code.
+While the documentation shows a lot more functionality, in this case we focus only on the local variables. 
 
 Exercise 2
 ----------
@@ -52,7 +52,6 @@ Exercise 2
         Call the IDS validator bundled tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/bad`` with the debugger argument. 
         What is the problem with this DBentry?
         
-
     .. md-tab-item:: Tip
 
         Use the locals() function to list all local variables when in the python debugger.
