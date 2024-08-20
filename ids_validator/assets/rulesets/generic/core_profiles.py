@@ -28,3 +28,21 @@ def validate_z_ion_core_profiles(ids):
                 assert (
                     0 < abs(ion.z_ion) <= zi
                 ), "Average ion charge above the summed nuclear charge of ion elements"
+
+
+@validator("core_profiles")
+def validate_pressure_thermal_electron_core_profiles(ids):
+    """Validate that the electron thermal pressure is consistent with density_thermal and temperature in the CORE_PROFILES IDS"""
+    for profiles_1d in ids.profiles_1d:
+        if not (
+            profiles_1d.electrons.temperature.has_value
+            and profiles_1d.electrons.density_thermal.has_value
+            and profiles_1d.electrons.pressure_thermal.has_value
+        ):
+            continue
+        assert Approx(
+            profiles_1d.electrons.pressure_thermal,
+            profiles_1d.electrons.density_thermal
+            * profiles_1d.electrons.temperature
+            * 1.6022e-19,
+        ), "Electron thermal pressure not consistent with density_thermal * temperature"
