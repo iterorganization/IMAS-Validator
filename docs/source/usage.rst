@@ -1,3 +1,4 @@
+.. _`usage`:
 Using the IMAS IDS validator
 ============================
 
