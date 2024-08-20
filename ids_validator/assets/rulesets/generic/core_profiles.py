@@ -32,7 +32,8 @@ def validate_z_ion_core_profiles(ids):
 
 @validator("core_profiles")
 def validate_pressure_thermal_electron_core_profiles(ids):
-    """Validate that the electron thermal pressure is consistent with density_thermal and temperature in the CORE_PROFILES IDS"""
+    """Validate that the electron thermal pressure is consistent
+    with density_thermal and temperature in the CORE_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if not (
             profiles_1d.electrons.temperature.has_value
