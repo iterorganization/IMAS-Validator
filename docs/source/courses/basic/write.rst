@@ -50,7 +50,7 @@ Exercise 1
 
         Add ``core_profiles`` in the ``@validator`` decorator to make sure the test is run against all ``core_profiles`` IDSs.
         
-        Use ``assert`` to make sure the is actually testing your rule.
+        Use ``assert`` to make sure your rule is actually being tested.
 
     .. md-tab-item:: Solution
 
