@@ -23,9 +23,9 @@ Exercise 1
 
         Call the IDS validator explore tool.
 
-        Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/custom-rulesets'
+        Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/custom-rulesets'.
 
-        Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name
+        Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name.
 
     .. md-tab-item:: Solution
 

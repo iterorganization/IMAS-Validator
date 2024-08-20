@@ -10,14 +10,12 @@ For a quick reminder of the ruleset structure look at :ref:`defining rules`.
 .. hint::
     :collapsible:
 
-    To create a new relu set ``my_ruleset`` with one (empty) rule file, run
+    To create a new ruleset ``my_ruleset`` with one (empty) rule file, run
 
     .. code-block:: console
 
         $ mkdir -p tmp/my_ruledir/my_ruleset/
         $ touch tmp/my_ruledir/my_ruleset/my_rulefile.py
-
-Read through :ref:`defining rules` for information about writing IDS validation rules.
 
 If you have your new empty rule file, we need to define validation rules inside.
 These are python functions structured like:
@@ -27,12 +25,12 @@ These are python functions structured like:
 2. Function definition accepting IDS instances as arguments.
 3. Docstring with a short description of the tests.
 4. The tests, which can use standard python logic, IMASPy IDSs and predefined
-   :py:class:`helper methods<ids_validator.rules.helpers>`. Assert statements
+   :py:class:`helper methods<ids_validator.rules.helpers>`. ``assert`` statements
    describe which conditions should be adhered to.
 
 See :ref:`rule definition` for more information.
 
-.. note:: There is no need to separately import the helper functions and validator decorator.
+.. note:: There is no need to separately import the helper functions and @validator decorator.
 
 Exercise 1
 ----------
@@ -51,6 +49,8 @@ Exercise 1
     .. md-tab-item:: Tip
 
         Add ``core_profiles`` in the ``@validator`` decorator to make sure the test is run against all ``core_profiles`` IDSs.
+        
+        Use ``assert`` to make sure the is actually testing your rule.
 
     .. md-tab-item:: Solution
 
@@ -205,7 +205,7 @@ Exercise 6
             bla bla
             bla bla
 
-You can write tests that combine multiple IDSs by adding both in the ``@validator`` decorator.
+You can write tests that combine multiple IDSs by adding both of their names in the ``@validator`` decorator.
 In that case the occurrence numbers need to be explicitly added like ``@validator("summary:0", "core_profiles:0")``.
 
 Exercise 7

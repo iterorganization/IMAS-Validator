@@ -13,6 +13,7 @@ IDS validation is done by applying rules to IDS structures. In this section we
 explain how rules are grouped together:
 
 ..
+
 **Rule**
   A Rule is a set of checks that logically belong together. Rules are defined in
   a Python function and applied to one IDS. See the section :ref:`rule

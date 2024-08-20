@@ -40,12 +40,14 @@ Exercise 1
 You might want to develop or simply use your own custom tests in addition to the standard
 bundled validation tests. You can add customly built tests to the validation process by adding CLI flags
 to determine in which ruleset folders the tool should look for IDS validation rules. 
-You can find custom rule folders with the (-e, --extra-rule-dirs) flag and define rulesets
-with the (-r, --ruleset) flag.
 A ruleset is a folder that can contain multiple validation test files, typically grouped per use case.
 A rule directory is a folder containing multiple ruleset folders so that the IDS validator can be 
 easily told where to look.
 The structure of these rulesets folders is further explained in :ref:`defining rules`.
+You can find custom rule folders and rulesets with the flags:
+
+- Rule folder (-e, --extra-rule-dirs)
+- Ruleset (-r, --ruleset)
 
 .. code-block:: console
 
