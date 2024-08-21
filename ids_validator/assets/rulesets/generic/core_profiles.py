@@ -1,7 +1,7 @@
 """Generic rules applying to the core_profiles IDS"""
 
 @validator("core_profiles")
-def validate_electroneutrality_core_profiles(ids):
+def validate_electroneutrality(ids):
     """Validate that electroneutrality is verified in the CORE_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].density.has_value:
@@ -14,7 +14,7 @@ def validate_electroneutrality_core_profiles(ids):
 
 
 @validator("core_profiles")
-def validate_z_ion_core_profiles(ids):
+def validate_z_ion(ids):
     """Validate that the ion average charge z_ion is consistent
     with ion elements in the CORE_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
@@ -50,7 +50,7 @@ def validate_pressure_thermal_electron_core_profiles(ids):
 
 
 @validator("core_profiles")
-def validate_zeff_core_profiles(ids):
+def validate_zeff(ids):
     """Validate that the effective charge zeff is consistent
     with ion densities in the CORE_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
@@ -71,7 +71,7 @@ def validate_zeff_core_profiles(ids):
 
 
 @validator("core_profiles")
-def validate_n_i_total_over_n_e_core_profiles(ids):
+def validate_n_i_total_over_n_e(ids):
     """Validate that the total density ratio is consistent
     with ion and electron densities in the CORE_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:

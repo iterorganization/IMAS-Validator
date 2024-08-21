@@ -1,7 +1,7 @@
 """Generic rules applying to the summary IDS"""
 
 @validator("summary")
-def validate_source_summary(ids):
+def validate_source(ids):
     """Validate that whenever a value node is filled,
     the related source node is filled in the SUMMARY IDS"""
     for value in Select(ids, "value", has_value=True):
