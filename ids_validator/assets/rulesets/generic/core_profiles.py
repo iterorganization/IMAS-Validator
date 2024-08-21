@@ -68,3 +68,23 @@ def validate_zeff_core_profiles(ids):
         assert Approx(
             profiles_1d.zeff, zeff
         ), "Effective charge zeff not consistent with ion square charge and density"
+
+
+@validator("core_profiles")
+def validate_n_i_total_over_n_e_core_profiles(ids):
+    """Validate that the total density ratio is consistent
+    with ion and electron densities in the CORE_PROFILES IDS"""
+    for profiles_1d in ids.profiles_1d:
+        if (
+            len(profiles_1d.ion) == 0
+            or not profiles_1d.n_i_total_over_n_e.has_value
+            or not profiles_1d.electrons.density.has_value
+            or not profiles_1d.ion[0].density.has_value
+        ):
+            continue
+        n_i_total_over_n_e = sum(ion.density for ion in profiles_1d.ion) / (
+            profiles_1d.electrons.density
+        )
+        assert Approx(
+            profiles_1d.n_i_total_over_n_e, n_i_total_over_n_e
+        ), "Total density ratio n_i_total_over_n_e not consistent with ion and electron densities"
