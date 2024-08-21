@@ -47,3 +47,24 @@ def validate_pressure_thermal_electron_core_profiles(ids):
             * profiles_1d.electrons.temperature
             * 1.602176634e-19,
         ), "Electron thermal pressure not consistent with density_thermal * temperature"
+
+
+@validator("core_profiles")
+def validate_zeff_core_profiles(ids):
+    """Validate that the effective charge zeff is consistent
+    with ion densities in the CORE_PROFILES IDS"""
+    for profiles_1d in ids.profiles_1d:
+        if (
+            len(profiles_1d.ion) == 0
+            or not profiles_1d.zeff.has_value
+            or not profiles_1d.electrons.density.has_value
+            or not profiles_1d.ion[0].z_ion_square_1d.has_value
+            or not profiles_1d.ion[0].density.has_value
+        ):
+            continue
+        zeff = sum(ion.density * ion.z_ion_square_1d for ion in profiles_1d.ion) / (
+            profiles_1d.electrons.density
+        )
+        assert Approx(
+            profiles_1d.zeff, zeff
+        ), "Effective charge zeff not consistent with ion square charge and density"
