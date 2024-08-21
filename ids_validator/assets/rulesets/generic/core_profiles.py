@@ -87,4 +87,4 @@ def validate_n_i_total_over_n_e(ids):
         )
         assert Approx(
             profiles_1d.n_i_total_over_n_e, n_i_total_over_n_e
-        ), "Total density ratio n_i_total_over_n_e not consistent with ion and electron densities"
+        ), "n_i_total_over_n_e not consistent with ion and electron densities"
