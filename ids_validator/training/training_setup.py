@@ -106,6 +106,7 @@ def copy_training_tests_to_cwd() -> None:
     shutil.copytree(
         training_rule_dir,
         Path(os.getcwd()) / "ids-validator-training-rulesets" / "custom_ruleset",
+        dirs_exist_ok=True,
     )
 
 
