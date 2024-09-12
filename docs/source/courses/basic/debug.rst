@@ -37,6 +37,8 @@ Exercise 1
 
             $ ids_validator validate 'imas:hdf5?path=ids-validator-course/bad' -f increasing_time
 
+        The summary report should only show the failing test for all IDS instances.
+
 Sometimes you want to take a closer look at the data when a test fails.
 The IDS validator has an optional feature to drop into a Python debugger (`pdb <https://docs.python.org/3/library/pdb.html>`_) console when a test returns an assertion error.
 This gives you access in the terminal to the stack traces and local variables in the code.

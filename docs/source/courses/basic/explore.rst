@@ -21,11 +21,11 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator explore tool.
+        1) Call the IDS validator explore tool.
 
-        Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/custom-rulesets'.
+        2) Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/custom-rulesets'.
 
-        Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name.
+        3) Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name.
 
     .. md-tab-item:: Solution
 
@@ -36,6 +36,12 @@ Exercise 1
             $ ids_validator explore -e ids-validator-training-rulesets/ -r custom_ruleset
 
             $ ids_validator explore -f errorbars
+
+        The output should be a summary of the bundled rules.
+
+        For the second part the summary should be extended with the custom ruleset.
+
+        for the third part the summary should be shortened to only contain the errorbars function.
 
 Since the rule folders can contain a lot of tests and information, the explore function offers the possibility to change the verbosity.
 
@@ -49,11 +55,11 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator explore tool showing the empty folders and files.
+        1) Call the IDS validator explore tool showing the empty folders and files.
 
-        Call the IDS validator explore tool for different verbosity levels
+        2) Call the IDS validator explore tool for different verbosity levels
 
-        What are the differences?
+        3) What are the differences?
 
     .. md-tab-item:: Solution
 

@@ -35,6 +35,9 @@ Exercise 1
 
             $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good'
 
+        The output should be a summary report showing that all tests passed.
+        The IDSs tested were core_profiles and waves.
+
 # TODO: explain how to interpret the summary report
 
 You might want to develop or simply use your own custom tests in addition to the standard
@@ -68,6 +71,8 @@ Exercise 2
         .. code-block:: console
 
             $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids-validator-training-rulesets/ -r custom_ruleset
+
+        More tests should be added to the summary report compared to Exercise 1.
             
 Exercise 3
 ----------
@@ -80,9 +85,9 @@ Exercise 3
 
     .. md-tab-item:: Solution
 
-        .. code-block:: console
-
-            Failed validation
+        Failed validation for both IDS instances.
+        The summary report should show information for
+        `generic/generic.py:validate_homogeneous_time`
             
 .. note::
 
