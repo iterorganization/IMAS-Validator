@@ -27,7 +27,7 @@ SDCC setup
   .. code-block:: bash
 
     # load IMAS and IMASPy before install
-    module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
+    module load IMAS/3.41.0-2024.07-intel-2023b IMASPy
     python3 -m venv ./venv
     . venv/bin/activate
     pip install --upgrade pip
@@ -40,7 +40,7 @@ SDCC setup
   .. code-block:: bash
 
     # Load modules every time you use ids_validator
-    module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
+    module load IMAS/3.41.0-2024.07-intel-2023b IMASPy
     # And activate the Python virtual environment
     . venv/bin/activate
 
