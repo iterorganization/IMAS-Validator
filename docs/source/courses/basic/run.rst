@@ -9,7 +9,7 @@ The only required argument is the imas_uri of the DBentry object you want to val
 
 .. code-block:: console
 
-    $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good'
+    $ ids_validator validate <DBENTRY_URI>
 
 .. note::
 
@@ -27,7 +27,7 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Run the IDS validator generic tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/good``
+        Run the IDS validator generic tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``
 
     .. md-tab-item:: Solution
 
@@ -63,7 +63,7 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator including custom tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/good``.
+        Call the IDS validator including custom tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``.
         The custom rules are defined in the ``ids-validator-training-rulesets/custom-rulesets`` ruleset folder.
 
     .. md-tab-item:: Solution
@@ -81,7 +81,7 @@ Exercise 3
 
     .. md-tab-item:: Exercise
 
-        What happens if you run the tests with the ``imas:hdf5?path=ids-validator-course/bad`` url?
+        What happens if you run the tests with the ``imas:hdf5?path=ids-validator-course/bad`` uri?
 
     .. md-tab-item:: Solution
 

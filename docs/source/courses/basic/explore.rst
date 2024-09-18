@@ -70,3 +70,7 @@ Exercise 2
             $ ids_validator explore --verbose
 
             $ ids_validator explore --no_docstring
+        
+       --show-empty will show some folders without any tests.
+       --verbose will show full docstrings for all tests.  
+       --no_docstring will show no docstrings for tests (but will still show docstrings for rulesets).

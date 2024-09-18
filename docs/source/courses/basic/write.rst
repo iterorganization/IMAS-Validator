@@ -102,8 +102,11 @@ Exercise 3
     .. md-tab-item:: Tip
 
         The positive and negative charges can be determined using
+
         - profiles_1d[i].ion[j].density
+
         - profiles_1d[i].ion[j].z_ion
+
         - profiles_1d[i].electrons.density
 
     .. md-tab-item:: Solution
@@ -116,7 +119,7 @@ Exercise 3
             @validator("core_profiles")
             def validate_electroneutrality_core_profiles(cp):
                 """Test whether the core_profiles have electroneutrality"""
-                for profiles_1d in ids.profiles_1d:
+                for profiles_1d in cp.profiles_1d:
                     if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].density.has_value:
                         continue
                     ni_zi = sum(ion.density * ion.z_ion for ion in profiles_1d.ion)
@@ -149,8 +152,8 @@ Exercise 4
             @validator("*")
             def validate_errors_positive(ids):
                 """Validate whether all error bar values are positive"""
-                    for error_lower in Select(ids, "_error_lower$", has_value=True):
-                        assert error_lower >= 0
+                for error_lower in Select(ids, "_error_lower$", has_value=True):
+                    assert error_lower >= 0
 
 Exercise 5
 ----------

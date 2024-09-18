@@ -21,7 +21,7 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator for the db_entry with url ``imas:hdf5?path=ids-validator-course/bad``
+        Call the IDS validator for the db_entry with uri ``imas:hdf5?path=ids-validator-course/bad``
 
         Run only the failing tests.
 
@@ -54,7 +54,7 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator bundled tests for the db_entry with url ``imas:hdf5?path=ids-validator-course/bad`` with the debugger argument. 
+        Call the IDS validator bundled tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/bad`` with the debugger argument. 
         What is the problem with this DBEntry?
         
     .. md-tab-item:: Tip
