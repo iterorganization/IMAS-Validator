@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 from xml.dom import minidom
 
 from ids_validator.validate.result import IDSValidationResult
@@ -18,7 +18,8 @@ class ValidationResultGenerator:
     def txt(self) -> str:
         return self._junit_txt
 
-    def __init__(self, report_list: List[IDSValidationResult]):
+    def __init__(self, uri: str, report_list: List[IDSValidationResult]):
+        self._uri: str = uri
         self._report_list = report_list
         self._junit_xml: str = ""
         self._junit_txt: str = ""
@@ -143,6 +144,7 @@ class ValidationResultGenerator:
 
         self._junit_txt = (
             f"Summary Report : \n"
+            f"Tested URI : {self._uri}\n"
             f"Number of tests carried out : {str(cpt_test)}\n"
             f"Number of successful tests : {str(cpt_succesful)}\n"
             f"Number of failed tests : {str(cpt_failure)}\n\n"
@@ -175,13 +177,13 @@ class ValidationResultGenerator:
                         f"{ids_validation_item.rule.name}, was successful\n"
                     )
 
-    def save_xml(self, file_name: Optional[str] = None) -> None:
+    def save_xml(self, file_name: str, verbose: bool = False) -> None:
         """
         Save generated validation report as JUnit xml file
 
         Args:
-            file_name: Optional[str] - name of file to be saved.
-                If not provided, filename is generated based on current date.
+            file_name: str - name of file to be saved.
+            verbose: bool - determines if function will print INFO message
 
         Return:
         """
@@ -190,15 +192,19 @@ class ValidationResultGenerator:
 
         with open(file_name, "w+") as f:
             f.write(self._junit_xml)
-            print(f"Generated JUnit xml report saved as: {os.path.abspath(file_name)}")
+            if verbose:
+                print(
+                    f"Generated JUnit xml report saved as:"
+                    f" {os.path.abspath(file_name)}"
+                )
 
-    def save_txt(self, file_name: Optional[str] = None) -> None:
+    def save_txt(self, file_name: str, verbose: bool = False) -> None:
         """
         Save generated validation report summary as plain text file
 
         Args:
-            file_name: Optional[str] - name of file to be saved.
-                If not provided, filename is generated based on current date.
+            file_name: str - name of file to be saved.
+            verbose: bool - determines if function will print INFO message
 
         Return:
         """
@@ -207,9 +213,11 @@ class ValidationResultGenerator:
 
         with open(file_name, "w+") as f:
             f.write(self._junit_txt)
-            print(
-                f"Generated JUnit summary report saved as: {os.path.abspath(file_name)}"
-            )
+            if verbose:
+                print(
+                    f"Generated JUnit summary report saved as:"
+                    f" {os.path.abspath(file_name)}"
+                )
 
     def gen_default_file_path(self, def_file_name: str, suffix: str) -> str:
         dir_path = Path("validate_reports")
@@ -218,3 +226,156 @@ class ValidationResultGenerator:
         today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         file_name = str(dir_path / f"{def_file_name}_{today}.{suffix}")
         return file_name
+
+
+class SummaryReportGenerator:
+    """Class for generating summary report"""
+
+    @property
+    def html(self) -> str:
+        return self._html
+
+    def __init__(
+        self, result_dict: dict[str, List[IDSValidationResult]], test_datetime: str
+    ):
+        self._result_dict = result_dict
+        self._test_datetime: str = test_datetime
+        self._html: str = ""
+        self.parse()
+
+    def parse(self) -> None:
+        self._generate_html()
+
+    def _generate_html(self) -> None:
+        """ """
+        num_failed_tests = 0
+        failed_tests_dict = {}
+        for uri, result_list in self._result_dict.items():
+            if not all([result.success for result in result_list]):
+                failed_tests_dict[uri] = result_list
+                num_failed_tests += 1
+
+        document_style = """
+        <style>
+            .header {
+                width: 100%;
+                height: 100%;
+                background-color: blue;
+                color: white;
+                padding: 5px;
+            }
+            .content {
+                padding: 10px;
+            }
+            body {
+                background-color: light-gray;
+                font-family: monospace;
+                font-size: 16px;
+            }
+            span[data-validation-successfull="true"]{
+                color: green;
+            }
+            span[data-validation-successfull="false"]{
+                color: red;
+            }
+            li>a {
+            display: inline-block;
+            margin-left: 10px;
+            }
+        </style>
+
+        """
+        self._html = f"""
+        <!DOCTYPE html>
+        <document>
+        <head>
+            <title>summary-{self._test_datetime}</title>
+            <meta charset="UTF-8"/>
+            {document_style}
+        </head>
+        <body>
+        <div class="header">
+            <h1>Validation summary</h1><br/>
+            {self._test_datetime}<br/>
+            Performed tests: {len(self._result_dict)}<br/>
+            Failed tests: {num_failed_tests}
+
+        </div>
+        <div class="content">
+            <h3>All tests</h3>
+            <ol>
+            {''.join([self._generate_uri_specific_html_element(uri, result_list)
+                      for uri, result_list in self._result_dict.items()])}
+            </ol>
+            <br>
+            <h3>Failed tests</h3>
+            <ol>
+            {''.join([self._generate_uri_specific_html_element(uri, result_list)
+                      for uri, result_list in failed_tests_dict.items()])}
+            </ol>
+            <br>
+            <h3>Failed tests URIs</h3>
+            {'&nbsp<br>'.join([uri for uri in failed_tests_dict.keys()])}
+        </div>
+        </body>
+        </document>
+        """
+
+    def _generate_uri_specific_html_element(
+        self, uri: str, result_list: List[IDSValidationResult]
+    ) -> str:
+        """
+        Returns html code summary generated for specific pair URI
+         - List of Validation results
+
+        Args:
+            uri : str - uri to be put in html code
+            result_list : List[IDSValidationResult]
+             - list of validation results specific for given uri
+
+        Returns:
+            filled html temlpate
+            if validation was successful:
+            <li><span data-validation-successfull="true">PASSED: </span>{uri}</li>
+
+            else:
+            <li><span data-validation-successfull="false">FAILED: </span>{uri}
+            <a href="./test_report.xml">Go to JUnit report</a>
+            <a href="./test_report.txt">Go to txt report</a></li>
+
+        """
+        validation_successfull: bool = all([result.success for result in result_list])
+        if validation_successfull:
+            return (
+                f'<li><span data-validation-successfull="true">'
+                f"PASSED: </span>{uri}</li>"
+            )
+
+        # process filename not to contain slashes, colon or question marks.
+        # They are not processed properly by URL bar in browser
+        processed_filename = (
+            uri.replace("/", "|").replace(":", "%3A").replace("?", "%3F")
+        )
+
+        return (
+            f'<li><span data-validation-successfull="false">FAILED: </span>{uri}<br>'
+            f'<a href="./{processed_filename}.xml">Go to JUnit report</a>'
+            f'<a href="./{processed_filename}.txt">Go to txt report</a>'
+            f"</li><br/>"
+        )
+
+    def save_html(self, file_path: str, verbose: bool = False) -> None:
+        """
+        Save generated report summary as html file
+
+        Args:
+            file_name: str - name of file to be saved.
+            verbose: bool - determines if function will print INFO message
+        """
+        with open(file_path, "w+") as file:
+            file.write(self.html)
+            if verbose:
+                print(
+                    f"Generated summary html report saved as:"
+                    f" {os.path.abspath(file_path)}"
+                )

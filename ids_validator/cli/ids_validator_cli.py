@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 import argparse
+import os
 import sys
+from datetime import datetime
 from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
-from ids_validator.report.validationResultGenerator import ValidationResultGenerator
+from ids_validator.report.validationResultGenerator import (
+    SummaryReportGenerator,
+    ValidationResultGenerator,
+)
 from ids_validator.validate.result import IDSValidationResult
 
 
@@ -162,26 +167,45 @@ def main(argv: List) -> None:
     parser = configure_argument_parser()
     args = parser.parse_args(args=argv if argv else ["--help"])
 
+    today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+
     try:
         command_parser = CommandParser()
         command_objects = command_parser.parse(args)
         for command in command_objects:
             command.execute()
 
-        result_list: List[IDSValidationResult] = []
+        # 'common' means it contains results for all executed commands
+        common_result_dict: dict[str, List[IDSValidationResult]] = {}
+
         for command in command_objects:
             if command.result is not None:
-                result_list = result_list + command.result
+                try:
+                    # save result for summary.html generation
+                    common_result_dict[command.uri] = command.result
 
-        if not result_list:
+                    # save result for this URI
+                    report_generator = ValidationResultGenerator(
+                        command.uri, command.result
+                    )
+                    report_filename = (
+                        f"./validate_reports/{today}/{command.uri.replace('/','|')}"
+                    )
+
+                    os.makedirs(os.path.dirname(report_filename), exist_ok=True)
+                    report_generator.save_xml(f"{report_filename}.xml")
+                    report_generator.save_txt(f"{report_filename}.txt")
+
+                except AttributeError:
+                    # If there is no uri in command, just don't save result
+                    ...
+
+        if not common_result_dict:
             return
 
-        report_generator = ValidationResultGenerator(result_list)
-        print(report_generator.txt)
-
-        report_generator.save_xml(args.output)
-        summary_filename = args.output if not args.output else f"{args.output}.summary"
-        report_generator.save_txt(summary_filename)
+        summary_filename = f"./validate_reports/{today}/summary.html"
+        summary_generator = SummaryReportGenerator(common_result_dict, today)
+        summary_generator.save_html(summary_filename, verbose=True)
 
     except CommandNotRecognisedException:
         parser.print_help()

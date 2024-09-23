@@ -27,6 +27,18 @@ class CommandInterface(ABC):
     @abstractmethod
     def result(self) -> List[IDSValidationResult]: ...
 
+    @property
+    def uri(self) -> str:
+        """
+        ValidateCommand specific property to get validated URI
+        """
+        return ""
+
+    @uri.setter
+    def uri(self, value: str) -> None:
+        # URI should be not settable from outside
+        ...
+
     @abstractmethod
     def __init__(self, args: argparse.Namespace) -> None: ...
 
