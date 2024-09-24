@@ -69,7 +69,9 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         help="Drop into debugger if tests fails",
     )
 
-    validate_group.add_argument("--output", help="""Specify name of the output file""")
+    validate_group.add_argument(
+        "-o", "--output", help="""Specify report directory path"""
+    )
 
     explore_parser = subparsers.add_parser("explore", help="explore existing rulesets")
 
@@ -169,6 +171,8 @@ def main(argv: List) -> None:
 
     today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
+    reports_path = args.output or "./validate_reports"
+
     try:
         command_parser = CommandParser()
         command_objects = command_parser.parse(args)
@@ -180,7 +184,7 @@ def main(argv: List) -> None:
 
         for command in command_objects:
             if command.result is not None:
-                try:
+                if command.uri:
                     # save result for summary.html generation
                     common_result_dict[command.uri] = command.result
 
@@ -189,21 +193,17 @@ def main(argv: List) -> None:
                         command.uri, command.result
                     )
                     report_filename = (
-                        f"./validate_reports/{today}/{command.uri.replace('/','|')}"
+                        f"{reports_path}/{today}/{command.uri.replace('/','|')}"
                     )
 
                     os.makedirs(os.path.dirname(report_filename), exist_ok=True)
                     report_generator.save_xml(f"{report_filename}.xml")
                     report_generator.save_txt(f"{report_filename}.txt")
 
-                except AttributeError:
-                    # If there is no uri in command, just don't save result
-                    ...
-
         if not common_result_dict:
             return
 
-        summary_filename = f"./validate_reports/{today}/summary.html"
+        summary_filename = f"{reports_path}/{today}/summary.html"
         summary_generator = SummaryReportGenerator(common_result_dict, today)
         summary_generator.save_html(summary_filename, verbose=True)
 
