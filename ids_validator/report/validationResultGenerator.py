@@ -250,10 +250,13 @@ class SummaryReportGenerator:
         """ """
         num_failed_tests = 0
         failed_tests_dict = {}
+        passed_tests_dict = {}
         for uri, result_list in self._result_dict.items():
             if not all([result.success for result in result_list]):
                 failed_tests_dict[uri] = result_list
                 num_failed_tests += 1
+            else:
+                passed_tests_dict[uri] = result_list
 
         document_style = """
         <style>
@@ -302,10 +305,10 @@ class SummaryReportGenerator:
 
         </div>
         <div class="content">
-            <h3>All tests</h3>
+            <h3>Passed tests</h3>
             <ol>
             {''.join([self._generate_uri_specific_html_element(uri, result_list)
-                      for uri, result_list in self._result_dict.items()])}
+                      for uri, result_list in passed_tests_dict.items()])}
             </ol>
             <br>
             <h3>Failed tests</h3>
@@ -313,9 +316,6 @@ class SummaryReportGenerator:
             {''.join([self._generate_uri_specific_html_element(uri, result_list)
                       for uri, result_list in failed_tests_dict.items()])}
             </ol>
-            <br>
-            <h3>Failed tests URIs</h3>
-            {'&nbsp<br>'.join([uri for uri in failed_tests_dict.keys()])}
         </div>
         </body>
         </document>

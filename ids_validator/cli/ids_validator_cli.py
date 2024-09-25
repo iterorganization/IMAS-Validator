@@ -7,6 +7,7 @@ from typing import List
 
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
+from ids_validator.cli.commands.validate_command import ValidateCommand
 from ids_validator.report.validationResultGenerator import (
     SummaryReportGenerator,
     ValidationResultGenerator,
@@ -171,11 +172,14 @@ def main(argv: List) -> None:
 
     today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-    reports_path = args.output or "./validate_reports"
-
     try:
         command_parser = CommandParser()
         command_objects = command_parser.parse(args)
+
+        # command specific actions
+        if isinstance(command_objects[0], ValidateCommand):
+            reports_path = args.output or "./validate_reports"
+
         for command in command_objects:
             command.execute()
 
@@ -183,29 +187,29 @@ def main(argv: List) -> None:
         common_result_dict: dict[str, List[IDSValidationResult]] = {}
 
         for command in command_objects:
-            if command.result is not None:
-                if command.uri:
-                    # save result for summary.html generation
-                    common_result_dict[command.uri] = command.result
+            if command.result is not None and isinstance(command, ValidateCommand):
+                # save result for summary.html generation
+                common_result_dict[command.uri] = command.result
 
-                    # save result for this URI
-                    report_generator = ValidationResultGenerator(
-                        command.uri, command.result
-                    )
-                    report_filename = (
-                        f"{reports_path}/{today}/{command.uri.replace('/','|')}"
-                    )
+                # save result for this URI
+                report_generator = ValidationResultGenerator(
+                    command.uri, command.result
+                )
+                report_filename = (
+                    f"{reports_path}/{today}/{command.uri.replace('/','|')}"
+                )
 
-                    os.makedirs(os.path.dirname(report_filename), exist_ok=True)
-                    report_generator.save_xml(f"{report_filename}.xml")
-                    report_generator.save_txt(f"{report_filename}.txt")
+                os.makedirs(os.path.dirname(report_filename), exist_ok=True)
+                report_generator.save_xml(f"{report_filename}.xml")
+                report_generator.save_txt(f"{report_filename}.txt")
 
         if not common_result_dict:
             return
 
-        summary_filename = f"{reports_path}/{today}/summary.html"
-        summary_generator = SummaryReportGenerator(common_result_dict, today)
-        summary_generator.save_html(summary_filename, verbose=True)
+        if isinstance(command_objects[0], ValidateCommand):
+            summary_filename = f"{reports_path}/{today}/report.html"
+            summary_generator = SummaryReportGenerator(common_result_dict, today)
+            summary_generator.save_html(summary_filename, verbose=True)
 
     except CommandNotRecognisedException:
         parser.print_help()
