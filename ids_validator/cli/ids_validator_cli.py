@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import logging
 import os
 import sys
 from datetime import datetime
@@ -14,10 +15,19 @@ from ids_validator.report.validationResultGenerator import (
 )
 from ids_validator.validate.result import IDSValidationResult
 
+cli_logger = logging.getLogger(__name__)
+cli_logger.setLevel(logging.INFO)
+
 
 def configure_argument_parser() -> argparse.ArgumentParser:
     # Management of input arguments
-    parser = argparse.ArgumentParser(description="IDS validator")
+    parser = argparse.ArgumentParser(
+        description="IDS validator",
+        epilog="Validate command prints URIs that failed validation on stdout."
+        "One can take advantage of this behaviour and pipe validator"
+        " calls using xargs command eg.:"
+        "ids_validator validate <uri1> <uri2> <uriX> | xargs ids_validator validate",
+    )
     subparsers = parser.add_subparsers(
         dest="command", description="subparsers for command"
     )
@@ -207,9 +217,19 @@ def main(argv: List) -> None:
             return
 
         if isinstance(command_objects[0], ValidateCommand):
+            # print URIs of failed tests
+            failed_test_uris = [
+                uri
+                for uri, result_list in common_result_dict.items()
+                if not all([result.success for result in result_list])
+            ]
+            if failed_test_uris:
+                cli_logger.info("Some URIs failed validation")
+                sys.stdout.write(" ".join(failed_test_uris) + "\n")
+
             summary_filename = f"{reports_path}/{today}/report.html"
             summary_generator = SummaryReportGenerator(common_result_dict, today)
-            summary_generator.save_html(summary_filename, verbose=True)
+            summary_generator.save_html(summary_filename)
 
     except CommandNotRecognisedException:
         parser.print_help()

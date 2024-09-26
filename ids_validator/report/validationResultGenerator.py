@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime
 from pathlib import Path
@@ -9,6 +10,9 @@ from ids_validator.validate.result import IDSValidationResult
 
 class ValidationResultGenerator:
     """Class for generating report"""
+
+    # class logger
+    __logger = logging.getLogger(__name__ + "." + __qualname__)
 
     @property
     def xml(self) -> str:
@@ -198,13 +202,12 @@ class ValidationResultGenerator:
                     f" {os.path.abspath(file_name)}"
                 )
 
-    def save_txt(self, file_name: str, verbose: bool = False) -> None:
+    def save_txt(self, file_name: str) -> None:
         """
         Save generated validation report summary as plain text file
 
         Args:
             file_name: str - name of file to be saved.
-            verbose: bool - determines if function will print INFO message
 
         Return:
         """
@@ -213,11 +216,10 @@ class ValidationResultGenerator:
 
         with open(file_name, "w+") as f:
             f.write(self._junit_txt)
-            if verbose:
-                print(
-                    f"Generated JUnit summary report saved as:"
-                    f" {os.path.abspath(file_name)}"
-                )
+            self.__logger.debug(
+                f"Generated JUnit summary report saved as:"
+                f" {os.path.abspath(file_name)}"
+            )
 
     def gen_default_file_path(self, def_file_name: str, suffix: str) -> str:
         dir_path = Path("validate_reports")
@@ -230,6 +232,9 @@ class ValidationResultGenerator:
 
 class SummaryReportGenerator:
     """Class for generating summary report"""
+
+    # class logger
+    __logger = logging.getLogger(__name__ + "." + __qualname__)
 
     @property
     def html(self) -> str:
@@ -364,18 +369,16 @@ class SummaryReportGenerator:
             f"</li><br/>"
         )
 
-    def save_html(self, file_path: str, verbose: bool = False) -> None:
+    def save_html(self, file_path: str) -> None:
         """
         Save generated report summary as html file
 
         Args:
             file_name: str - name of file to be saved.
-            verbose: bool - determines if function will print INFO message
         """
         with open(file_path, "w+") as file:
             file.write(self.html)
-            if verbose:
-                print(
-                    f"Generated summary html report saved as:"
-                    f" {os.path.abspath(file_path)}"
-                )
+            self.__logger.debug(
+                f"Generated summary html report saved as:"
+                f" {os.path.abspath(file_path)}"
+            )
