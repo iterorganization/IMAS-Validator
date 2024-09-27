@@ -196,8 +196,7 @@ class ValidationResultGenerator:
         with open(file_name, "w+") as f:
             f.write(self._junit_xml)
             self.__logger.debug(
-                f"Generated JUnit report saved as:"
-                f" {os.path.abspath(file_name)}"
+                f"Generated JUnit report saved as:" f" {os.path.abspath(file_name)}"
             )
 
     def save_txt(self, file_name: str) -> None:
@@ -215,8 +214,7 @@ class ValidationResultGenerator:
         with open(file_name, "w+") as f:
             f.write(self._junit_txt)
             self.__logger.debug(
-                f"Generated txt report saved as:"
-                f" {os.path.abspath(file_name)}"
+                f"Generated txt report saved as:" f" {os.path.abspath(file_name)}"
             )
 
     def gen_default_file_path(self, def_file_name: str, suffix: str) -> str:
