@@ -46,6 +46,7 @@ def test_error_result() -> None:
     last_tb = last_tb.replace(">", "")
     assert result_generator._junit_txt == (
         f"Summary Report : \n"
+        f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1\n"
         f"Number of successful tests : 0\n"
         f"Number of failed tests : 1\n\n"
@@ -79,13 +80,14 @@ def test_successful_assert() -> None:
     )
 
     assert result_generator._junit_txt == (
-        "Summary Report : \n"
-        "Number of tests carried out : 1\n"
-        "Number of successful tests : 1\n"
-        "Number of failed tests : 0\n\n"
-        "IDS core_profiles occurrence 0\n\t"
-        "Test with rule name : to/rule.py/dummy_rule_function, was successful\n"
-    )
+            "Summary Report : \n"
+            "Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
+            "Number of tests carried out : 1\n"
+            "Number of successful tests : 1\n"
+            "Number of failed tests : 0\n\n"
+            "IDS core_profiles occurrence 0\n\t"
+            "Test with rule name : to/rule.py/dummy_rule_function, was successful\n"
+        )
 
 
 def test_failed_assert() -> None:
@@ -125,6 +127,7 @@ def test_failed_assert() -> None:
     last_tb = last_tb.replace(">", "")
     assert result_generator._junit_txt == (
         f"Summary Report : \n"
+        f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1\n"
         f"Number of successful tests : 0\n"
         f"Number of failed tests : 1\n\n"
