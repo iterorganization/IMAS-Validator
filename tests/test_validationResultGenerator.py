@@ -22,7 +22,8 @@ def test_error_result() -> None:
         {},
         exc=RuntimeError("Dummy exception"),
     )
-    result_generator = ValidationResultGenerator([result])
+    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    result_generator = ValidationResultGenerator(uri, [result])
 
     tb = "\n".join(result.tb.format())
     node_text = minidom.Document().createTextNode(tb)
@@ -67,7 +68,8 @@ def test_successful_assert() -> None:
         {("core_profiles", 0): ["a", "b", "c"]},
         exc=None,
     )
-    result_generator = ValidationResultGenerator([result])
+    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    result_generator = ValidationResultGenerator(uri, [result])
     assert result_generator._junit_xml == (
         '<testsuites id="1" name="ids_validator" tests="1" failures="0">\n\t'
         '<testsuite id="1.1" name="core_profiles-0" tests="1" failures="0">\n\t\t'
@@ -97,7 +99,8 @@ def test_failed_assert() -> None:
         {("core_profiles", 0): ["a", "b", "c"]},
         exc=None,
     )
-    result_generator = ValidationResultGenerator([result])
+    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    result_generator = ValidationResultGenerator(uri, [result])
 
     tb = "\n".join(result.tb.format())
     node_text = minidom.Document().createTextNode(tb)
