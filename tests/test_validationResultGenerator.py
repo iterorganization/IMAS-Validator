@@ -1,8 +1,12 @@
 import traceback
+from datetime import datetime
 from pathlib import Path
 from xml.dom import minidom
 
-from ids_validator.report.validationResultGenerator import ValidationResultGenerator
+from ids_validator.report.validationResultGenerator import (
+    SummaryReportGenerator,
+    ValidationResultGenerator,
+)
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result import IDSValidationResult
 
@@ -30,7 +34,7 @@ def test_error_result() -> None:
     str_to_compare = node_text.data.replace('"', "&quot;")
     str_to_compare = str_to_compare.replace(">", "&gt;")
     str_to_compare = str_to_compare.replace("<", "&lt;")
-    assert result_generator._junit_xml == (
+    assert result_generator.xml == (
         f'<testsuites id="1" name="ids_validator" tests="1" failures="1">\n\t'
         f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
         f'<testcase id="1.1.1" name="to/rule.py/dummy_rule_function">\n\t\t\t'
@@ -44,7 +48,7 @@ def test_error_result() -> None:
     last_tb = str(result.tb[-1])
     last_tb = last_tb.replace("<", "")
     last_tb = last_tb.replace(">", "")
-    assert result_generator._junit_txt == (
+    assert result_generator.txt == (
         f"Summary Report : \n"
         f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1\n"
@@ -71,7 +75,7 @@ def test_successful_assert() -> None:
     )
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
     result_generator = ValidationResultGenerator(uri, [result])
-    assert result_generator._junit_xml == (
+    assert result_generator.xml == (
         '<testsuites id="1" name="ids_validator" tests="1" failures="0">\n\t'
         '<testsuite id="1.1" name="core_profiles-0" tests="1" failures="0">\n\t\t'
         '<testcase id="1.1.1" name="to/rule.py/dummy_rule_function"/>\n\t'
@@ -79,19 +83,19 @@ def test_successful_assert() -> None:
         "</testsuites>\n"
     )
 
-    assert result_generator._junit_txt == (
-            "Summary Report : \n"
-            "Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
-            "Number of tests carried out : 1\n"
-            "Number of successful tests : 1\n"
-            "Number of failed tests : 0\n\n"
-            "IDS core_profiles occurrence 0\n\t"
-            "Test with rule name : to/rule.py/dummy_rule_function, was successful\n"
-        )
+    assert result_generator.txt == (
+        "Summary Report : \n"
+        "Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
+        "Number of tests carried out : 1\n"
+        "Number of successful tests : 1\n"
+        "Number of failed tests : 0\n\n"
+        "IDS core_profiles occurrence 0\n\t"
+        "Test with rule name : to/rule.py/dummy_rule_function, was successful\n"
+    )
 
 
 def test_failed_assert() -> None:
-    # Create a failed assert esult, similar to ResultCollector.assert_()
+    # Create a failed assert result, similar to ResultCollector.assert_()
     result = IDSValidationResult(
         False,
         "Optional message",
@@ -109,7 +113,7 @@ def test_failed_assert() -> None:
     str_to_compare = node_text.data.replace('"', "&quot;")
     str_to_compare = str_to_compare.replace(">", "&gt;")
     str_to_compare = str_to_compare.replace("<", "&lt;")
-    assert result_generator._junit_xml == (
+    assert result_generator.xml == (
         f'<testsuites id="1" name="ids_validator" tests="1" failures="1">\n\t'
         f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
         f'<testcase id="1.1.1" name="to/rule.py/dummy_rule_function">\n\t\t\t'
@@ -125,7 +129,7 @@ def test_failed_assert() -> None:
     last_tb = str(result.tb[-1])
     last_tb = last_tb.replace("<", "")
     last_tb = last_tb.replace(">", "")
-    assert result_generator._junit_txt == (
+    assert result_generator.txt == (
         f"Summary Report : \n"
         f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1\n"
@@ -136,4 +140,91 @@ def test_failed_assert() -> None:
         f"Message : Optional message\n\t\t"
         f"Traceback : {str(last_tb)}\n\t\t"
         f"Nodes_Dict : {{('core_profiles', 0): ['a', 'b', 'c']}}\n"
+    )
+
+
+def test_report_html_generator() -> None:
+    # Test report.html generator
+    result = IDSValidationResult(
+        False,
+        "Optional message",
+        IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
+        [("core_profiles", 0)],
+        traceback.extract_stack(),
+        {("core_profiles", 0): ["a", "b", "c"]},
+        exc=None,
+    )
+    today = datetime.today()
+    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    reports_dict = {uri: [result]}
+    html_result_generator = SummaryReportGenerator(reports_dict, today)
+
+    document_style = """
+    <style>
+        .header {
+            width: 100%;
+            height: 100%;
+            background-color: blue;
+            color: white;
+            padding: 5px;
+        }
+        .content {
+            padding: 10px;
+        }
+        body {
+            background-color: light-gray;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        span[data-validation-successfull="true"]{
+            color: green;
+        }
+        span[data-validation-successfull="false"]{
+            color: red;
+        }
+        li>a {
+        display: inline-block;
+        margin-left: 10px;
+        }
+    </style>
+    
+    """
+    # delete white characters from html before assert,
+    # to avoid errors connected with html document formatting
+    assert (
+        html_result_generator.html.replace(" ", "").replace("\t", "")
+        == f"""
+        <!DOCTYPE html>
+        <document>
+        <head>
+            <title>summary-{today}</title>
+            <meta charset="UTF-8"/>
+            {document_style}
+        </head>
+        <body>
+        <div class="header">
+            <h1>Validation summary</h1><br/>
+            {today}<br/>
+            Performed tests: 1<br/>
+            Failed tests: 1
+
+        </div>
+        <div class="content">
+            <h3>Passed tests</h3>
+            <ol>
+            
+            </ol>
+            <br>
+            <h3>Failed tests</h3>
+            <ol>
+            <li><span data-validation-successfull="false">FAILED: </span>imas:mdsplus?test_validationResultGeneratorUri<br><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.xml">Go to JUnit report</a><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.txt">Go to txt report</a></li><br/>
+            </ol>
+        </div>
+        </body>
+        </document>
+    """.replace(
+            " ", ""
+        ).replace(
+            "\t", ""
+        )
     )

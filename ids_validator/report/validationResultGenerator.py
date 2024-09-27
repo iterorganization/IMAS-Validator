@@ -181,13 +181,12 @@ class ValidationResultGenerator:
                         f"{ids_validation_item.rule.name}, was successful\n"
                     )
 
-    def save_xml(self, file_name: str, verbose: bool = False) -> None:
+    def save_xml(self, file_name: str) -> None:
         """
         Save generated validation report as JUnit xml file
 
         Args:
             file_name: str - name of file to be saved.
-            verbose: bool - determines if function will print INFO message
 
         Return:
         """
@@ -196,11 +195,10 @@ class ValidationResultGenerator:
 
         with open(file_name, "w+") as f:
             f.write(self._junit_xml)
-            if verbose:
-                print(
-                    f"Generated JUnit xml report saved as:"
-                    f" {os.path.abspath(file_name)}"
-                )
+            self.__logger.debug(
+                f"Generated JUnit report saved as:"
+                f" {os.path.abspath(file_name)}"
+            )
 
     def save_txt(self, file_name: str) -> None:
         """
@@ -217,7 +215,7 @@ class ValidationResultGenerator:
         with open(file_name, "w+") as f:
             f.write(self._junit_txt)
             self.__logger.debug(
-                f"Generated JUnit summary report saved as:"
+                f"Generated txt report saved as:"
                 f" {os.path.abspath(file_name)}"
             )
 
@@ -369,16 +367,16 @@ class SummaryReportGenerator:
             f"</li><br/>"
         )
 
-    def save_html(self, file_path: str) -> None:
+    def save_html(self, file_name: str) -> None:
         """
         Save generated report summary as html file
 
         Args:
             file_name: str - name of file to be saved.
         """
-        with open(file_path, "w+") as file:
+        with open(file_name, "w+") as file:
             file.write(self.html)
             self.__logger.debug(
                 f"Generated summary html report saved as:"
-                f" {os.path.abspath(file_path)}"
+                f" {os.path.abspath(file_name)}"
             )
