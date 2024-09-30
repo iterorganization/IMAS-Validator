@@ -190,6 +190,10 @@ Exercise 5
                     if quantity_max is not None and quantity_max.has_value:
                         assert quantity_min <= quantity_max
 
+You can write tests that are only run on specific DD versions. 
+In that case the dd_version needs to be to the added to the ``@validator`` decorator like ``@validator("core_profiles", version="3.40")``.
+You can also specify ranges. For more information, see `python packaging specifiers docs <https://packaging.pypa.io/en/stable/specifiers.html>`_
+
 Exercise 6
 ----------
 
@@ -197,16 +201,38 @@ Exercise 6
 
     .. md-tab-item:: Exercise
 
-        What happens if you add ``version=..........`` to the ``@validator`` decorator?
-        Why?
+        In the DD version ``3.41``, ``ids.ids_properties.provenance.node(i).sources(:)`` was changed to ``ids.ids_properties.provenance.node(i).reference(j)`` 
+
+        1) Write a test that checks whether the length of references for all nodes is larger than zero for ``core_profiles``.
+        The DBEntry ``imas:hdf5?path=ids-validator-course/good`` has DD version ``3.40.1`` while ``imas:hdf5?path=ids-validator-course/new`` has version ``3.42.0``.
+        Run your test for both.
+
+        2) Specify a version in the ``@validator`` decorator so that it only covers tests after version ``3.41.0``.
+        Run your test for both and check if there are no errors left.
+
+        3) Write a test that checks whether the length of sources for all nodes is larger than zero for ``core_profiles`` specifically for versions before ``3.41.0``.
+        Run your test for both and check if there are no errors left.
+
+    .. md-tab-item:: Tip
+
+        You can specify ranges of versions like ``<3.0.0`` and ``>=2.0.0,<3.0.0``
 
     .. md-tab-item:: Solution
 
         .. code-block:: python
             :caption: ``my_ruledir/my_ruleset/my_rulefile.py``
 
-            bla bla
-            bla bla
+            @validator("core_profiles", version=">=3.41.0")
+            def test_sources_new(cp):
+                """Validate that references are filled for versions after 3.41.0"""
+                for node in cp.ids_properties.provenance.node:
+                    assert len(node.reference) > 0
+
+            @validator("core_profiles", version="<3.41.0")
+            def test_sources_old(cp):
+                """Validate that sources are filled for versions before 3.41.0"""
+                for node in cp.ids_properties.provenance.node:
+                    assert len(node.sources) > 0
 
 You can write tests that combine multiple IDSs by adding both of their names in the ``@validator`` decorator.
 In that case the occurrence numbers need to be explicitly added like ``@validator("summary:0", "core_profiles:0")``.

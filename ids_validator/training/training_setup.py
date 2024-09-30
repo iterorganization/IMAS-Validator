@@ -14,15 +14,26 @@ from imaspy.ids_toplevel import IDSToplevel
 from ids_validator import get_project_root
 
 
-def training_core_profiles() -> IDSToplevel:
-    cp = imaspy.IDSFactory("3.40.1").core_profiles()
+def training_core_profiles(new_version: bool = False) -> IDSToplevel:
+    if new_version:
+        version = "3.42.0"
+    else:
+        version = "3.40.1"
+    cp = imaspy.IDSFactory(version).core_profiles()
     # Fill some properties:
     cp.ids_properties.homogeneous_time = 0  # INT_0D
     cp.ids_properties.comment = "Comment"  # STR_0D
     cp.ids_properties.provenance.node.resize(1)
     cp.ids_properties.provenance.node[0].path = "profiles_1d"  # STR_0D
     sources = ["First string", "Second string", "Third!"]
-    cp.ids_properties.provenance.node[0].sources = sources  # STR_1D
+    if new_version:
+        timestamp = "2020-07-24T14:19:00Z"
+        cp.ids_properties.provenance.node[0].reference.resize(3)
+        for i in range(3):
+            cp.ids_properties.provenance.node[0].reference[i].name = sources[i]
+            cp.ids_properties.provenance.node[0].reference[i].timestamp = timestamp
+    else:
+        cp.ids_properties.provenance.node[0].sources = sources  # STR_1D
     # Fill some data
     cp.time = [0.0, 1.0]
     cp.profiles_1d.resize(2)
@@ -46,8 +57,12 @@ def training_core_profiles() -> IDSToplevel:
     return cp
 
 
-def training_data_waves() -> IDSToplevel:
-    wv = imaspy.IDSFactory("3.40.1").waves()
+def training_data_waves(new_version: bool = False) -> IDSToplevel:
+    if new_version:
+        version = "3.42.0"
+    else:
+        version = "3.40.1"
+    wv = imaspy.IDSFactory(version).waves()
     # Fill some properties:
     wv.ids_properties.homogeneous_time = 0  # INT_0D
     # Fill some data
@@ -87,13 +102,25 @@ def training_data_waves() -> IDSToplevel:
 def create_training_db_entries() -> None:
     cp = training_core_profiles()
     wv = training_data_waves()
-    with DBEntry("imas:hdf5?path=ids-validator-course/good", "w") as entry:
+    with DBEntry(
+        "imas:hdf5?path=ids-validator-course/good", "w", dd_version="3.40.1"
+    ) as entry:
         entry.put(cp)
         entry.put(wv)
         print(entry.uri)
     cp.time = [1.0, 0.0]
     wv.time = [1.0, 0.0]
-    with DBEntry("imas:hdf5?path=ids-validator-course/bad", "w") as entry:
+    with DBEntry(
+        "imas:hdf5?path=ids-validator-course/bad", "w", dd_version="3.40.1"
+    ) as entry:
+        entry.put(cp)
+        entry.put(wv)
+        print(entry.uri)
+    with DBEntry(
+        "imas:hdf5?path=ids-validator-course/new", "w", dd_version="3.42.0"
+    ) as entry:
+        cp = training_core_profiles(new_version=True)
+        wv = training_data_waves(new_version=True)
         entry.put(cp)
         entry.put(wv)
         print(entry.uri)

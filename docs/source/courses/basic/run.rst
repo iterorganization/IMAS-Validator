@@ -38,8 +38,6 @@ Exercise 1
         The output should be a summary report showing that all tests passed.
         The IDSs tested were core_profiles and waves.
 
-# TODO: explain how to interpret the summary report
-
 You might want to develop or simply use your own custom tests in addition to the standard
 bundled validation tests. You can add customly built tests to the validation process by adding CLI flags
 to determine in which ruleset folders the tool should look for IDS validation rules. 
@@ -89,6 +87,10 @@ Exercise 3
         The summary report should show information for
         `generic/generic.py:validate_homogeneous_time`
             
+.. note::
+
+    The IDS validator tool is also integrated in SimDB.
+
 .. note::
 
     You can also run the IDS validator tool from a python script. This might be helpful if you want to automatically run your
