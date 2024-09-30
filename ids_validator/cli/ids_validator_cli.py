@@ -170,8 +170,8 @@ def main(argv: List) -> None:
 
         result_list: List[IDSValidationResult] = []
         for command in command_objects:
-            if command.result is not None:
-                result_list = result_list + command.result
+            if args.command == "validate" and command.result.results is not None:
+                result_list = result_list + command.result.results
 
         if not result_list:
             return

@@ -59,6 +59,7 @@ def dbentry():
     db.get = Mock(wraps=get)
     db.factory = IDSFactory("3.40.1")
     db.dd_version = "3.40.1"
+    db.uri = ""
     return db
 
 
@@ -82,7 +83,9 @@ def rules():
 
 @pytest.fixture
 def rule_executor(dbentry, rules):
-    result_collector = ResultCollector(validate_options=ValidateOptions())
+    result_collector = ResultCollector(
+        validate_options=ValidateOptions(), imas_uri=dbentry.uri
+    )
     rule_executor = RuleExecutor(
         dbentry, rules, result_collector, validate_options=ValidateOptions()
     )
@@ -149,13 +152,13 @@ def test_apply_rules_to_data_logging(rule_executor, caplog):
     rule_executor.apply_rules_to_data()
     start_log_calls = [
         "Started executing rules",
-        "Running t/all.py/Mock func 0 on magnetics:1",
+        "Running t/all.py:Mock func 0 on magnetics:1",
     ]
     fix_assert_str = (
         "Make sure the validation test is testing something with an assert statement."
     )
     empty_log_calls = [
-        f"No assertions in t/all.py/Mock func 0. {fix_assert_str}",
+        f"No assertions in t/all.py:Mock func 0. {fix_assert_str}",
     ]
     module = "ids_validator.validate.rule_executor"
     for val in start_log_calls:
