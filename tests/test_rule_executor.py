@@ -149,13 +149,13 @@ def test_apply_rules_to_data_logging(rule_executor, caplog):
     rule_executor.apply_rules_to_data()
     start_log_calls = [
         "Started executing rules",
-        "Running t/all.py/Mock func 0 on magnetics:1",
+        "Running t/all.py:Mock func 0 on magnetics:1",
     ]
     fix_assert_str = (
         "Make sure the validation test is testing something with an assert statement."
     )
     empty_log_calls = [
-        f"No assertions in t/all.py/Mock func 0. {fix_assert_str}",
+        f"No assertions in t/all.py:Mock func 0. {fix_assert_str}",
     ]
     module = "ids_validator.validate.rule_executor"
     for val in start_log_calls:
