@@ -42,6 +42,7 @@ def test_validate(caplog):
         spec=True,
         list_all_occurrences=list_all_occurrences,
         get=get,
+        uri="",
         factory=IDSFactory("3.40.1"),
     ), patch(f"{module}._check_imas_version"):
         validate_options = ValidateOptions(
@@ -49,10 +50,11 @@ def test_validate(caplog):
             extra_rule_dirs=[Path("tests/rulesets/validate-test")],
             apply_generic=False,
         )
-        results = validate(
+        results_collection = validate(
             imas_uri="",
             validate_options=validate_options,
         )
+        results = results_collection.results
         assert len(results) == 3
         assert all(isinstance(res, IDSValidationResult) for res in results)
         results = sorted(results, key=lambda x: x.rule.func.__name__)

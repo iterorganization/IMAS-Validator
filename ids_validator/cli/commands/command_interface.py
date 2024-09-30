@@ -1,8 +1,7 @@
 import argparse
 from abc import ABC, abstractmethod
-from typing import List
 
-from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result import IDSValidationResultCollection
 
 
 class CommandNotExecutedException(Exception):
@@ -25,7 +24,7 @@ class CommandInterface(ABC):
 
     @property
     @abstractmethod
-    def result(self) -> List[IDSValidationResult]: ...
+    def result(self) -> IDSValidationResultCollection: ...
 
     @abstractmethod
     def __init__(self, args: argparse.Namespace) -> None: ...

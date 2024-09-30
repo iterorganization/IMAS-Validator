@@ -59,6 +59,7 @@ def dbentry():
     db.get = Mock(wraps=get)
     db.factory = IDSFactory("3.40.1")
     db.dd_version = "3.40.1"
+    db.uri = ""
     return db
 
 
@@ -82,7 +83,9 @@ def rules():
 
 @pytest.fixture
 def rule_executor(dbentry, rules):
-    result_collector = ResultCollector(validate_options=ValidateOptions())
+    result_collector = ResultCollector(
+        validate_options=ValidateOptions(), imas_uri=dbentry.uri
+    )
     rule_executor = RuleExecutor(
         dbentry, rules, result_collector, validate_options=ValidateOptions()
     )
