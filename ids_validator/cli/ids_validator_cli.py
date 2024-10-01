@@ -197,7 +197,7 @@ def main(argv: List) -> None:
         common_result_list: List[IDSValidationResultCollection] = []
 
         for command in command_objects:
-            if command.result is not None and isinstance(command, ValidateCommand):
+            if isinstance(command, ValidateCommand) and command.result is not None:
 
                 common_result_list.append(command.result)
 

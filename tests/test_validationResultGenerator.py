@@ -8,7 +8,11 @@ from ids_validator.report.validationResultGenerator import (
     ValidationResultGenerator,
 )
 from ids_validator.rules.data import IDSValidationRule
-from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result import (
+    IDSValidationResult,
+    IDSValidationResultCollection,
+)
+from ids_validator.validate_options import ValidateOptions
 
 
 def dummy_rule_function() -> None:
@@ -26,8 +30,15 @@ def test_error_result() -> None:
         {},
         exc=RuntimeError("Dummy exception"),
     )
+
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
-    result_generator = ValidationResultGenerator(uri, [result])
+    result_collection = IDSValidationResultCollection(
+        results=[result],
+        coverage_dict={},
+        validate_options=ValidateOptions(),
+        imas_uri=uri,
+    )
+    result_generator = ValidationResultGenerator(result_collection)
 
     tb = "\n".join(result.tb.format())
     node_text = minidom.Document().createTextNode(tb)
@@ -59,6 +70,7 @@ def test_error_result() -> None:
         f"Message : \n\t\t"
         f"Traceback : {str(last_tb)}\n\t\t"
         f"Nodes_Dict : {{}}\n"
+        f"\n\nCoverage map:\n"
     )
 
 
@@ -74,7 +86,13 @@ def test_successful_assert() -> None:
         exc=None,
     )
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
-    result_generator = ValidationResultGenerator(uri, [result])
+    result_collection = IDSValidationResultCollection(
+        results=[result],
+        coverage_dict={},
+        validate_options=ValidateOptions(),
+        imas_uri=uri,
+    )
+    result_generator = ValidationResultGenerator(result_collection)
     assert result_generator.xml == (
         '<testsuites id="1" name="ids_validator" tests="1" failures="0">\n\t'
         '<testsuite id="1.1" name="core_profiles-0" tests="1" failures="0">\n\t\t'
@@ -91,6 +109,7 @@ def test_successful_assert() -> None:
         "Number of failed tests : 0\n\n"
         "IDS core_profiles occurrence 0\n\t"
         "Test with rule name : to/rule.py:dummy_rule_function, was successful\n"
+        "\n\nCoverage map:\n"
     )
 
 
@@ -106,7 +125,13 @@ def test_failed_assert() -> None:
         exc=None,
     )
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
-    result_generator = ValidationResultGenerator(uri, [result])
+    result_collection = IDSValidationResultCollection(
+        results=[result],
+        coverage_dict={},
+        validate_options=ValidateOptions(),
+        imas_uri=uri,
+    )
+    result_generator = ValidationResultGenerator(result_collection)
 
     tb = "\n".join(result.tb.format())
     node_text = minidom.Document().createTextNode(tb)
@@ -140,6 +165,7 @@ def test_failed_assert() -> None:
         f"Message : Optional message\n\t\t"
         f"Traceback : {str(last_tb)}\n\t\t"
         f"Nodes_Dict : {{('core_profiles', 0): {'a', 'b', 'c'}}}\n"
+        f"\n\nCoverage map:\n"
     )
 
 
@@ -155,9 +181,15 @@ def test_report_html_generator() -> None:
         exc=None,
     )
     today = datetime.today()
+
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
-    reports_dict = {uri: [result]}
-    html_result_generator = SummaryReportGenerator(reports_dict, today)
+    result_collection = IDSValidationResultCollection(
+        results=[result],
+        coverage_dict={},
+        validate_options=ValidateOptions(),
+        imas_uri=uri,
+    )
+    html_result_generator = SummaryReportGenerator([result_collection], today)
 
     document_style = """
     <style>
