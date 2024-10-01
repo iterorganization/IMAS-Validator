@@ -23,7 +23,7 @@ def test_generic_tests_with_randomly_generated_ids(ids_name, tmp_path):
     dbentry.put(ids)
     dbentry.close()
 
-    results = validate(uri)
-    assert len(results) > 0
-    for result in results:
+    results_collection = validate(uri)
+    assert len(results_collection.results) > 0
+    for result in results_collection.results:
         assert result.exc is None  # Generic tests should not lead to an Exception

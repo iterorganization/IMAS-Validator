@@ -37,7 +37,7 @@ def test_error_result() -> None:
     assert result_generator.xml == (
         f'<testsuites id="1" name="ids_validator" tests="1" failures="1">\n\t'
         f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
-        f'<testcase id="1.1.1" name="to/rule.py/dummy_rule_function">\n\t\t\t'
+        f'<testcase id="1.1.1" name="to/rule.py:dummy_rule_function">\n\t\t\t'
         f'<failure message="" type="" nodes_dict="{{}}">{str(str_to_compare)}'
         f"</failure>\n\t\t"
         f"</testcase>\n\t"
@@ -55,7 +55,7 @@ def test_error_result() -> None:
         f"Number of successful tests : 0\n"
         f"Number of failed tests : 1\n\n"
         f"IDS core_profiles occurrence 0\n\n"
-        f"Test with rule name : to/rule.py/dummy_rule_function, failed\n\t\t"
+        f"Test with rule name : to/rule.py:dummy_rule_function, failed\n\t\t"
         f"Message : \n\t\t"
         f"Traceback : {str(last_tb)}\n\t\t"
         f"Nodes_Dict : {{}}\n"
@@ -70,7 +70,7 @@ def test_successful_assert() -> None:
         IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
         [("core_profiles", 0)],
         traceback.extract_stack(),
-        {("core_profiles", 0): ["a", "b", "c"]},
+        {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
     )
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
@@ -78,7 +78,7 @@ def test_successful_assert() -> None:
     assert result_generator.xml == (
         '<testsuites id="1" name="ids_validator" tests="1" failures="0">\n\t'
         '<testsuite id="1.1" name="core_profiles-0" tests="1" failures="0">\n\t\t'
-        '<testcase id="1.1.1" name="to/rule.py/dummy_rule_function"/>\n\t'
+        '<testcase id="1.1.1" name="to/rule.py:dummy_rule_function"/>\n\t'
         "</testsuite>\n"
         "</testsuites>\n"
     )
@@ -90,7 +90,7 @@ def test_successful_assert() -> None:
         "Number of successful tests : 1\n"
         "Number of failed tests : 0\n\n"
         "IDS core_profiles occurrence 0\n\t"
-        "Test with rule name : to/rule.py/dummy_rule_function, was successful\n"
+        "Test with rule name : to/rule.py:dummy_rule_function, was successful\n"
     )
 
 
@@ -102,7 +102,7 @@ def test_failed_assert() -> None:
         IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
         [("core_profiles", 0)],
         traceback.extract_stack(),
-        {("core_profiles", 0): ["a", "b", "c"]},
+        {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
     )
     uri = "imas:mdsplus?test_validationResultGeneratorUri"
@@ -116,9 +116,9 @@ def test_failed_assert() -> None:
     assert result_generator.xml == (
         f'<testsuites id="1" name="ids_validator" tests="1" failures="1">\n\t'
         f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
-        f'<testcase id="1.1.1" name="to/rule.py/dummy_rule_function">\n\t\t\t'
+        f'<testcase id="1.1.1" name="to/rule.py:dummy_rule_function">\n\t\t\t'
         f'<failure message="Optional message" type="" '
-        f"nodes_dict=\"{{('core_profiles', 0): ['a', 'b', 'c']}}\">"
+        f"nodes_dict=\"{{('core_profiles', 0): {'a', 'b', 'c'}}}\">"
         f"{str_to_compare}"
         f"</failure>\n\t\t"
         f"</testcase>\n\t"
@@ -136,10 +136,10 @@ def test_failed_assert() -> None:
         f"Number of successful tests : 0\n"
         f"Number of failed tests : 1\n\n"
         f"IDS core_profiles occurrence 0\n\n"
-        f"Test with rule name : to/rule.py/dummy_rule_function, failed\n\t\t"
+        f"Test with rule name : to/rule.py:dummy_rule_function, failed\n\t\t"
         f"Message : Optional message\n\t\t"
         f"Traceback : {str(last_tb)}\n\t\t"
-        f"Nodes_Dict : {{('core_profiles', 0): ['a', 'b', 'c']}}\n"
+        f"Nodes_Dict : {{('core_profiles', 0): {'a', 'b', 'c'}}}\n"
     )
 
 

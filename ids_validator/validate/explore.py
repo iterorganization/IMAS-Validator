@@ -31,7 +31,7 @@ def explore(
         docstring_level: 0 for no docstrings, 1 for shortened and 2 for full docstrings.
     """
 
-    result_collector = ResultCollector(validate_options=validate_options)
+    result_collector = ResultCollector(validate_options=validate_options, imas_uri="")
     docs = load_docs(
         result_collector=result_collector,
         validate_options=validate_options,
