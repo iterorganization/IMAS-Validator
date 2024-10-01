@@ -13,7 +13,7 @@ from ids_validator.report.validationResultGenerator import (
     SummaryReportGenerator,
     ValidationResultGenerator,
 )
-from ids_validator.validate.result import IDSValidationResult
+from ids_validator.validate.result import IDSValidationResultCollection
 
 cli_logger = logging.getLogger(__name__)
 cli_logger.setLevel(logging.INFO)
@@ -194,41 +194,39 @@ def main(argv: List) -> None:
             command.execute()
 
         # 'common' means it contains results for all executed commands
-        common_result_dict: dict[str, List[IDSValidationResult]] = {}
+        common_result_list: List[IDSValidationResultCollection] = []
 
         for command in command_objects:
             if command.result is not None and isinstance(command, ValidateCommand):
-                # save result for summary.html generation
-                common_result_dict[command.uri] = command.result
+
+                common_result_list.append(command.result)
 
                 # save result for this URI
-                report_generator = ValidationResultGenerator(
-                    command.uri, command.result
-                )
+                report_generator = ValidationResultGenerator(command.result)
                 report_filename = (
-                    f"{reports_path}/{today}/{command.uri.replace('/','|')}"
+                    f"{reports_path}/{today}/{command.result.imas_uri.replace('/','|')}"
                 )
 
                 os.makedirs(os.path.dirname(report_filename), exist_ok=True)
                 report_generator.save_xml(f"{report_filename}.xml")
                 report_generator.save_txt(f"{report_filename}.txt")
 
-        if not common_result_dict:
+        if not common_result_list:
             return
 
         if isinstance(command_objects[0], ValidateCommand):
             # print URIs of failed tests
             failed_test_uris = [
-                uri
-                for uri, result_list in common_result_dict.items()
-                if not all([result.success for result in result_list])
+                result_collection.imas_uri
+                for result_collection in common_result_list
+                if not all([result.success for result in result_collection.results])
             ]
             if failed_test_uris:
                 cli_logger.info("Some URIs failed validation")
                 sys.stdout.write(" ".join(failed_test_uris) + "\n")
 
             summary_filename = f"{reports_path}/{today}/report.html"
-            summary_generator = SummaryReportGenerator(common_result_dict, today)
+            summary_generator = SummaryReportGenerator(common_result_list, today)
             summary_generator.save_html(summary_filename)
 
     except CommandNotRecognisedException:

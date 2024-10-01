@@ -39,15 +39,3 @@ class ValidateCommand(GenericCommand):
 
     def __str__(self) -> str:
         return f"VALIDATE URI={self._uri} VALIDATE_OPTIONS={self.validate_options}"
-
-    @property
-    def uri(self) -> str:
-        """
-        ValidateCommand specific property to get validated URI
-        """
-        return self._uri
-
-    @uri.setter
-    def uri(self, value: str) -> None:
-        # URI should be not settable from outside
-        ...
