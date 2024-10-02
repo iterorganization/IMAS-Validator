@@ -6,6 +6,8 @@ import sys
 from datetime import datetime
 from typing import List
 
+from junit2htmlreport.parser import Junit  # type: ignore
+
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
 from ids_validator.cli.commands.validate_command import ValidateCommand
@@ -207,14 +209,37 @@ def main(argv: List) -> None:
                     f"{reports_path}/{today}/{command.result.imas_uri.replace('/','|')}"
                 )
 
+                validation_passed = all(
+                    [result.success for result in command.result.results]
+                )
+                PASSED_FAILED_KEYWORD: str = "PASSED" if validation_passed else "FAILED"
+
                 os.makedirs(os.path.dirname(report_filename), exist_ok=True)
                 report_generator.save_xml(f"{report_filename}.xml")
                 report_generator.save_txt(f"{report_filename}.txt")
+
+                # generate detailed html report
+                junit_report_parser = Junit(f"{report_filename}.xml")
+                html = junit_report_parser.html(show_toc=True)
+                with open(f"{report_filename}.html", "wb") as outfile:
+                    outfile.write(html.encode("utf-8"))
+
+                cli_logger.info(
+                    f"URI {command.result.imas_uri} has"
+                    f" {PASSED_FAILED_KEYWORD} validation."
+                    f" Detailed report can be found in {report_filename}.txt/html/xml"
+                )
 
         if not common_result_list:
             return
 
         if isinstance(command_objects[0], ValidateCommand):
+            # generate summary report
+            summary_filename = f"{reports_path}/{today}/report.html"
+            summary_generator = SummaryReportGenerator(common_result_list, today)
+            summary_generator.save_html(summary_filename)
+            cli_logger.info(f"Report summary saved as: {summary_filename}")
+
             # print URIs of failed tests
             failed_test_uris = [
                 result_collection.imas_uri
@@ -222,12 +247,7 @@ def main(argv: List) -> None:
                 if not all([result.success for result in result_collection.results])
             ]
             if failed_test_uris:
-                cli_logger.info("Some URIs failed validation")
                 sys.stdout.write(" ".join(failed_test_uris) + "\n")
-
-            summary_filename = f"{reports_path}/{today}/report.html"
-            summary_generator = SummaryReportGenerator(common_result_list, today)
-            summary_generator.save_html(summary_filename)
 
     except CommandNotRecognisedException:
         parser.print_help()

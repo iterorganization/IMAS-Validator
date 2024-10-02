@@ -349,23 +349,16 @@ class SummaryReportGenerator:
 
         Returns:
             filled html temlpate
-            if validation was successful:
-            <li><span data-validation-successfull="true">PASSED: </span>{uri}</li>
 
-            else:
-            <li><span data-validation-successfull="false">FAILED: </span>{uri}
-            <a href="./test_report.xml">Go to JUnit report</a>
-            <a href="./test_report.txt">Go to txt report</a></li>
+            <li><span data-validation-successfull="false">PASSED/FAILED: </span>{uri}
+            <a href="./test_report.html">HTML report</a>
+            <a href="./test_report.txt">TXT report</a></li>
 
         """
         validation_successful: bool = all(
             [result.success for result in validation_results.results]
         )
-        if validation_successful:
-            return (
-                f"<li><span data-validation-successfull='true'>"
-                f"PASSED: </span>{validation_results.imas_uri}</li>"
-            )
+        PASSED_FAILED_KEYWORD: str = "PASSED" if validation_successful else "FAILED"
 
         # process filename not to contain slashes, colon or question marks.
         # They are not processed properly by URL bar in browser
@@ -376,10 +369,12 @@ class SummaryReportGenerator:
         )
 
         return (
-            f'<li><span data-validation-successfull="false">FAILED: </span>'
+            f"<li><span data-validation-successfull="
+            f'{"true" if validation_successful else "false"}>'
+            f"{PASSED_FAILED_KEYWORD}: </span>"
             f"{validation_results.imas_uri}<br>"
-            f'<a href="./{processed_filename}.xml">Go to JUnit report</a>'
-            f'<a href="./{processed_filename}.txt">Go to txt report</a>'
+            f'<a href="./{processed_filename}.html">HTML report</a>'
+            f'<a href="./{processed_filename}.txt">TXT report</a>'
             f"</li><br/>"
         )
 
