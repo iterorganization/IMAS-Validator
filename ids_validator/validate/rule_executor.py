@@ -11,6 +11,7 @@ from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
+from rich.progress import Progress
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
@@ -98,29 +99,32 @@ class RuleExecutor:
         """
 
         ids_list = self._get_ids_list()
-        for ids_name, occurrence in ids_list:
-            ids_instance = self._load_ids_instance(ids_name, occurrence)
-            ids_version = Version(ids_instance[0]._dd_version)
-            # match with first ids_name to prevent matching the same rule multiple
-            # times for multi-ids
-            filtered_rules = [
-                rule
-                for rule in self.rules
-                if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
-                and (rule.ids_occs[0] == occurrence or rule.ids_occs[0] is None)
-                and ids_version in SpecifierSet(rule.version)
-            ]
-            for rule in filtered_rules:
-                idss = [ids_instance]
-                # get rest of idss for multi-validation rules.
-                # unoptimized algorithm, change if performance ever becomes problem.
-                for name, occ in zip(rule.ids_names[1:], rule.ids_occs[1:]):
-                    assert occ is not None
-                    instance = self._load_ids_instance(name, occ)
-                    idss.append(instance)
-                if not len(idss) == len(rule.ids_names):
-                    raise ValueError("Number of inputs not the same as required")
-                yield idss, rule
+        with Progress() as progress:
+            t1 = progress.add_task("[red]Processing...", total=len(ids_list))
+            for ids_name, occurrence in ids_list:
+                progress.update(t1, advance=1)
+                ids_instance = self._load_ids_instance(ids_name, occurrence)
+                ids_version = Version(ids_instance[0]._dd_version)
+                # match with first ids_name to prevent matching the same rule multiple
+                # times for multi-ids
+                filtered_rules = [
+                    rule
+                    for rule in self.rules
+                    if (rule.ids_names[0] == ids_name or rule.ids_names[0] == "*")
+                    and (rule.ids_occs[0] == occurrence or rule.ids_occs[0] is None)
+                    and ids_version in SpecifierSet(rule.version)
+                ]
+                for rule in filtered_rules:
+                    idss = [ids_instance]
+                    # get rest of idss for multi-validation rules.
+                    # unoptimized algorithm, change if performance ever becomes problem.
+                    for name, occ in zip(rule.ids_names[1:], rule.ids_occs[1:]):
+                        assert occ is not None
+                        instance = self._load_ids_instance(name, occ)
+                        idss.append(instance)
+                    if not len(idss) == len(rule.ids_names):
+                        raise ValueError("Number of inputs not the same as required")
+                    yield idss, rule
 
     def _load_ids_instance(self, ids_name: str, occurrence: int) -> IDSInstance:
         return (
