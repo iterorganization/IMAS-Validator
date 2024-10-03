@@ -205,6 +205,9 @@ class ValidationResultGenerator:
         for (ids, occurrence), result_list in failed_result_dictionary.items():
             txt_report_body += f"- IDS {ids} occurrence {occurrence}\n"
             for result_object in result_list:
+                # Print only rules that failed validation
+                if result_object.success:
+                    continue
                 txt_report_body += f"\tRULE: {result_object.rule.name}\n"
                 txt_report_body += f"\t\tMESSAGE: {result_object.msg}\n"
                 txt_report_body += (
