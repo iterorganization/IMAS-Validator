@@ -227,7 +227,8 @@ def main(argv: List) -> None:
                 cli_logger.info(
                     f"URI {command.result.imas_uri} has"
                     f" {PASSED_FAILED_KEYWORD} validation."
-                    f" Detailed report can be found in {report_filename}.txt/html/xml"
+                    f" Detailed report can be found in"
+                    f" {report_filename}.txt |.html |.xml"
                 )
 
         if not common_result_list:

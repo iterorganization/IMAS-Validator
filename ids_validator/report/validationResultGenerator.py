@@ -143,55 +143,92 @@ class ValidationResultGenerator:
             validation_result: IDSValidationResultCollection - validation result
 
         Return:
+            None
         """
+        # This function is split into 3 parts:
+        # - generate txt report header
+        # - generate report body (list od ids-occurrence and result)
+        # - generate coverage map
 
+        # --- init variables ---
         self._junit_txt = ""
-        ids_tmp: str = ""
+        txt_report_header = ""
+        txt_report_body = ""
+        txt_report_coverage_map = ""
 
+        # --------- generate report header ---------
         cpt_test = len(validation_result.results)
         cpt_failure = sum(not item.success for item in validation_result.results)
         cpt_succesful = cpt_test - cpt_failure
 
-        self._junit_txt = (
+        txt_report_header += (
             f"Summary Report : \n"
             f"Tested URI : {validation_result.imas_uri}\n"
-            f"Number of tests carried out : {str(cpt_test)}\n"
-            f"Number of successful tests : {str(cpt_succesful)}\n"
-            f"Number of failed tests : {str(cpt_failure)}\n\n"
+            f"Number of tests carried out : {cpt_test}\n"
+            f"Number of successful tests : {cpt_succesful}\n"
+            f"Number of failed tests : {cpt_failure}\n\n"
         )
 
-        for ids_validation_item in validation_result.results:
-            for tuple_item in ids_validation_item.idss:
-                if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
-                    self._junit_txt += (
-                        f"IDS {str(tuple_item[0])} occurrence {str(tuple_item[1])}\n"
-                    )
-                    ids_tmp = str(tuple_item[0]) + "-" + str(tuple_item[1])
+        # --------- generate report body ---------
+        result_dictionary: dict = {}
+        passed_result_dictionary: dict = {}
+        failed_result_dictionary: dict = {}
 
-                if ids_validation_item.success is False:
-                    last_tb = str(ids_validation_item.tb[-1])
-                    last_tb = last_tb.replace("<", "")
-                    last_tb = last_tb.replace(">", "")
-                    self._junit_txt += (
-                        f"\nTest with rule name : "
-                        f"{ids_validation_item.rule.name}, failed\n"
-                    )
-                    self._junit_txt += f"\t\tMessage : {ids_validation_item.msg}\n"
-                    self._junit_txt += f"\t\tTraceback : {last_tb}\n"
-                    self._junit_txt += (
-                        f"\t\tNodes_Dict : {ids_validation_item.nodes_dict}\n"
-                    )
+        # convert List[IDSValidationResult] into dictionary:
+        # {(ids, occurrence) : List[IDSValidationResult]} for sake of code readability
+        for single_validation_result in validation_result.results:
+            for ids, occurrence in single_validation_result.idss:
+                dict_key = (ids, occurrence)
+                if dict_key not in result_dictionary:
+                    result_dictionary[dict_key] = [single_validation_result]
                 else:
-                    self._junit_txt += (
-                        f"\tTest with rule name : "
-                        f"{ids_validation_item.rule.name}, was successful\n"
-                    )
-        self._junit_txt += "\n\nCoverage map:\n"
+                    result_dictionary[dict_key].append(single_validation_result)
+
+        # split custom dictionary into one holding PASSED ids-occurrences
+        # and one with FAILED
+        for ids_occurrence, result_list in result_dictionary.items():
+            if all([result.success for result in result_list]):
+                passed_result_dictionary[ids_occurrence] = result_list
+            else:
+                failed_result_dictionary[ids_occurrence] = result_list
+
+        # fill txt report body
+        # PASSED tests
+        txt_report_body += "PASSED IDSs:\n"
+        for (ids, occurrence), result_list in passed_result_dictionary.items():
+            txt_report_body += f"+ IDS {ids} occurrence {occurrence}\n"
+
+        # FAILED tests
+        txt_report_body += "\n"
+        txt_report_body += "FAILED IDSs:\n"
+
+        for (ids, occurrence), result_list in failed_result_dictionary.items():
+            txt_report_body += f"- IDS {ids} occurrence {occurrence}\n"
+            for result_object in result_list:
+                txt_report_body += f"\tRULE: {result_object.rule.name}\n"
+                txt_report_body += f"\t\tMESSAGE: {result_object.msg}\n"
+                txt_report_body += (
+                    f"\t\tTRACEBACK: "
+                    f"{str(result_object.tb[-1]).replace('<', '').replace('>','')}\n"
+                )
+                txt_report_body += (
+                    f"\t\tNODES: "
+                    f"{result_object.nodes_dict.get((ids, occurrence), '')}"
+                    f"\n\n"
+                )
+
+        # --------- generate coverage map ---------
+        txt_report_coverage_map += "\n\nCoverage map:\n"
         for k, v in validation_result.coverage_dict.items():
-            self._junit_txt += (
+            txt_report_coverage_map += (
                 f"\t{k[0]}/{k[1]} : filled = {v.filled},"
                 f" visited = {v.visited}, overlap = {v.overlap}\n"
             )
+
+        # --------- put everything into single txt variable ---------
+        self._junit_txt = (
+            f"{txt_report_header}" f"{txt_report_body}" f"{txt_report_coverage_map}"
+        )
 
     def save_xml(self, file_name: str) -> None:
         """

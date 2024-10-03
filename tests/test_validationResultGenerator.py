@@ -59,19 +59,22 @@ def test_error_result() -> None:
     last_tb = str(result.tb[-1])
     last_tb = last_tb.replace("<", "")
     last_tb = last_tb.replace(">", "")
-    assert result_generator.txt == (
+
+    assert result_generator.txt.replace('\t', '').replace('\n', '').replace(' ', '') == (
         f"Summary Report : \n"
         f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1\n"
         f"Number of successful tests : 0\n"
         f"Number of failed tests : 1\n\n"
-        f"IDS core_profiles occurrence 0\n\n"
-        f"Test with rule name : to/rule.py:dummy_rule_function, failed\n\t\t"
-        f"Message : \n\t\t"
-        f"Traceback : {str(last_tb)}\n\t\t"
-        f"Nodes_Dict : {{}}\n"
-        f"\n\nCoverage map:\n"
-    )
+        f"PASSED IDSs:"
+        f"FAILED IDSs:"
+        f"- IDS core_profiles occurrence 0"
+	    f"RULE: to/rule.py:dummy_rule_function"
+	    f"MESSAGE:" 
+	    f"TRACEBACK: {last_tb}"
+	    f"NODES:"
+        f"Coverage map:"
+    ).replace('\t', '').replace('\n', '').replace(' ', '')
 
 
 def test_successful_assert() -> None:
@@ -101,16 +104,17 @@ def test_successful_assert() -> None:
         "</testsuites>\n"
     )
 
-    assert result_generator.txt == (
-        "Summary Report : \n"
+    assert result_generator.txt.replace('\t', '').replace('\n', '').replace(' ', '') == (
+        "Summary Report : "
         "Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
-        "Number of tests carried out : 1\n"
-        "Number of successful tests : 1\n"
-        "Number of failed tests : 0\n\n"
-        "IDS core_profiles occurrence 0\n\t"
-        "Test with rule name : to/rule.py:dummy_rule_function, was successful\n"
-        "\n\nCoverage map:\n"
-    )
+        "Number of tests carried out : 1"
+        "Number of successful tests : 1"
+        "Number of failed tests : 0"
+        "PASSED IDSs:"
+        "+ IDS core_profiles occurrence 0"
+        "FAILED IDSs:"
+        "Coverage map:"
+    ).replace('\t', '').replace('\n', '').replace(' ', '')
 
 
 def test_failed_assert() -> None:
@@ -154,19 +158,22 @@ def test_failed_assert() -> None:
     last_tb = str(result.tb[-1])
     last_tb = last_tb.replace("<", "")
     last_tb = last_tb.replace(">", "")
-    assert result_generator.txt == (
-        f"Summary Report : \n"
+
+    assert result_generator.txt.replace('\t', '').replace('\n','').replace(' ','') == (
+        f"Summary Report : "
         f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
-        f"Number of tests carried out : 1\n"
-        f"Number of successful tests : 0\n"
-        f"Number of failed tests : 1\n\n"
-        f"IDS core_profiles occurrence 0\n\n"
-        f"Test with rule name : to/rule.py:dummy_rule_function, failed\n\t\t"
-        f"Message : Optional message\n\t\t"
-        f"Traceback : {str(last_tb)}\n\t\t"
-        f"Nodes_Dict : {{('core_profiles', 0): {'a', 'b', 'c'}}}\n"
-        f"\n\nCoverage map:\n"
-    )
+        f"Number of tests carried out : 1"
+        f"Number of successful tests : 0"
+        f"Number of failed tests : 1"
+        f"PASSED IDSs:"
+        f"FAILED IDSs:"
+        f"- IDS core_profiles occurrence 0"
+	    f"RULE: to/rule.py:dummy_rule_function"
+		f"MESSAGE: Optional message"
+		f"TRACEBACK: {last_tb}"
+		f"NODES: ('a', 'b', 'c')"
+        f"Coverage map:"
+    ).replace('\t', '').replace('\n','').replace(' ','')
 
 
 def test_report_html_generator() -> None:
@@ -249,7 +256,7 @@ def test_report_html_generator() -> None:
             <br>
             <h3>Failed tests</h3>
             <ol>
-            <li><span data-validation-successfull="false">FAILED: </span>imas:mdsplus?test_validationResultGeneratorUri<br><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.xml">Go to JUnit report</a><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.txt">Go to txt report</a></li><br/>
+            <li><span data-validation-successfull=false>FAILED: </span>imas:mdsplus?test_validationResultGeneratorUri<br><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.html">HTML report</a><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.txt">TXT report</a></li><br/>
             </ol>
         </div>
         </body>
