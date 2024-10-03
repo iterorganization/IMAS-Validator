@@ -154,12 +154,12 @@ class ResultCollector:
             key = (name, occ)
             if key not in self.filled_nodes_dict.keys():
                 self.filled_nodes_dict[key] = set()
-            imaspy.util.visit_children(
-                lambda node: self.filled_nodes_dict[key].add(node._path),
-                ids_instance,
-                leaf_only=True,
-                visit_empty=False,
-            )
+                imaspy.util.visit_children(
+                    lambda node: self.filled_nodes_dict[key].add(node._path),
+                    ids_instance,
+                    leaf_only=True,
+                    visit_empty=False,
+                )
 
     def coverage_dict(self) -> CoverageDict:
         """
