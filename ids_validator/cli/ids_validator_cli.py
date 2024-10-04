@@ -94,12 +94,6 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     explore_group_exclusive = explore_group.add_mutually_exclusive_group()
 
     explore_group_exclusive.add_argument(
-        "--verbose",
-        action="store_true",
-        default=False,
-        help="Display detailed ruleset description",
-    )
-    explore_group_exclusive.add_argument(
         "--no-docstring",
         action="store_true",
         default=False,
@@ -143,6 +137,12 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             action="store_true",
             default=False,
             help="Disable rulesets bundled with ids_validator.",
+        )
+        group.add_argument(
+            "--verbose",
+            action="store_true",
+            default=False,
+            help="Display detailed output",
         )
 
         group.add_argument(
@@ -209,11 +209,6 @@ def main(argv: List) -> None:
                     f"{reports_path}/{today}/{command.result.imas_uri.replace('/','|')}"
                 )
 
-                validation_passed = all(
-                    [result.success for result in command.result.results]
-                )
-                PASSED_FAILED_KEYWORD: str = "PASSED" if validation_passed else "FAILED"
-
                 os.makedirs(os.path.dirname(report_filename), exist_ok=True)
                 report_generator.save_xml(f"{report_filename}.xml")
                 report_generator.save_txt(f"{report_filename}.txt")
@@ -224,12 +219,29 @@ def main(argv: List) -> None:
                 with open(f"{report_filename}.html", "wb") as outfile:
                     outfile.write(html.encode("utf-8"))
 
+                # print output
+                validation_passed = all(
+                    [result.success for result in command.result.results]
+                )
+                color_red = "\x1b[31m"
+                color_green = "\x1b[32m"
+                color_end = "\033[0m"
+                PASSED_FAILED_KEYWORD: str = (
+                    f"{color_green}PASSED{color_end}"
+                    if validation_passed
+                    else f"{color_red}FAILED{color_end}"
+                )
+
                 cli_logger.info(
                     f"URI {command.result.imas_uri} has"
                     f" {PASSED_FAILED_KEYWORD} validation."
-                    f" Detailed report can be found in"
-                    f" {report_filename}.txt |.html |.xml"
                 )
+
+                # display txt report if set to verbose output
+                if args.verbose:
+                    cli_logger.info("See detailed report below:")
+                    cli_logger.info(f"{color_red}{'-'*50}\n{report_generator.txt}")
+                    cli_logger.info(f"{color_red}{'-'*50}")
 
         if not common_result_list:
             return
