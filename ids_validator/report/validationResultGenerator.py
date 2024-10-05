@@ -406,6 +406,7 @@ class SummaryReportGenerator:
             validation_results.imas_uri.replace("/", "|")
             .replace(":", "%3A")
             .replace("?", "%3F")
+            .replace("#", "%23")
         )
 
         return (
