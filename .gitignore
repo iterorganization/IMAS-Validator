@@ -17,4 +17,6 @@ build
 junit.xml
 .idea/
 
+ids-validator-course
+ids-validator-training-rulesets
 validate_reports

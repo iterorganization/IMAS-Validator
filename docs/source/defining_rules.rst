@@ -4,7 +4,7 @@ Defining validation rules
 ===========================
 
 On this page we explain the structure of rules. For a step-by-step guide to
-creating new rules, see the :ref:`rule tutorial`.
+creating new rules, see the :ref:`training<IDS validator 101>`.
 
 Rule grouping
 -------------
@@ -13,7 +13,6 @@ IDS validation is done by applying rules to IDS structures. In this section we
 explain how rules are grouped together:
 
 ..
-  TODO: update Rule definition when multi-IDS validation is implemented
 
 **Rule**
   A Rule is a set of checks that logically belong together. Rules are defined in

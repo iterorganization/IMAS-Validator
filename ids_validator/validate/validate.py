@@ -32,6 +32,7 @@ def validate(
 ) -> IDSValidationResultCollection:
     """
     Main function
+
     Args:
         imas_uri: url for DBEntry object
         validate_options: dataclass with options for validate function

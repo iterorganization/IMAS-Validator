@@ -285,6 +285,8 @@ intersphinx_mapping = {
 }
 intersphinx_timeout = 60  # Downloads time out after 1 minute
 
+smartquotes = False
+
 # Configuration of sphinx.ext.mathjax
 # https://www.sphinx-doc.org/en/master/usage/extensions/math.html#module-sphinx.ext.mathjax
 
