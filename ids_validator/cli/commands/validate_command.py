@@ -18,7 +18,7 @@ class ValidateCommand(GenericCommand):
 
     def __init__(self, args: argparse.Namespace) -> None:
         super(ValidateCommand, self).__init__(args)
-        self.uri = args.uri[0]
+        self._uri = args.uri[0]
         self.validate_options = ValidateOptions(
             rulesets=flatten_2d_list_or_return_empty(args.ruleset),
             extra_rule_dirs=[
@@ -34,8 +34,8 @@ class ValidateCommand(GenericCommand):
     def execute(self) -> None:
         super().execute()
         self._result = validate(
-            imas_uri=self.uri, validate_options=self.validate_options
+            imas_uri=self._uri, validate_options=self.validate_options
         )
 
     def __str__(self) -> str:
-        return f"VALIDATE URI={self.uri} VALIDATE_OPTIONS={self.validate_options}"
+        return f"VALIDATE URI={self._uri} VALIDATE_OPTIONS={self.validate_options}"

@@ -3,15 +3,15 @@
 Installing the IMAS IDS validator
 =================================
 
-SDCC setup
-----------
+SDCC module load
+----------------
 
-.. note::
-  A module will become available on SDCC after the first release of IDS validator.
-  Use the following instructions to work with the latest development version.
+.. code-block:: bash
 
-.. 
-  Update SDCC setup on first release
+  module load IDS-Validator
+
+SDCC installation
+-----------------
 
 * Setup a project folder and clone git repository
 
@@ -27,7 +27,7 @@ SDCC setup
   .. code-block:: bash
 
     # load IMAS and IMASPy before install
-    module load IMAS/3.41.0-2024.07-intel-2023b IMASPy
+    module load IMAS IMASPy
     python3 -m venv ./venv
     . venv/bin/activate
     pip install --upgrade pip
@@ -35,21 +35,21 @@ SDCC setup
     # For development an installation in editable mode may be more convenient
     pip install -e .[all]
 
-* Load IMAS and IMASPy
+* Run each session if tool already installed
 
   .. code-block:: bash
 
     # Load modules every time you use ids_validator
-    module load IMAS/3.41.0-2024.07-intel-2023b IMASPy
-    # And activate the Python virtual environment
+    module load IMAS IMASPy
+    # And activate the Python virtual environment every time you use ids_validator
     . venv/bin/activate
 
 * Test the installation
 
   .. code-block:: bash
 
-    python3 -c "import ids_validator; print(ids_validator.__version__)"
-    pytest
+    python -c "import ids_validator; print(ids_validator.__version__)"
+    python -m pytest
 
 
 Ubuntu installation
@@ -91,8 +91,8 @@ Ubuntu installation
 
   .. code-block:: bash
 
-    python3 -c "import ids_validator; print(ids_validator.__version__)"
-    pytest
+    python -c "import ids_validator; print(ids_validator.__version__)"
+    python -m pytest
 
 * To build the ids-validator documentation, execute:
 

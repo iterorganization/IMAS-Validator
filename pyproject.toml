@@ -52,6 +52,7 @@ dependencies = [
     "importlib_resources",
     "rich",
     "packaging",
+    "junit2html"
 ]
 
 [project.optional-dependencies]

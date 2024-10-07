@@ -6,10 +6,12 @@ Running validations with IDS validator
 In this section we start with the core functionality of the IDS validator: running tests on IDS data.
 The easiest way of using the IDS validator is by using the CLI from your terminal.
 The only required argument is the imas_uri of the DBentry object you want to validate.
+To print the report output directly to your terminal, add the ``--verbose`` option.
 
 .. code-block:: console
 
     $ ids_validator validate <DBENTRY_URI>
+    $ ids_validator validate <DBENTRY_URI> --verbose
 
 .. note::
 
@@ -28,6 +30,8 @@ Exercise 1
     .. md-tab-item:: Exercise
 
         Run the IDS validator generic tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``
+
+        Run it again with the ``--verbose`` option.
 
     .. md-tab-item:: Solution
 
@@ -62,7 +66,7 @@ Exercise 2
     .. md-tab-item:: Exercise
 
         Call the IDS validator including custom tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``.
-        The custom rules are defined in the ``ids-validator-training-rulesets/custom-rulesets`` ruleset folder.
+        The custom rules are defined in the ``ids-validator-training-rulesets/custom_ruleset`` ruleset folder.
 
     .. md-tab-item:: Solution
 
@@ -85,7 +89,7 @@ Exercise 3
 
         Failed validation for both IDS instances.
         The summary report should show information for
-        `generic/generic.py:validate_homogeneous_time`
+        `generic/generic.py:validate_increasing_time`
             
 .. note::
 
