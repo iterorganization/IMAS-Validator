@@ -102,7 +102,6 @@ class RuleExecutor:
         with Progress() as progress:
             t1 = progress.add_task("[red]Processing...", total=len(ids_list))
             for ids_name, occurrence in ids_list:
-                progress.update(t1, advance=1)
                 ids_instance = self._load_ids_instance(ids_name, occurrence)
                 ids_version = Version(ids_instance[0]._dd_version)
                 # match with first ids_name to prevent matching the same rule multiple
@@ -115,6 +114,7 @@ class RuleExecutor:
                     and ids_version in SpecifierSet(rule.version)
                 ]
                 for rule in filtered_rules:
+                    progress.update(t1, advance=1 / len(filtered_rules))
                     idss = [ids_instance]
                     # get rest of idss for multi-validation rules.
                     # unoptimized algorithm, change if performance ever becomes problem.
