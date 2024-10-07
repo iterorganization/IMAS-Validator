@@ -128,7 +128,11 @@ def create_training_db_entries() -> None:
 
 def copy_training_tests_to_cwd() -> None:
     training_rule_dir = (
-        get_project_root() / "ids_validator" / "assets" / "rulesets" / "custom_ruleset"
+        get_project_root()
+        / "ids_validator"
+        / "assets"
+        / "training_rulesets"
+        / "custom_ruleset"
     )
     shutil.copytree(
         training_rule_dir,

@@ -115,7 +115,7 @@ disallow_untyped_decorators = true
 [[tool.mypy.overrides]]
 module = [
     "tests.*",
-    "ids_validator.assets.rulesets.*",
+    "ids_validator.assets.*",
 ]
 ignore_errors = true
 
