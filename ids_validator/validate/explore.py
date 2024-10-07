@@ -14,7 +14,7 @@ from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
 
-default_val_opts = ValidateOptions()
+default_val_opts = ValidateOptions(explore=True)
 
 
 def explore(
