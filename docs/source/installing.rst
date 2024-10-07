@@ -3,15 +3,15 @@
 Installing the IMAS IDS validator
 =================================
 
-SDCC setup
-----------
+SDCC module load
+----------------
 
-.. note::
-  A module will become available on SDCC after the first release of IDS validator.
-  Use the following instructions to work with the latest development version.
+.. code-block:: bash
 
-.. 
-  Update SDCC setup on first release
+  module load IDS-Validator
+
+SDCC installation
+-----------------
 
 * Setup a project folder and clone git repository
 

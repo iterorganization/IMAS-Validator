@@ -6,10 +6,12 @@ Running validations with IDS validator
 In this section we start with the core functionality of the IDS validator: running tests on IDS data.
 The easiest way of using the IDS validator is by using the CLI from your terminal.
 The only required argument is the imas_uri of the DBentry object you want to validate.
+To print the report output directly to your terminal, add the ``--verbose`` option.
 
 .. code-block:: console
 
     $ ids_validator validate <DBENTRY_URI>
+    $ ids_validator validate <DBENTRY_URI> --verbose
 
 .. note::
 
@@ -28,6 +30,8 @@ Exercise 1
     .. md-tab-item:: Exercise
 
         Run the IDS validator generic tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``
+
+        Run it again with the ``--verbose`` option.
 
     .. md-tab-item:: Solution
 
