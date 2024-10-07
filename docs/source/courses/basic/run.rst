@@ -89,7 +89,7 @@ Exercise 3
 
         Failed validation for both IDS instances.
         The summary report should show information for
-        `generic/generic.py:validate_homogeneous_time`
+        `generic/generic.py:validate_increasing_time`
             
 .. note::
 
