@@ -60,6 +60,7 @@ def test_validate_command_str_cast():
         no_generic=True,
         debug=False,
         no_bundled=False,
+        node_coverage=True,
         filter_name=[],
         filter_ids=[],
         filter=[["homogeneous_time", "core_profiles"]],

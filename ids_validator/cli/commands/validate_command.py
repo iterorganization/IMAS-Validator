@@ -28,6 +28,7 @@ class ValidateCommand(GenericCommand):
             apply_generic=args.no_generic,
             use_pdb=args.debug,
             use_bundled_rulesets=not args.no_bundled,  # invert logic
+            track_node_dict=args.node_coverage,
             rule_filter=prepare_rule_filter_object(args),
             explore=False,
         )

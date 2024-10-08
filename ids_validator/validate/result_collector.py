@@ -114,7 +114,8 @@ class ResultCollector:
             exc=None,
         )
         self.results.append(result)
-        self.append_nodes_dict(nodes_dict, self._current_idss)
+        if self.validate_options.track_node_dict:
+            self.append_nodes_dict(nodes_dict, self._current_idss)
         # raise exception for debugging traceback
         if self.validate_options.use_pdb and not res_bool:
             raise InternalValidateDebugException()
