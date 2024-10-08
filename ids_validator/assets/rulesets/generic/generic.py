@@ -43,7 +43,7 @@ def validate_increasing_time(ids):
             # Get the corresponding AoS quantity (e.g. profiles_1d for
             # profiles_1d[0].time):d
             aos = Parent(time_quantity, 2)
-            aos_name = aos.metadata.name
+            aos_name = aos._obj.metadata.name
             if aos_name in aos_dict.keys():
                 aos_dict[aos_name] = aos
 
