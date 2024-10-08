@@ -26,6 +26,7 @@ class ExploreCommand(GenericCommand):
             ],
             use_bundled_rulesets=not args.no_bundled,  # invert logic
             rule_filter=prepare_rule_filter_object(args),
+            explore=True,
         )
 
         self.show_empty = args.show_empty

@@ -230,13 +230,18 @@ def filter_rulesets(
     Returns:
         List of directories corresponding to given rule sets
     """
+    print(validate_options.explore)
     filtered_rulesets: List[Path] = []
     for ruleset_dir in ruleset_dirs:
         name = ruleset_dir.name
-        if validate_options.apply_generic and name == "generic":
-            filtered_rulesets.append(ruleset_dir)
-        elif name in validate_options.rulesets:
-            filtered_rulesets.append(ruleset_dir)
+        if name == "generic":
+            if validate_options.apply_generic:
+                filtered_rulesets.append(ruleset_dir)
+        else:
+            if (
+                validate_options.explore and len(validate_options.rulesets) == 0
+            ) or name in validate_options.rulesets:
+                filtered_rulesets.append(ruleset_dir)
     filtered_ruleset_names = [p.name for p in filtered_rulesets]
     for ruleset in validate_options.rulesets:
         if ruleset not in filtered_ruleset_names:

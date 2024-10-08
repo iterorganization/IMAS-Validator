@@ -29,6 +29,7 @@ class ValidateCommand(GenericCommand):
             use_pdb=args.debug,
             use_bundled_rulesets=not args.no_bundled,  # invert logic
             rule_filter=prepare_rule_filter_object(args),
+            explore=False,
         )
 
     def execute(self) -> None:

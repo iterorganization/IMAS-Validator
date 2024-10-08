@@ -175,6 +175,28 @@ def test_filter_rulesets_apply_generic(caplog):
     ]
 
 
+def test_filter_rulesets_explore(caplog):
+    base = "tests/rulesets/base"
+    unfiltered_rulesets = [
+        Path(base),
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+    ]
+    filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/test-ruleset"), Path(base)]
+    validate_options = ValidateOptions(
+        rulesets=[],
+        apply_generic=True,
+        explore=True,
+    )
+    assert Counter(
+        filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
+    ) == Counter(filtered_rulesets)
+    log_test = "Using 3 / 3 rulesets"
+    assert caplog.record_tuples == [
+        ("ids_validator.rules.loading", logging.INFO, log_test)
+    ]
+
+
 def test_filter_rulesets_with_rulesets(caplog):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [

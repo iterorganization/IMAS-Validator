@@ -51,3 +51,5 @@ class ValidateOptions:
     """Whether or not to drop into debugger for failed tests"""
     rule_filter: RuleFilter = field(default_factory=RuleFilter)
     """Dictionary of filter criteria"""
+    explore: bool = False
+    """Whether this is an explore run or validate run."""
