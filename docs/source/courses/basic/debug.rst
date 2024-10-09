@@ -9,10 +9,16 @@ First, let's filter the tests so that we only run the failing test.
 We do this by adding flags to our command.
 If you only want to test specific rules you can filter on:
 
-- Rule name (-f, --filter, --filter_name)
+- Rule name (-f, --filter, --filter_name) 
 - IDS name (-f, --filter, --filter_ids)
 - Whether or not to use bundled rules (-b, --no-bundled)
 - Whether or not to use tests for all IDSs (-g, --no-generic)
+
+.. note::
+
+    Rule name consists of ``<ruleset_name>/<file_name>:<rule_name>``,
+    so you can use the --filter option to filter on a specific rule file.
+
 
 Exercise 1
 ----------

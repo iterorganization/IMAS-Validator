@@ -3,12 +3,15 @@ from datetime import datetime
 from pathlib import Path
 from xml.dom import minidom
 
+import pytest
+
 from ids_validator.report.validationResultGenerator import (
     SummaryReportGenerator,
     ValidationResultGenerator,
 )
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result import (
+    CoverageMap,
     IDSValidationResult,
     IDSValidationResultCollection,
 )
@@ -60,7 +63,9 @@ def test_error_result() -> None:
     last_tb = last_tb.replace("<", "")
     last_tb = last_tb.replace(">", "")
 
-    assert result_generator.txt.replace('\t', '').replace('\n', '').replace(' ', '') == (
+    assert result_generator.txt.replace("\t", "").replace("\n", "").replace(
+        " ", ""
+    ) == (
         f"Summary Report : \n"
         f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1\n"
@@ -69,12 +74,18 @@ def test_error_result() -> None:
         f"PASSED IDSs:"
         f"FAILED IDSs:"
         f"- IDS core_profiles occurrence 0"
-	    f"RULE: to/rule.py:dummy_rule_function"
-	    f"MESSAGE:" 
-	    f"TRACEBACK: {last_tb}"
-	    f"NODES:"
-        f"Coverage map:"
-    ).replace('\t', '').replace('\n', '').replace(' ', '')
+        f"RULE: to/rule.py:dummy_rule_function"
+        f"MESSAGE:"
+        f"TRACEBACK: {last_tb}"
+        f"NODES:"
+        # f"Coverage map:"
+    ).replace(
+        "\t", ""
+    ).replace(
+        "\n", ""
+    ).replace(
+        " ", ""
+    )
 
 
 def test_successful_assert() -> None:
@@ -104,7 +115,9 @@ def test_successful_assert() -> None:
         "</testsuites>\n"
     )
 
-    assert result_generator.txt.replace('\t', '').replace('\n', '').replace(' ', '') == (
+    assert result_generator.txt.replace("\t", "").replace("\n", "").replace(
+        " ", ""
+    ) == (
         "Summary Report : "
         "Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         "Number of tests carried out : 1"
@@ -113,8 +126,14 @@ def test_successful_assert() -> None:
         "PASSED IDSs:"
         "+ IDS core_profiles occurrence 0"
         "FAILED IDSs:"
-        "Coverage map:"
-    ).replace('\t', '').replace('\n', '').replace(' ', '')
+        # "Coverage map:"
+    ).replace(
+        "\t", ""
+    ).replace(
+        "\n", ""
+    ).replace(
+        " ", ""
+    )
 
 
 def test_failed_assert() -> None:
@@ -159,7 +178,9 @@ def test_failed_assert() -> None:
     last_tb = last_tb.replace("<", "")
     last_tb = last_tb.replace(">", "")
 
-    assert result_generator.txt.replace('\t', '').replace('\n','').replace(' ','') == (
+    assert result_generator.txt.replace("\t", "").replace("\n", "").replace(
+        " ", ""
+    ) == (
         f"Summary Report : "
         f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
         f"Number of tests carried out : 1"
@@ -168,12 +189,18 @@ def test_failed_assert() -> None:
         f"PASSED IDSs:"
         f"FAILED IDSs:"
         f"- IDS core_profiles occurrence 0"
-	    f"RULE: to/rule.py:dummy_rule_function"
-		f"MESSAGE: Optional message"
-		f"TRACEBACK: {last_tb}"
-		f"NODES: ('a', 'b', 'c')"
-        f"Coverage map:"
-    ).replace('\t', '').replace('\n','').replace(' ','')
+        f"RULE: to/rule.py:dummy_rule_function"
+        f"MESSAGE: Optional message"
+        f"TRACEBACK: {last_tb}"
+        f"NODES: ('a', 'b', 'c')"
+        # f"Coverage map:"
+    ).replace(
+        "\t", ""
+    ).replace(
+        "\n", ""
+    ).replace(
+        " ", ""
+    )
 
 
 def test_report_html_generator() -> None:
@@ -267,3 +294,32 @@ def test_report_html_generator() -> None:
             "\t", ""
         )
     )
+
+
+@pytest.mark.parametrize(
+    "expected_result, coverage_dict",
+    (
+        [False, {}],
+        [True, {("core_profiles", 0): CoverageMap(filled=3, visited=3, overlap=3)}],
+    ),
+)
+def test_coverage_dict(expected_result, coverage_dict) -> None:
+    # Create a successful assert result, similar to ResultCollector.assert_()
+    result = IDSValidationResult(
+        True,
+        "Optional message",
+        IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
+        [("core_profiles", 0)],
+        traceback.extract_stack(),
+        {("core_profiles", 0): ("a", "b", "c")},
+        exc=None,
+    )
+    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    result_collection = IDSValidationResultCollection(
+        results=[result],
+        coverage_dict=coverage_dict,
+        validate_options=ValidateOptions(),
+        imas_uri=uri,
+    )
+    result_generator = ValidationResultGenerator(result_collection)
+    assert ("Coverage map:" in result_generator.txt) == expected_result

@@ -221,12 +221,13 @@ class ValidationResultGenerator:
                 )
 
         # --------- generate coverage map ---------
-        txt_report_coverage_map += "\n\nCoverage map:\n"
-        for k, v in validation_result.coverage_dict.items():
-            txt_report_coverage_map += (
-                f"\t{k[0]}/{k[1]} : filled = {v.filled},"
-                f" visited = {v.visited}, overlap = {v.overlap}\n"
-            )
+        if validation_result.coverage_dict.items():
+            txt_report_coverage_map += "\n\nCoverage map:\n"
+            for k, v in validation_result.coverage_dict.items():
+                txt_report_coverage_map += (
+                    f"\t{k[0]}/{k[1]} : filled = {v.filled},"
+                    f" visited = {v.visited}, overlap = {v.overlap}\n"
+                )
 
         # --------- put everything into single txt variable ---------
         self._junit_txt = (

@@ -49,6 +49,7 @@ def test_validate(caplog):
             rulesets=["test-ruleset"],
             extra_rule_dirs=[Path("tests/rulesets/validate-test")],
             apply_generic=False,
+            track_node_dict=True,
         )
         results_collection = validate(
             imas_uri="",

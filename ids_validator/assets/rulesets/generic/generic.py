@@ -33,27 +33,31 @@ def validate_homogeneous_time(ids):
 @validator("*")
 def validate_increasing_time(ids):
     """Validate that all non-empty time vectors are strictly increasing."""
-    dynamic_aos = []
-    for time_quantity in Select(ids, "(^|/)time$", has_value=True):
-        # 1D time array:
-        if time_quantity.metadata.ndim == 1:
-            assert Increasing(time_quantity)
-        # FLT_0D times also occur for timed arrays of structures
-        else:
-            # Get the corresponding AoS quantity (e.g. profiles_1d for
-            # profiles_1d[0].time):d
-            aos = Parent(time_quantity, 2)
-            if aos not in dynamic_aos:
-                dynamic_aos.append(aos)
+    if ids.ids_properties.homogeneous_time == 1:
+        assert Increasing(ids.time)
+    else:
+        aos_dict = {}
+        for time_quantity in Select(ids, "(^|/)time$", has_value=True):
+            # 1D time array:
+            if time_quantity.metadata.ndim == 1:
+                assert Increasing(time_quantity)
+            # FLT_0D times also occur for timed arrays of structures
+            else:
+                # Get the corresponding AoS quantity (e.g. profiles_1d for
+                # profiles_1d[0].time):d
+                aos = Parent(time_quantity, 2)
+                aos_name = aos._obj.metadata.name
+                if aos_name in aos_dict.keys():
+                    aos_dict[aos_name] = aos
 
-    # Validate time "vectors" for timed arrays of structures
-    for aos in dynamic_aos:
-        last_time = float("-inf")
-        for struct in aos:
-            assert (
-                last_time < struct.time
-            ), f"Non-increasing time found for dynamic Array of Structures: {aos!r}"
-            last_time = struct.time
+        # Validate time "vectors" for timed arrays of structures
+        for aos in aos_dict.values():
+            last_time = float("-inf")
+            for struct in aos:
+                assert (
+                    last_time < struct.time
+                ), f"Non-increasing time found for dynamic Array of Structures: {aos!r}"
+                last_time = struct.time
 
 
 @validator("*")

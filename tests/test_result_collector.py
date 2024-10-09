@@ -13,7 +13,7 @@ from ids_validator.validate_options import ValidateOptions
 
 @pytest.fixture
 def res_collector():
-    res_col = ResultCollector(validate_options=ValidateOptions(), imas_uri="")
+    res_col = ResultCollector(validate_options=ValidateOptions(track_node_dict=True), imas_uri="")
     return res_col
 
 

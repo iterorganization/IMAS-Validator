@@ -83,6 +83,14 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     )
 
     validate_group.add_argument(
+        "-nc",
+        "--node-coverage",
+        action="store_true",
+        default=False,
+        help="Track the node coverage for a test",
+    )
+
+    validate_group.add_argument(
         "-o", "--output", help="""Specify report directory path"""
     )
 
