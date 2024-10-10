@@ -6,7 +6,7 @@ import logging
 import sys
 
 from imaspy import DBEntry
-from imaspy.exception import ALException
+from imaspy.exception import ALException, LowlevelError
 
 try:
     from imaspy.imas_interface import has_imas, ll_interface
@@ -46,7 +46,7 @@ def validate(
     _check_imas_version()
     try:
         dbentry = DBEntry(imas_uri, "r")
-    except ALException as e:
+    except (ALException, LowlevelError) as e:
         logger.error(e)
         sys.exit(1)
 
