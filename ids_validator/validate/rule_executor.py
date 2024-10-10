@@ -5,6 +5,7 @@ IDS data
 
 import logging
 import pdb
+import sys
 from typing import Iterator, List, Tuple
 
 from imaspy import DBEntry
@@ -81,9 +82,9 @@ class RuleExecutor:
             else:
                 self.result_collector.add_error_result(exc)
             if self.validate_options.use_pdb:
-                self.progress.stop()
+                self.progress_stop()
                 pdb.post_mortem(tb)
-                self.progress.start()
+                self.progress_start()
         finally:
             if len(self.result_collector.results) == res_num:
                 logger.info(
@@ -102,7 +103,7 @@ class RuleExecutor:
         """
 
         ids_list = self._get_ids_list()
-        self.progress.start()
+        self.progress_start()
         t1 = self.progress.add_task("[red]Processing...", total=len(ids_list))
         for ids_name, occurrence in ids_list:
             ids_instance = self._load_ids_instance(ids_name, occurrence)
@@ -128,7 +129,7 @@ class RuleExecutor:
                 if not len(idss) == len(rule.ids_names):
                     raise ValueError("Number of inputs not the same as required")
                 yield idss, rule
-        self.progress.stop()
+        self.progress_stop()
 
     def _load_ids_instance(self, ids_name: str, occurrence: int) -> IDSInstance:
         return (
@@ -149,3 +150,13 @@ class RuleExecutor:
             for occurrence in occurrence_list:
                 ids_list.append((ids_name, occurrence))
         return ids_list
+
+    def progress_start(self) -> None:
+        """Start progress object if in interactive environment"""
+        if sys.stdout.isatty():
+            self.progress.start()
+            # self.progress.refresh()
+
+    def progress_stop(self) -> None:
+        """Stop progress object if in interactive environment"""
+        self.progress.stop()

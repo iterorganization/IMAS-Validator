@@ -42,7 +42,12 @@ def validate(
     """
 
     _check_imas_version()
-    dbentry = DBEntry(imas_uri, "r")
+    try:
+        dbentry = DBEntry(imas_uri, "r")
+    except Exception as e:
+        print(e)
+        raise
+
     result_collector = ResultCollector(
         validate_options=validate_options, imas_uri=imas_uri
     )
