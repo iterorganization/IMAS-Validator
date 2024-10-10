@@ -34,7 +34,7 @@ def test_non_existing_pulsefile(tmp_path):
 
     # When using imas_core >= 5.2, this raises an ALException. In earlier AL versions
     # IMASPy raises a LowlevelError.
-    with pytest.raises((imaspy.exception.LowlevelError, imaspy.exception.ALException)):
+    with pytest.raises(SystemExit):
         ids_validator_cli.main(argv)
 
 

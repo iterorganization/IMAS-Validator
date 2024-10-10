@@ -3,8 +3,10 @@ This file describes the main function for the IMAS IDS validation tool
 """
 
 import logging
+import sys
 
 from imaspy import DBEntry
+from imaspy.exception import ALException
 
 try:
     from imaspy.imas_interface import has_imas, ll_interface
@@ -42,7 +44,12 @@ def validate(
     """
 
     _check_imas_version()
-    dbentry = DBEntry(imas_uri, "r")
+    try:
+        dbentry = DBEntry(imas_uri, "r")
+    except ALException as e:
+        logger.error(e)
+        sys.exit(1)
+
     result_collector = ResultCollector(
         validate_options=validate_options, imas_uri=imas_uri
     )
