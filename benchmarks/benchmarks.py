@@ -2,8 +2,10 @@ from ids_validator.rules.loading import load_rules
 from ids_validator.validate.result_collector import ResultCollector
 from ids_validator.validate.validate import validate
 from ids_validator.validate_options import RuleFilter, ValidateOptions
+from ids_validator.training.training_setup import create_training_db_entries
 
 uri_list = [
+    "imas:hdf5?path=ids-validator-course/good",
     "imas:hdf5?user=public;pulse=105053;run=1;database=ITER;version=3",
 ]
 
@@ -20,14 +22,15 @@ class FullValidate:
         generic_ruleset_list,
     ]
 
-    param_names = ["uri", "ruleset"]
+    # param_names = ["uri", "ruleset"]
 
-    def setup(self, ruleset):
+    def setup(self, uri, ruleset):
+        create_training_db_entries()
         self.validate_options = ValidateOptions(
             rulesets=[ruleset],
         )
 
-    def time_validate_full_run(self, uri):
+    def time_validate_full_run(self, uri, ruleset):
         validate(
             imas_uri=[uri],
             validate_options=self.validate_options,
@@ -39,12 +42,13 @@ class NodeDict:
         uri_list,
     ]
 
-    param_names = ["uri"]
+    # param_names = ["uri"]
 
-    def setup(self):
+    def setup(self, uri):
+        create_training_db_entries()
         rule_filter = RuleFilter(name=["increasing_time"])
         self.validate_options = ValidateOptions(
-            filter=rule_filter,
+            rule_filter=rule_filter,
             track_node_dict=True,
         )
 
@@ -57,6 +61,7 @@ class NodeDict:
 
 class LoadRules:
     def setup(self):
+        create_training_db_entries()
         self.validate_options = ValidateOptions()
         self.result_collector = ResultCollector(
             validate_options=self.validate_options,
