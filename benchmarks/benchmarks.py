@@ -22,8 +22,6 @@ class FullValidate:
         generic_ruleset_list,
     ]
 
-    # param_names = ["uri", "ruleset"]
-
     def setup(self, uri, ruleset):
         create_training_db_entries()
         self.validate_options = ValidateOptions(
@@ -35,15 +33,11 @@ class FullValidate:
             imas_uri=uri,
             validate_options=self.validate_options,
         )
+    time_validate_full_run.timeout = 300
 
 
 class NodeDict:
-    # params = [
-    #     uri_list,
-    # ]
     params = uri_list
-
-    # param_names = ["uri"]
 
     def setup(self, uri):
         create_training_db_entries()
@@ -58,6 +52,7 @@ class NodeDict:
             imas_uri=uri,
             validate_options=self.validate_options,
         )
+    time_validate_with_node_dict.timeout = 300
 
 
 class LoadRules:
@@ -74,13 +69,3 @@ class LoadRules:
             result_collector=self.result_collector,
             validate_options=self.validate_options,
         )
-
-
-# how many URIs?
-# test full run
-#     - per ruleset?
-#     - all tests
-# test only run not ids load?
-# test node dict
-#     - few specific tests?
-# test load rules
