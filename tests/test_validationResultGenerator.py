@@ -77,7 +77,8 @@ def test_error_result() -> None:
         f"RULE: to/rule.py:dummy_rule_function"
         f"MESSAGE:"
         f"TRACEBACK: {last_tb}"
-        f"NODES:"
+        f"NODES COUNT: 0"
+        f"NODES: []"
         # f"Coverage map:"
     ).replace(
         "\t", ""
@@ -192,7 +193,8 @@ def test_failed_assert() -> None:
         f"RULE: to/rule.py:dummy_rule_function"
         f"MESSAGE: Optional message"
         f"TRACEBACK: {last_tb}"
-        f"NODES: ('a', 'b', 'c')"
+        f"NODES COUNT: 3"
+        f"NODES: ['a', 'b', 'c']"
         # f"Coverage map:"
     ).replace(
         "\t", ""

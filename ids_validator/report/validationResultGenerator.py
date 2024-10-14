@@ -204,21 +204,44 @@ class ValidationResultGenerator:
 
         for (ids, occurrence), result_list in failed_result_dictionary.items():
             txt_report_body += f"- IDS {ids} occurrence {occurrence}\n"
+
+            failed_rules_dict: dict = (
+                {}
+            )  # k: rule_name v: {message, traceback, nodes: {} }
+
+            # prepare output data and put it into single dictionary
+            # this part of code focuses on putting all failed nodes under
+            # single 'rule' txt entry
             for result_object in result_list:
-                # Print only rules that failed validation
+                # save only failed rules
                 if result_object.success:
                     continue
-                txt_report_body += f"\tRULE: {result_object.rule.name}\n"
-                txt_report_body += f"\t\tMESSAGE: {result_object.msg}\n"
+                if result_object.rule.name not in failed_rules_dict.keys():
+                    failed_rules_dict[result_object.rule.name] = {
+                        "message": result_object.msg,
+                        "traceback": str(result_object.tb[-1])
+                        .replace("<", "")
+                        .replace(">", ""),
+                        "nodes": list(
+                            result_object.nodes_dict.get((ids, occurrence), "")
+                        ),
+                    }
+                else:
+                    failed_rules_dict[result_object.rule.name]["nodes"] += list(
+                        result_object.nodes_dict.get((ids, occurrence), "")
+                    )
+
+            # print output data
+            for rule_name, rule_result_dict in failed_rules_dict.items():
+                txt_report_body += f"\tRULE: {rule_name}\n"
+                txt_report_body += f"\t\tMESSAGE: {rule_result_dict['message']}\n"
                 txt_report_body += (
-                    f"\t\tTRACEBACK: "
-                    f"{str(result_object.tb[-1]).replace('<', '').replace('>','')}\n"
+                    f"\t\tTRACEBACK: " f"{rule_result_dict['traceback']}\n"
                 )
                 txt_report_body += (
-                    f"\t\tNODES: "
-                    f"{result_object.nodes_dict.get((ids, occurrence), '')}"
-                    f"\n\n"
+                    f"\t\tNODES COUNT: " f"{len(rule_result_dict['nodes'])}\n"
                 )
+                txt_report_body += f"\t\tNODES: " f"{rule_result_dict['nodes']}" f"\n\n"
 
         # --------- generate coverage map ---------
         if validation_result.coverage_dict.items():
