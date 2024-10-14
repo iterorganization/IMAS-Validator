@@ -32,15 +32,16 @@ class FullValidate:
 
     def time_validate_full_run(self, uri, ruleset):
         validate(
-            imas_uri=[uri],
+            imas_uri=uri,
             validate_options=self.validate_options,
         )
 
 
 class NodeDict:
-    params = [
-        uri_list,
-    ]
+    # params = [
+    #     uri_list,
+    # ]
+    params = uri_list
 
     # param_names = ["uri"]
 
@@ -54,7 +55,7 @@ class NodeDict:
 
     def time_validate_with_node_dict(self, uri):
         validate(
-            imas_uri=[uri],
+            imas_uri=uri,
             validate_options=self.validate_options,
         )
 
