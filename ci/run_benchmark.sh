@@ -38,16 +38,16 @@ asv machine --yes
 
 # Run ASV for the current commit, develop and main
 asv run --skip-existing-successful HEAD^!
-asv run --skip-existing-successful develop^!
+# asv run --skip-existing-successful develop^!
 
-# Compare results
-if [ `git rev-parse --abbrev-ref HEAD` == develop ]
-then
-    # asv compare master develop
-    echo ""
-else
-    asv compare develop HEAD
-fi
+# # Compare results
+# if [ `git rev-parse --abbrev-ref HEAD` == develop ]
+# then
+#     # asv compare master develop
+#     echo ""
+# else
+#     asv compare develop HEAD
+# fi
 
 # Publish results
 asv publish
