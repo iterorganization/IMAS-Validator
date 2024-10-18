@@ -16,6 +16,7 @@ venv
 build
 junit.xml
 .idea/
+.asv
 
 ids-validator-course
 ids-validator-training-rulesets
