@@ -5,6 +5,10 @@ from pathlib import Path
 from typing import List
 from xml.dom import minidom
 
+from ids_validator.report.utils import (
+    CustomResultCollection,
+    convert_result_into_custom_collection,
+)
 from ids_validator.validate.result import IDSValidationResultCollection
 
 
@@ -156,6 +160,11 @@ class ValidationResultGenerator:
         txt_report_body = ""
         txt_report_coverage_map = ""
 
+        # --------- refactor input data ---------
+        custom_result_collection: List[CustomResultCollection] = (
+            convert_result_into_custom_collection(validation_result)
+        )
+
         # --------- generate report header ---------
         cpt_test = len(validation_result.results)
         cpt_failure = sum(not item.success for item in validation_result.results)
@@ -169,79 +178,41 @@ class ValidationResultGenerator:
             f"Number of failed tests : {cpt_failure}\n\n"
         )
 
-        # --------- generate report body ---------
-        result_dictionary: dict = {}
-        passed_result_dictionary: dict = {}
-        failed_result_dictionary: dict = {}
-
-        # convert List[IDSValidationResult] into dictionary:
-        # {(ids, occurrence) : List[IDSValidationResult]} for sake of code readability
-        for single_validation_result in validation_result.results:
-            for ids, occurrence in single_validation_result.idss:
-                dict_key = (ids, occurrence)
-                if dict_key not in result_dictionary:
-                    result_dictionary[dict_key] = [single_validation_result]
-                else:
-                    result_dictionary[dict_key].append(single_validation_result)
-
-        # split custom dictionary into one holding PASSED ids-occurrences
-        # and one with FAILED
-        for ids_occurrence, result_list in result_dictionary.items():
-            if all([result.success for result in result_list]):
-                passed_result_dictionary[ids_occurrence] = result_list
-            else:
-                failed_result_dictionary[ids_occurrence] = result_list
-
         # fill txt report body
         # PASSED tests
         txt_report_body += "PASSED IDSs:\n"
-        for (ids, occurrence), result_list in passed_result_dictionary.items():
-            txt_report_body += f"+ IDS {ids} occurrence {occurrence}\n"
+        for custom_result_object in custom_result_collection:
+            if all([result.success for result in custom_result_object.result_list]):
+                txt_report_body += (
+                    f"+ IDS {custom_result_object.ids}"
+                    f" occurrence {custom_result_object.occurrence}\n"
+                )
 
         # FAILED tests
         txt_report_body += "\n"
         txt_report_body += "FAILED IDSs:\n"
 
-        for (ids, occurrence), result_list in failed_result_dictionary.items():
-            txt_report_body += f"- IDS {ids} occurrence {occurrence}\n"
+        for custom_result_object in custom_result_collection:
 
-            failed_rules_dict: dict = (
-                {}
-            )  # k: rule_name v: {message, traceback, nodes: {} }
+            # This time we print only failed tests
+            if all([result.success for result in custom_result_object.result_list]):
+                continue
 
-            # prepare output data and put it into single dictionary
-            # this part of code focuses on putting all failed nodes under
-            # single 'rule' txt entry
-            for result_object in result_list:
-                # save only failed rules
-                if result_object.success:
-                    continue
-                if result_object.rule.name not in failed_rules_dict.keys():
-                    failed_rules_dict[result_object.rule.name] = {
-                        "message": result_object.msg,
-                        "traceback": str(result_object.tb[-1])
-                        .replace("<", "")
-                        .replace(">", ""),
-                        "nodes": list(
-                            result_object.nodes_dict.get((ids, occurrence), "")
-                        ),
-                    }
-                else:
-                    failed_rules_dict[result_object.rule.name]["nodes"] += list(
-                        result_object.nodes_dict.get((ids, occurrence), "")
-                    )
+            txt_report_body += (
+                f"- IDS {custom_result_object.ids}"
+                f" occurrence {custom_result_object.occurrence}\n"
+            )
 
-            # print output data
-            for rule_name, rule_result_dict in failed_rules_dict.items():
-                txt_report_body += f"\tRULE: {rule_name}\n"
-                txt_report_body += f"\t\tMESSAGE: {rule_result_dict['message']}\n"
+            for custom_rule_object in custom_result_object.rules:
+                txt_report_body += f"\tRULE: {custom_rule_object.rule_name}\n"
+                txt_report_body += f"\t\tMESSAGE: {custom_rule_object.message}\n"
                 txt_report_body += (
-                    f"\t\tTRACEBACK: " f"{rule_result_dict['traceback']}\n"
+                    f"\t\tTRACEBACK: " f"{custom_rule_object.traceback}\n"
                 )
                 txt_report_body += (
-                    f"\t\tNODES COUNT: " f"{len(rule_result_dict['nodes'])}\n"
+                    f"\t\tNODES COUNT: " f"{len(custom_rule_object.nodes)}\n"
                 )
-                txt_report_body += f"\t\tNODES: " f"{rule_result_dict['nodes']}" f"\n\n"
+                txt_report_body += f"\t\tNODES: " f"{custom_rule_object.nodes}" f"\n\n"
 
         # --------- generate coverage map ---------
         if validation_result.coverage_dict.items():
@@ -300,159 +271,3 @@ class ValidationResultGenerator:
         today = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         file_name = str(dir_path / f"{def_file_name}_{today}.{suffix}")
         return file_name
-
-
-class SummaryReportGenerator:
-    """Class for generating summary report"""
-
-    # class logger
-    __logger = logging.getLogger(__name__ + "." + __qualname__)
-
-    @property
-    def html(self) -> str:
-        return self._html
-
-    def __init__(
-        self,
-        validation_results: List[IDSValidationResultCollection],
-        test_datetime: str,
-    ):
-        self._validation_results = validation_results
-        self._test_datetime: str = test_datetime
-        self._html: str = ""
-        self.parse()
-
-    def parse(self) -> None:
-        self._generate_html()
-
-    def _generate_html(self) -> None:
-        """ """
-        num_failed_tests = 0
-        failed_tests_list = []
-        passed_tests_list = []
-        for result_collection in self._validation_results:
-            if not all([result.success for result in result_collection.results]):
-                failed_tests_list.append(result_collection)
-                num_failed_tests += 1
-            else:
-                passed_tests_list.append(result_collection)
-
-        document_style = """
-        <style>
-            .header {
-                width: 100%;
-                height: 100%;
-                background-color: blue;
-                color: white;
-                padding: 5px;
-            }
-            .content {
-                padding: 10px;
-            }
-            body {
-                background-color: light-gray;
-                font-family: monospace;
-                font-size: 16px;
-            }
-            span[data-validation-successfull="true"]{
-                color: green;
-            }
-            span[data-validation-successfull="false"]{
-                color: red;
-            }
-            li>a {
-            display: inline-block;
-            margin-left: 10px;
-            }
-        </style>
-
-        """
-        self._html = f"""
-        <!DOCTYPE html>
-        <document>
-        <head>
-            <title>summary-{self._test_datetime}</title>
-            <meta charset="UTF-8"/>
-            {document_style}
-        </head>
-        <body>
-        <div class="header">
-            <h1>Validation summary</h1><br/>
-            {self._test_datetime}<br/>
-            Performed tests: {len(self._validation_results)}<br/>
-            Failed tests: {num_failed_tests}
-
-        </div>
-        <div class="content">
-            <h3>Passed tests</h3>
-            <ol>
-            {''.join([self._generate_uri_specific_html_element(result_collection)
-                      for result_collection in passed_tests_list])}
-            </ol>
-            <br>
-            <h3>Failed tests</h3>
-            <ol>
-             {''.join([self._generate_uri_specific_html_element(result_collection)
-                      for result_collection in failed_tests_list])}
-            </ol>
-        </div>
-        </body>
-        </document>
-        """
-
-    def _generate_uri_specific_html_element(
-        self, validation_results: IDSValidationResultCollection
-    ) -> str:
-        """
-        Returns html code summary generated for specific pair URI
-         - List of Validation results
-
-        Args:
-            validation_results : IDSValidationResultCollection
-             - validation result
-
-        Returns:
-            filled html temlpate
-
-            <li><span data-validation-successfull="false">PASSED/FAILED: </span>{uri}
-            <a href="./test_report.html">HTML report</a>
-            <a href="./test_report.txt">TXT report</a></li>
-
-        """
-        validation_successful: bool = all(
-            [result.success for result in validation_results.results]
-        )
-        PASSED_FAILED_KEYWORD: str = "PASSED" if validation_successful else "FAILED"
-
-        # process filename not to contain slashes, colon or question marks.
-        # They are not processed properly by URL bar in browser
-        processed_filename = (
-            validation_results.imas_uri.replace("/", "|")
-            .replace(":", "%3A")
-            .replace("?", "%3F")
-            .replace("#", "%23")
-        )
-
-        return (
-            f"<li><span data-validation-successfull="
-            f'{"true" if validation_successful else "false"}>'
-            f"{PASSED_FAILED_KEYWORD}: </span>"
-            f"{validation_results.imas_uri}<br>"
-            f'<a href="./{processed_filename}.html">HTML report</a>'
-            f'<a href="./{processed_filename}.txt">TXT report</a>'
-            f"</li><br/>"
-        )
-
-    def save_html(self, file_name: str) -> None:
-        """
-        Save generated report summary as html file
-
-        Args:
-            file_name: str - name of file to be saved.
-        """
-        with open(file_name, "w+") as file:
-            file.write(self.html)
-            self.__logger.debug(
-                f"Generated summary html report saved as:"
-                f" {os.path.abspath(file_name)}"
-            )

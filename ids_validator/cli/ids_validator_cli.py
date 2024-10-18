@@ -11,10 +11,8 @@ from junit2htmlreport.parser import Junit  # type: ignore
 from ids_validator.cli.command_parser import CommandParser
 from ids_validator.cli.commands.command_interface import CommandNotRecognisedException
 from ids_validator.cli.commands.validate_command import ValidateCommand
-from ids_validator.report.validationResultGenerator import (
-    SummaryReportGenerator,
-    ValidationResultGenerator,
-)
+from ids_validator.report.summaryReportGenerator import SummaryReportGenerator
+from ids_validator.report.validationResultGenerator import ValidationResultGenerator
 from ids_validator.validate.result import IDSValidationResultCollection
 
 cli_logger = logging.getLogger(__name__)
