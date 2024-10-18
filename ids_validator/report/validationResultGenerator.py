@@ -1,4 +1,5 @@
 import logging
+import operator
 import os
 from datetime import datetime
 from pathlib import Path
@@ -57,82 +58,87 @@ class ValidationResultGenerator:
         Return:
         """
 
-        cpt_test_in_testsuite: int = 0
-        cpt_failure_in_testsuite: int = 0
-        ids_tmp: str = ""
-        testsuite_array: List[minidom.Element] = []
+        custom_result_collection_list: List[CustomResultCollection] = (
+            convert_result_into_custom_collection(validation_result)
+        )
+
+        cpt_test = len(validation_result.results)
+        cpt_failure = sum(not item.success for item in validation_result.results)
 
         # Create minidom Document in JUnit xml format
         xml = minidom.Document()
 
-        # Set testsuites balise
+        # Set <testsuites> root tag
         testsuites = xml.createElement("testsuites")
         testsuites.setAttribute("id", "1")
         testsuites.setAttribute("name", "ids_validator")
-        testsuites.setAttribute("tests", str(len(validation_result.results)))
+        testsuites.setAttribute("tests", str(cpt_test))
+        testsuites.setAttribute("failures", str(cpt_failure))
 
-        # Get failures tests cpt
-        cpt_failure_in_testsuite = sum(
-            not item.success for item in validation_result.results
-        )
-        testsuites.setAttribute("failures", str(cpt_failure_in_testsuite))
-        cpt_failure_in_testsuite = 0
-
-        # Add testsuites to xml
+        # Remember to add tag to document after initializing it
         xml.appendChild(testsuites)
 
-        # Set testsuite balise
-        for report in validation_result.results:
-            for tuple_item in report.idss:
-                if str(tuple_item[0]) + "-" + str(tuple_item[1]) != ids_tmp:
-                    ids_tmp = tuple_item[0] + "-" + str(tuple_item[1])
-                    testsuite = xml.createElement("testsuite")
-                    testsuite.setAttribute("id", "1." + str(len(testsuite_array) + 1))
-                    testsuite.setAttribute("name", ids_tmp)
-                    testsuite_array.append(testsuite)
+        test_suite_counter = 1
+        for custom_result_collection in sorted(
+            custom_result_collection_list, key=operator.attrgetter("ids", "occurrence")
+        ):
 
-        # Set Testcase and append to testsuite
-        for testsuite_item in testsuite_array:
-            for ids_validation_item in validation_result.results:
-                for tuple_item in ids_validation_item.idss:
-                    if testsuite_item.getAttribute("name") == tuple_item[0] + "-" + str(
-                        tuple_item[1]
-                    ):
-                        cpt_test_in_testsuite = cpt_test_in_testsuite + 1
-                        testcase = xml.createElement("testcase")
-                        testcase.setAttribute(
-                            "id",
-                            testsuite_item.getAttribute("id")
-                            + "."
-                            + str(cpt_test_in_testsuite),
+            # single validation is split into (ids, occurrence) test pairs.
+            # one instance of (ids, occurrence) is named 'testsuite' here
+            # and <testsuite> tag is being generated
+
+            testsuite = xml.createElement("testsuite")
+            testsuite.setAttribute("id", f"1.{test_suite_counter}")
+            testsuite.setAttribute(
+                "name",
+                f"{custom_result_collection.ids}:{custom_result_collection.occurrence}",
+            )
+
+            test_case_counter = 1
+            for custom_rule_object in custom_result_collection.rules:
+                testcase = xml.createElement("testcase")
+                testcase.setAttribute(
+                    "id", f"1.{test_suite_counter}.{test_case_counter}"
+                )
+                testcase.setAttribute("name", f"{custom_rule_object.rule_name}")
+                testcase.setAttribute("classname", testsuite.getAttribute("name"))
+
+                # if rule failed
+                if not custom_rule_object.success:
+                    failure = xml.createElement("failure")
+
+                    failure_message = custom_rule_object.message
+
+                    failure.setAttribute("message", failure_message)
+
+                    failure.setAttribute("type", "")
+                    failure.setAttribute(
+                        "nodes_count", f"{len(custom_rule_object.nodes)}"
+                    )
+                    failure.setAttribute(
+                        "nodes", f"{' ' .join(custom_rule_object.nodes)}"
+                    )
+
+                    custom_traceback_message = custom_rule_object.traceback
+                    custom_traceback_message += "\n\nAffected nodes: "
+                    if len(custom_rule_object.nodes) > 10:
+                        custom_traceback_message += " ".join(
+                            custom_rule_object.nodes[:5]
                         )
-                        testcase.setAttribute("name", ids_validation_item.rule.name)
-                        if ids_validation_item.success is False:
-                            cpt_failure_in_testsuite = cpt_failure_in_testsuite + 1
-                            # Add testcase to testSuite
-                            testsuite_item.appendChild(testcase)
-                            # Create, set failure and append to testcase
-                            failure = xml.createElement("failure")
-                            failure.setAttribute("message", ids_validation_item.msg)
-                            failure.setAttribute("type", "")
-                            failure.setAttribute(
-                                "nodes_dict", str(ids_validation_item.nodes_dict)
-                            )
-                            tb = "\n".join(ids_validation_item.tb.format())
-                            failure.appendChild(xml.createTextNode(tb))
-                            # Add failure to testcase
-                            testcase.appendChild(failure)
-                        else:
-                            # Add testcase to testSuite
-                            testsuite_item.appendChild(testcase)
-            testsuite_item.setAttribute("tests", str(cpt_test_in_testsuite))
-            testsuite_item.setAttribute("failures", str(cpt_failure_in_testsuite))
-            cpt_test_in_testsuite = 0
-            cpt_failure_in_testsuite = 0
+                        custom_traceback_message += (
+                            f" and {len(custom_rule_object.nodes) - 5} more..."
+                        )
+                    else:
+                        custom_traceback_message += " ".join(custom_rule_object.nodes)
 
-        # Append testsuite to xml
-        for item_element in testsuite_array:
-            testsuites.appendChild(item_element)
+                    failure.appendChild(xml.createTextNode(custom_traceback_message))
+                    testcase.appendChild(failure)
+
+                testsuite.appendChild(testcase)
+                test_case_counter += 1
+
+            testsuites.appendChild(testsuite)
+            test_suite_counter += 1
 
         # Write xml file
         self._junit_xml = testsuites.toprettyxml(indent="\t")

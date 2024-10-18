@@ -5,10 +5,8 @@ from xml.dom import minidom
 
 import pytest
 
-from ids_validator.report.validationResultGenerator import (
-    SummaryReportGenerator,
-    ValidationResultGenerator,
-)
+from ids_validator.report.validationResultGenerator import ValidationResultGenerator
+from ids_validator.report.summaryReportGenerator import SummaryReportGenerator
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result import (
     CoverageMap,
@@ -43,21 +41,19 @@ def test_error_result() -> None:
     )
     result_generator = ValidationResultGenerator(result_collection)
 
-    tb = "\n".join(result.tb.format())
-    node_text = minidom.Document().createTextNode(tb)
-    str_to_compare = node_text.data.replace('"', "&quot;")
-    str_to_compare = str_to_compare.replace(">", "&gt;")
-    str_to_compare = str_to_compare.replace("<", "&lt;")
-    assert result_generator.xml == (
-        f'<testsuites id="1" name="ids_validator" tests="1" failures="1">\n\t'
-        f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
-        f'<testcase id="1.1.1" name="to/rule.py:dummy_rule_function">\n\t\t\t'
-        f'<failure message="" type="" nodes_dict="{{}}">{str(str_to_compare)}'
-        f"</failure>\n\t\t"
-        f"</testcase>\n\t"
-        f"</testsuite>\n"
-        f"</testsuites>\n"
-    )
+    tb = str(result.tb[-1]).replace("<", "").replace(">", "")
+
+    assert (result_generator.xml ==
+(f'''<testsuites id="1" name="ids_validator" tests="1" failures="1">
+	<testsuite id="1.1" name="core_profiles:0">
+		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0">
+			<failure message="" type="" nodes_count="0" nodes="">{tb}
+
+Affected nodes: </failure>
+		</testcase>
+	</testsuite>
+</testsuites>
+'''))
 
     last_tb = str(result.tb[-1])
     last_tb = last_tb.replace("<", "")
@@ -108,13 +104,14 @@ def test_successful_assert() -> None:
         imas_uri=uri,
     )
     result_generator = ValidationResultGenerator(result_collection)
-    assert result_generator.xml == (
-        '<testsuites id="1" name="ids_validator" tests="1" failures="0">\n\t'
-        '<testsuite id="1.1" name="core_profiles-0" tests="1" failures="0">\n\t\t'
-        '<testcase id="1.1.1" name="to/rule.py:dummy_rule_function"/>\n\t'
-        "</testsuite>\n"
-        "</testsuites>\n"
-    )
+
+    assert (result_generator.xml ==
+(f'''<testsuites id="1" name="ids_validator" tests="1" failures="0">
+	<testsuite id="1.1" name="core_profiles:0">
+		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0"/>
+	</testsuite>
+</testsuites>
+'''))
 
     assert result_generator.txt.replace("\t", "").replace("\n", "").replace(
         " ", ""
@@ -157,23 +154,19 @@ def test_failed_assert() -> None:
     )
     result_generator = ValidationResultGenerator(result_collection)
 
-    tb = "\n".join(result.tb.format())
-    node_text = minidom.Document().createTextNode(tb)
-    str_to_compare = node_text.data.replace('"', "&quot;")
-    str_to_compare = str_to_compare.replace(">", "&gt;")
-    str_to_compare = str_to_compare.replace("<", "&lt;")
-    assert result_generator.xml == (
-        f'<testsuites id="1" name="ids_validator" tests="1" failures="1">\n\t'
-        f'<testsuite id="1.1" name="core_profiles-0" tests="1" failures="1">\n\t\t'
-        f'<testcase id="1.1.1" name="to/rule.py:dummy_rule_function">\n\t\t\t'
-        f'<failure message="Optional message" type="" '
-        f"nodes_dict=\"{{('core_profiles', 0): {'a', 'b', 'c'}}}\">"
-        f"{str_to_compare}"
-        f"</failure>\n\t\t"
-        f"</testcase>\n\t"
-        f"</testsuite>\n"
-        f"</testsuites>\n"
-    )
+    tb = str(result.tb[-1]).replace("<", "").replace(">", "")
+
+    assert (result_generator.xml ==
+(f'''<testsuites id="1" name="ids_validator" tests="1" failures="1">
+	<testsuite id="1.1" name="core_profiles:0">
+		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0">
+			<failure message="Optional message" type="" nodes_count="3" nodes="a b c">{tb}
+
+Affected nodes: a b c</failure>
+		</testcase>
+	</testsuite>
+</testsuites>
+'''))
 
     last_tb = str(result.tb[-1])
     last_tb = last_tb.replace("<", "")
