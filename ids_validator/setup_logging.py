@@ -3,15 +3,18 @@
 
 import logging
 
+import imaspy  # noqa: F401, imported to overwrite logging handlers at correct timing
+from rich.logging import RichHandler
+
 
 class _PrettyFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
 
-    light_grey = "\x1b[90m"
-    yellow = "\x1b[33m"
-    red = "\x1b[31m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
+    light_grey = "[light grey]"
+    yellow = "[yellow]"
+    red = "[red]"
+    bold_red = "[bold red]"
+    reset = "[/]"
 
     formatstr = (
         "%(asctime)s %(levelname)-8s %(message)s "
@@ -21,7 +24,7 @@ class _PrettyFormatter(logging.Formatter):
 
     FORMATS = {
         logging.DEBUG: logging.Formatter(light_grey + formatstr, time_format),
-        logging.INFO: logging.Formatter(formatstr, time_format),
+        logging.INFO: logging.Formatter("[white]" + formatstr, time_format),
         logging.WARNING: logging.Formatter(yellow + formatstr, time_format),
         logging.ERROR: logging.Formatter(red + formatstr, time_format),
         logging.CRITICAL: logging.Formatter(bold_red + formatstr, time_format),
@@ -32,8 +35,8 @@ class _PrettyFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def default_stream_handler() -> logging.StreamHandler:
-    ch = logging.StreamHandler()
+def default_stream_handler() -> RichHandler:
+    ch = RichHandler(markup=True, show_time=False, show_path=False, show_level=False)
     ch.setFormatter(_PrettyFormatter())
     return ch
 
@@ -41,3 +44,19 @@ def default_stream_handler() -> logging.StreamHandler:
 def connect_formatter(logger: logging.Logger) -> None:
     """Connect general formatter to given logger"""
     logger.addHandler(default_stream_handler())
+    setup_rich_log_handler(False)
+
+
+def setup_rich_log_handler(quiet: bool) -> None:
+    """Setup rich.logging.RichHandler on the root logger.
+
+    Args:
+        quiet: When True: set log level of the `imaspy` logger to WARNING or higher.
+    """
+    # Disable default imaspy log handler
+    imaspy_logger = logging.getLogger("imaspy")
+    for handler in imaspy_logger.handlers:
+        imaspy_logger.removeHandler(handler)
+    if quiet:  # Silence IMASPy INFO messages
+        # If loglevel is less than WARNING, set it to WARNING:
+        imaspy_logger.setLevel(max(logging.WARNING, imaspy_logger.getEffectiveLevel()))
