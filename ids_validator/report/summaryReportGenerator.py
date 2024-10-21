@@ -29,7 +29,8 @@ class SummaryReportGenerator:
         self._generate_html()
 
     def _generate_html(self) -> None:
-        """ """
+        """Generates full HTML report summary for validation results
+        stored in self._validation_results"""
         num_failed_tests = 0
         failed_tests_list = []
         passed_tests_list = []
@@ -106,17 +107,14 @@ class SummaryReportGenerator:
     def _generate_uri_specific_html_element(
         self, validation_results: IDSValidationResultCollection
     ) -> str:
-        """
-        Returns html code summary generated for specific pair URI
-         - List of Validation results
+        """Returns html code summary generated for specific pair
+        (URI, List of Validation results)
 
         Args:
-            validation_results : IDSValidationResultCollection
-             - validation result
+            validation_results : IDSValidationResultCollection - validation result
 
         Returns:
-            filled html temlpate
-
+            filled html template:
             <li><span data-validation-successfull="false">PASSED/FAILED: </span>{uri}
             <a href="./test_report.html">HTML report</a>
             <a href="./test_report.txt">TXT report</a></li>
@@ -152,6 +150,9 @@ class SummaryReportGenerator:
 
         Args:
             file_name: str - name of file to be saved.
+
+        Returns:
+            None
         """
         with open(file_name, "w+") as file:
             file.write(self.html)

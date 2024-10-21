@@ -14,7 +14,7 @@ from ids_validator.validate.result import IDSValidationResultCollection
 
 
 class ValidationReportGenerator:
-    """Class for generating report"""
+    """Report generation class"""
 
     # class logger
     __logger = logging.getLogger(__name__ + "." + __qualname__)
@@ -39,9 +39,10 @@ class ValidationReportGenerator:
         Creation of output file structure in JUnit xml format.
 
         Args:
-            validation_result: IDSValidationResultCollection - validation result
+            validation_result: IDSValidationResultCollection
 
-        Return:
+        Returns:
+            None
         """
         self._parse_junit_xml(validation_result)
         self._parse_junit_txt(validation_result)
@@ -55,7 +56,8 @@ class ValidationReportGenerator:
         Args:
             validation_result: IDSValidationResultCollection - validation result
 
-        Return:
+        Returns:
+            None
         """
 
         custom_result_collection_list: List[CustomResultCollection] = (
@@ -152,7 +154,7 @@ class ValidationReportGenerator:
         Args:
             validation_result: IDSValidationResultCollection - validation result
 
-        Return:
+        Returns:
             None
         """
         # This function is split into 3 parts:
@@ -241,7 +243,8 @@ class ValidationReportGenerator:
         Args:
             file_name: str - name of file to be saved.
 
-        Return:
+        Returns:
+            None
         """
         if not file_name:
             file_name = self.gen_default_file_path("test_result", "xml")
@@ -259,7 +262,8 @@ class ValidationReportGenerator:
         Args:
             file_name: str - name of file to be saved.
 
-        Return:
+        Returns:
+            None
         """
         if not file_name:
             file_name = self.gen_default_file_path("summary_report", "txt")
