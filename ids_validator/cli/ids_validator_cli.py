@@ -229,9 +229,9 @@ def main(argv: List) -> None:
                 validation_passed = all(
                     [result.success for result in command.result.results]
                 )
-                color_red = "\x1b[31m"
-                color_green = "\x1b[32m"
-                color_end = "\033[0m"
+                color_red = "[red]"
+                color_green = "[green]"
+                color_end = "[/]"
                 PASSED_FAILED_KEYWORD: str = (
                     f"{color_green}PASSED{color_end}"
                     if validation_passed

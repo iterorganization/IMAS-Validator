@@ -230,7 +230,6 @@ def filter_rulesets(
     Returns:
         List of directories corresponding to given rule sets
     """
-    print(validate_options.explore)
     filtered_rulesets: List[Path] = []
     for ruleset_dir in ruleset_dirs:
         name = ruleset_dir.name
