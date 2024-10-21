@@ -29,28 +29,30 @@ pip install --upgrade pip setuptools wheel
 pip install virtualenv .[benchmark]
 
 # Copy previous results (if any)
-mkdir -p /mnt/bamboo_deploy/ids-validator/benchmarks/results
-mkdir -p .asv
-cp -rf /mnt/bamboo_deploy/ids-validator/benchmarks/results .asv/
+rm -r /mnt/bamboo_deploy/ids-validator/benchmarks/results
+rm -r .asv
+# mkdir -p /mnt/bamboo_deploy/ids-validator/benchmarks/results
+# mkdir -p .asv
+# cp -rf /mnt/bamboo_deploy/ids-validator/benchmarks/results .asv/
 
-# Ensure there is a machine configuration
-asv machine --yes
+# # Ensure there is a machine configuration
+# asv machine --yes
 
-# Run ASV for the current commit, develop and main
-asv run --skip-existing-successful HEAD^!
-asv run --skip-existing-successful develop^!
+# # Run ASV for the current commit, develop and main
+# asv run --skip-existing-successful HEAD^!
+# asv run --skip-existing-successful develop^!
 
-# Compare results
-if [ `git rev-parse --abbrev-ref HEAD` == develop ]
-then
-    # asv compare master develop
-    echo ""
-else
-    asv compare develop HEAD
-fi
+# # Compare results
+# if [ `git rev-parse --abbrev-ref HEAD` == develop ]
+# then
+#     # asv compare master develop
+#     echo ""
+# else
+#     asv compare develop HEAD
+# fi
 
-# Publish results
-asv publish
+# # Publish results
+# asv publish
 
-# And persistently store them
-cp -rf .asv/{results,html} /mnt/bamboo_deploy/ids-validator/benchmarks/
+# # And persistently store them
+# cp -rf .asv/{results,html} /mnt/bamboo_deploy/ids-validator/benchmarks/
