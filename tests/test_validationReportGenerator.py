@@ -5,7 +5,7 @@ from xml.dom import minidom
 
 import pytest
 
-from ids_validator.report.validationResultGenerator import ValidationResultGenerator
+from ids_validator.report.validationReportGenerator import ValidationReportGenerator
 from ids_validator.report.summaryReportGenerator import SummaryReportGenerator
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.result import (
@@ -32,14 +32,14 @@ def test_error_result() -> None:
         exc=RuntimeError("Dummy exception"),
     )
 
-    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    uri = "imas:mdsplus?test_validationReportGeneratorUri"
     result_collection = IDSValidationResultCollection(
         results=[result],
         coverage_dict={},
         validate_options=ValidateOptions(),
         imas_uri=uri,
     )
-    result_generator = ValidationResultGenerator(result_collection)
+    result_generator = ValidationReportGenerator(result_collection)
 
     tb = str(result.tb[-1]).replace("<", "").replace(">", "")
 
@@ -63,7 +63,7 @@ Affected nodes: </failure>
         " ", ""
     ) == (
         f"Summary Report : \n"
-        f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
+        f"Tested URI : imas:mdsplus?test_validationReportGeneratorUri\n"
         f"Number of tests carried out : 1\n"
         f"Number of successful tests : 0\n"
         f"Number of failed tests : 1\n\n"
@@ -96,14 +96,14 @@ def test_successful_assert() -> None:
         {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
     )
-    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    uri = "imas:mdsplus?test_validationReportGeneratorUri"
     result_collection = IDSValidationResultCollection(
         results=[result],
         coverage_dict={},
         validate_options=ValidateOptions(),
         imas_uri=uri,
     )
-    result_generator = ValidationResultGenerator(result_collection)
+    result_generator = ValidationReportGenerator(result_collection)
 
     assert (result_generator.xml ==
 (f'''<testsuites id="1" name="ids_validator" tests="1" failures="0">
@@ -117,7 +117,7 @@ def test_successful_assert() -> None:
         " ", ""
     ) == (
         "Summary Report : "
-        "Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
+        "Tested URI : imas:mdsplus?test_validationReportGeneratorUri\n"
         "Number of tests carried out : 1"
         "Number of successful tests : 1"
         "Number of failed tests : 0"
@@ -145,14 +145,14 @@ def test_failed_assert() -> None:
         {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
     )
-    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    uri = "imas:mdsplus?test_validationReportGeneratorUri"
     result_collection = IDSValidationResultCollection(
         results=[result],
         coverage_dict={},
         validate_options=ValidateOptions(),
         imas_uri=uri,
     )
-    result_generator = ValidationResultGenerator(result_collection)
+    result_generator = ValidationReportGenerator(result_collection)
 
     tb = str(result.tb[-1]).replace("<", "").replace(">", "")
 
@@ -176,7 +176,7 @@ Affected nodes: a b c</failure>
         " ", ""
     ) == (
         f"Summary Report : "
-        f"Tested URI : imas:mdsplus?test_validationResultGeneratorUri\n"
+        f"Tested URI : imas:mdsplus?test_validationReportGeneratorUri\n"
         f"Number of tests carried out : 1"
         f"Number of successful tests : 0"
         f"Number of failed tests : 1"
@@ -211,7 +211,7 @@ def test_report_html_generator() -> None:
     )
     today = datetime.today()
 
-    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    uri = "imas:mdsplus?test_validationReportGeneratorUri"
     result_collection = IDSValidationResultCollection(
         results=[result],
         coverage_dict={},
@@ -278,7 +278,7 @@ def test_report_html_generator() -> None:
             <br>
             <h3>Failed tests</h3>
             <ol>
-            <li><span data-validation-successfull=false>FAILED: </span>imas:mdsplus?test_validationResultGeneratorUri<br><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.html">HTML report</a><a href="./imas%3Amdsplus%3Ftest_validationResultGeneratorUri.txt">TXT report</a></li><br/>
+            <li><span data-validation-successfull=false>FAILED: </span>imas:mdsplus?test_validationReportGeneratorUri<br><a href="./imas%3Amdsplus%3Ftest_validationReportGeneratorUri.html">HTML report</a><a href="./imas%3Amdsplus%3Ftest_validationReportGeneratorUri.txt">TXT report</a></li><br/>
             </ol>
         </div>
         </body>
@@ -309,12 +309,12 @@ def test_coverage_dict(expected_result, coverage_dict) -> None:
         {("core_profiles", 0): ("a", "b", "c")},
         exc=None,
     )
-    uri = "imas:mdsplus?test_validationResultGeneratorUri"
+    uri = "imas:mdsplus?test_validationReportGeneratorUri"
     result_collection = IDSValidationResultCollection(
         results=[result],
         coverage_dict=coverage_dict,
         validate_options=ValidateOptions(),
         imas_uri=uri,
     )
-    result_generator = ValidationResultGenerator(result_collection)
+    result_generator = ValidationReportGenerator(result_collection)
     assert ("Coverage map:" in result_generator.txt) == expected_result

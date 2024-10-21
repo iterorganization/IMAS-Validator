@@ -13,7 +13,7 @@ from ids_validator.report.utils import (
 from ids_validator.validate.result import IDSValidationResultCollection
 
 
-class ValidationResultGenerator:
+class ValidationReportGenerator:
     """Class for generating report"""
 
     # class logger

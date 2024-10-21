@@ -9,6 +9,11 @@ from ids_validator.validate.result import (
 
 @dataclass
 class CustomRuleObject:
+    """
+    Represents single rule applied to data being validated.
+    It is a helper class used during report generation.
+    """
+
     rule_name: str
     success: bool
     message: str
@@ -18,6 +23,11 @@ class CustomRuleObject:
 
 @dataclass
 class CustomResultCollection:
+    """
+    Stores all validation data for single (ids, occurrence) pair.
+    It is a helper class used during report generation.
+    """
+
     ids: str
     occurrence: int
     result_list: List[IDSValidationResult]
@@ -27,14 +37,33 @@ class CustomResultCollection:
 def convert_result_into_custom_collection(
     validation_result: IDSValidationResultCollection,
 ) -> List[CustomResultCollection]:
-    """ """
+    """
+    Converts IDSValidationResultCollection into List[CustomResultCollection]
+    in order to group validation results by (ids, occurrence)
+
+    Args:
+        validation_result: IDSValidationResultCollection - validation result
+
+    Returns:
+        List[CustomResultCollection]
+    """
+    # This function has two steps:
+
+    # 1. Put (ids, occurrence) pair and List[IDSValidationResult]
+    # together in CustomResultCollection objects
+
+    # 2. Extract rules that failed from List[IDSValidationResult]
+    # and also put them in CustomResultCollection
+
     result_collection: List[CustomResultCollection] = []
 
+    # Step 1:
     for single_validation_result in validation_result.results:
         for ids, occurrence in single_validation_result.idss:
             if (ids, occurrence) not in [
                 (x.ids, x.occurrence) for x in result_collection
             ]:
+                # If object representing (ids, occurrence) doesn't exists
                 result_collection.append(
                     CustomResultCollection(
                         ids=ids,
@@ -44,6 +73,8 @@ def convert_result_into_custom_collection(
                     )
                 )
             else:
+                # If it already exists, find element and
+                # append IDSValidationResult into it's result list
                 target_element = next(
                     x
                     for x in result_collection
@@ -51,16 +82,20 @@ def convert_result_into_custom_collection(
                 )
                 target_element.result_list.append(single_validation_result)
 
+    # Step 2:
+    # For every ids:occurrence
     for custom_result_collection in result_collection:
         ids = custom_result_collection.ids
         occurrence = custom_result_collection.occurrence
-        # prepare output data and put it into single dictionary
-        # this part of code focuses on putting all failed nodes under
-        # single 'rule' entry
+
+        # For every IDSValidationResult in custom structure
         for result_object in custom_result_collection.result_list:
 
-            affected_node = list(result_object.nodes_dict.get((ids, occurrence), set()))
-
+            affected_nodes = list(
+                result_object.nodes_dict.get((ids, occurrence), set())
+            )
+            # If there is no CustomRuleObject in CustomResultCollection.rules
+            # that matches result_object.rule.name: create new CustomRuleObject
             if result_object.rule.name not in [
                 custom_rule_object.rule_name
                 for custom_rule_object in custom_result_collection.rules
@@ -73,15 +108,16 @@ def convert_result_into_custom_collection(
                         traceback=str(result_object.tb[-1])
                         .replace("<", "")
                         .replace(">", ""),
-                        nodes=affected_node,
+                        nodes=affected_nodes,
                     )
                 )
 
             else:
-                target_cutom_rule_object = next(
+                # If CustomRuleObject already exists, just append list of affected nodes
+                target_custom_rule_object = next(
                     rule_object
                     for rule_object in custom_result_collection.rules
                     if rule_object.rule_name == result_object.rule.name
                 )
-                target_cutom_rule_object.nodes += affected_node
+                target_custom_rule_object.nodes += affected_nodes
     return result_collection
