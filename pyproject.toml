@@ -58,7 +58,7 @@ dependencies = [
 [project.optional-dependencies]
 # these self-dependencies are available since pip 21.2
 all = [
-    "ids-validator[docs,test,linting]"
+    "ids-validator[docs,test,linting,benchmark]"
 ]
 docs = [
     "sphinx>=6.0.0,<7.0.0",
@@ -77,6 +77,10 @@ linting = [
     "flake8",
     "mypy",
     "isort",
+]
+benchmark = [
+    "asv==0.6.1",
+    "virtualenv",
 ]
 
 [project.scripts]
