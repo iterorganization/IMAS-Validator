@@ -212,6 +212,9 @@ class ValidationReportGenerator:
             )
 
             for custom_rule_object in custom_result_object.rules:
+                if custom_rule_object.success:
+                    continue # print only failed rules
+
                 txt_report_body += f"\tRULE: {custom_rule_object.rule_name}\n"
                 txt_report_body += f"\t\tMESSAGE: {custom_rule_object.message}\n"
                 txt_report_body += (
