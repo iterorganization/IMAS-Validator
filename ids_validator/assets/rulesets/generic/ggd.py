@@ -1,12 +1,13 @@
 """Rules applying to all IDSs containing GGDs"""
 
 import re
-from os import walk
 
 import imaspy
 from imaspy import identifiers
 from imaspy.ids_data_type import IDSDataType
 from imaspy.ids_defs import IDS_TIME_MODE_HOMOGENEOUS
+
+# TODO: only test on GGD IDS instead of all
 
 SUPPORTED_IDS_NAMES = (
     "edge_profiles",
@@ -18,31 +19,139 @@ SUPPORTED_IDS_NAMES = (
     "wall",
 )
 
-#   EXPERIMENTAL_IDS_NAMES = [
-#       "equilibrium",
-#       "distribution_sources",
-#       "distributions",
-#       "tf",
-#       "transport_solver_numerics",
-#       "waves",
-#   ]
+
+# Some IDSs do not have the grid structure in a separate `grid_ggd` object, as
+# described by the GGD guidelines. They are for now denoted as experimental IDS, as they
+# are currently not covered by the unit tests. If the DD for these stays like this, they
+# will need to be handled separately. GGD grid locations for each IDS:
+# equilibrium (grids_ggd/grid)
+# distribution_sources (source/ggd/grid)
+# distributions (distribution/ggd/grid)
+# tf (field_map/grid)
+# transport_solver_numerics (boundary_conditions_ggd/grid)
+# waves (coherent_wave/full_wave/grid)
 
 
+# Helper functions
 def validate_identifier(identifier):
-    """Validate that an identifier has its name, index and description filled"""
+    """Validate that an identifier has its name, index and description fields filled"""
     assert identifier.name.has_value
     assert identifier.index.has_value
     assert identifier.description.has_value
 
 
-def is_index_in_identifiers(index, identifier_list):
-    """Checks if an index appears in an identifier list"""
-    return any(index == member.value for member in identifier_list)
+def is_index_in_aos_identifier(aos, index):
+    """Checks if a given index appears exactly once in the identifiers of an AoS."""
+    matches = sum(1 for structure in aos if structure.identifier.index == index)
+    assert matches == 1
 
 
-# TODO: only test on GGD IDS instead of all
+def is_index_in_identifier_ref(index, identifier_ref):
+    """Checks if a given index appears in an identifier reference"""
+    return any(index == member.value for member in identifier_ref)
 
 
+def find_structure_by_index(aos, index):
+    """Return the first object in an AoS whose identifier.index matches the
+    given index, or None if no match is found."""
+    for structure in aos:
+        if structure.identifier.index == index:
+            return structure
+
+
+def recursive_ggd_path_search(quantity, scalar_list, vector_list):
+    """Recursively searches through an IDS node for scalar GGD arrays
+    (real & complex) and vector GGD arrays (regular and rphiz), and stores
+    these in the scalar and vectors lists, respectively.
+    """
+    for subquantity in quantity:
+        if subquantity.metadata.data_type == IDSDataType.STRUCT_ARRAY:
+            # Get scalar and complex scalar array quantities
+            if (
+                subquantity.metadata.structure_reference
+                in [
+                    "generic_grid_scalar",
+                    "generic_grid_scalar_complex",
+                ]
+                and subquantity.has_value
+            ):
+                scalar_list.append(subquantity)
+
+            # Get vector and rzphi-vector array quantities
+            # From DDv4 onward `generic_grid_vector_components_rzphi` will be
+            # replaced by `generic_grid_vector_components_rphiz`
+            elif (
+                subquantity.metadata.structure_reference
+                in [
+                    "generic_grid_vector_components",
+                    "generic_grid_vector_components_rzphi",
+                    "generic_grid_vector_components_rphiz",
+                ]
+                and subquantity.has_value
+            ):
+                vector_list.append(subquantity)
+
+        if subquantity.metadata.data_type == IDSDataType.STRUCTURE:
+            recursive_ggd_path_search(
+                subquantity,
+                scalar_list,
+                vector_list,
+            )
+
+
+def get_ggd_aos(ids):
+    """Get a list containing all GGD AoS in the IDS"""
+    ggd_list = []
+    for node in Select(ids, "(^|/)ggd$", leaf_only=False):
+        if node.metadata.name == "ggd":
+            parent_node = imaspy.util.get_parent(node._obj)
+            if parent_node.metadata.name != "ggd":
+                ggd_list.append(node)
+    return ggd_list
+
+
+def get_matching_grid_ggd(ids, array):
+    """Get the matching grid_ggd structure on which a GGD array is defined."""
+    path = array._path
+    match = re.search(r"ggd\[(\d+)\]", path)
+    matching_grid_ggd = ids.grid_ggd[int(match.group(1))]
+    return matching_grid_ggd
+
+
+def recursive_label_search(ggd, label_list):
+    """Recursively searches through a GGD structure for quantities which
+    have the name 'label', and appends these to the given label_list."""
+    for node in ggd:
+        if node.metadata.name == "label":
+            label_list.append(node)
+        if (
+            node.metadata.data_type == IDSDataType.STRUCTURE
+            or node.metadata.data_type == IDSDataType.STRUCT_ARRAY
+        ):
+            recursive_label_search(
+                node,
+                label_list,
+            )
+
+
+def get_filled_ggd_arrays(ids):
+    """Get a list of each filled scalar and vector GGD array in the IDS"""
+    ggd_list = get_ggd_aos(ids)
+    scalar_arrays = []
+    vector_arrays = []
+    for ggd_aos in ggd_list:
+        for ggd in ggd_aos:
+
+            recursive_ggd_path_search(
+                ggd._obj,
+                scalar_arrays,
+                vector_arrays,
+            )
+
+    return scalar_arrays, vector_arrays
+
+
+# Validator rules
 # Grid rules
 @validator("*")
 def validate_grid_ggd_identifier(ids):
@@ -53,13 +162,14 @@ def validate_grid_ggd_identifier(ids):
 
 @validator("*")
 def validate_grid_ggd_length(ids):
-    """Validate that there are as many grids as there are time steps"""
+    """Validate that there are as many grid_ggd's as there are time steps"""
     assert len(ids.grid_ggd) == len(ids.time)
 
 
 @validator("*")
 def validate_grid_ggd_time_homogeneous(ids):
-    """Validate that there if the IDS has homogeneous time, the individual grid_ggd time nodes are not filled."""
+    """Validate that there if the IDS has homogeneous time,
+    the time nodes in the individual grid_ggd structures are not filled."""
     if ids.ids_properties.homogeneous_time == IDS_TIME_MODE_HOMOGENEOUS:
         for grid_ggd in ids.grid_ggd:
             assert not grid_ggd.time.has_value
@@ -76,18 +186,19 @@ def validate_space_identifier(ids):
 
 @validator("*")
 def validate_space_coordinates_type_identifier(ids):
-    """Validate that the coordinate type identifiers match"""
+    """Validate that the space.coordinate_types match with ones that
+    are in the reference identifier list."""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             for coord_type in space.coordinates_type:
-                assert is_index_in_identifiers(
+                assert is_index_in_identifier_ref(
                     coord_type, identifiers.coordinate_identifier
                 )
 
 
 @validator("*")
 def validate_space_geometry_type_identifier(ids):
-    """Validate that the geometry_type is at least 0
+    """Validate that the geometry_type of all spaces is at least 0
     (0 standard, 1 fourier, >1 fourier with periodicity)"""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
@@ -97,7 +208,8 @@ def validate_space_geometry_type_identifier(ids):
 # Objects_per_dimension rules
 @validator("*")
 def validate_obj_per_dim_geometry_content(ids):
-    """Validate that the geometry_content match the ggd_geometry_content_identifier"""
+    """Validate that the geometry_content values match
+    the reference ggd_geometry_content_identifier"""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
@@ -118,7 +230,7 @@ def validate_obj_per_dim_geometry_content(ids):
 @validator("*")
 def validate_obj_per_dim_geometry_length(ids):
     """Validate that the geometry of the objects have the correct length, according to
-    its geometry_content"""
+    its geometry_content."""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             for obj_per_dim in space.objects_per_dimension:
@@ -127,14 +239,22 @@ def validate_obj_per_dim_geometry_length(ids):
                     geometry = obj.geometry
                     if geometry_content.has_value and geometry_content != 0:
                         if geometry_content == 1:
+                            # only contains the node coordinates
                             assert len(geometry) == len(space.coordinates_type)
                         elif geometry_content == 11:
+                            # contains the node coordinates, connection length and
+                            # distance in poloidal plane
                             assert len(geometry) == len(space.coordinates_type) + 2
                         elif geometry_content == 21:
+                            # contains 3 surface areas
                             assert len(geometry) == 3
                         elif geometry_content == 31:
+                            # contains coordinate indices (ix, iy) and volume
+                            # after extension
                             assert len(geometry) == 3
                         elif geometry_content == 32:
+                            # contains coordinate indices (ix, iy), volume after
+                            # extension, connection length, and distance in poloidal plane
                             assert len(geometry) == 5
                     else:
                         if geometry.has_value:
@@ -209,19 +329,6 @@ def validate_grid_subset_length(ids):
         assert len(grid_ggd.grid_subset) > 0
 
 
-def is_index_in_aos_identifier(aos, index):
-    """Check if an index appears exactly once in the identifier of an AoS."""
-    matches = sum(1 for structure in aos if structure.identifier.index == index)
-    assert matches == 1
-
-
-def find_index_match_in_aos_identifier(aos, index):
-    """Return the first object in 'aos' whose identifier.index matches the given index, or None if no match is found."""
-    for structure in aos:
-        if structure.identifier.index == index:
-            return structure
-
-
 @validator("*")
 def validate_grid_subset_space_index(ids):
     """Validate that the space in the subset points to an existing space in the grid."""
@@ -242,9 +349,7 @@ def validate_grid_subset_dimension_index(ids):
                 for object in element.object:
                     dim = object.dimension
                     space_idx = object.space
-                    space = find_index_match_in_aos_identifier(
-                        grid_ggd.space, space_idx
-                    )
+                    space = find_structure_by_index(grid_ggd.space, space_idx)
                     assert len(space.objects_per_dimension) >= dim
 
 
@@ -258,9 +363,7 @@ def validate_grid_subset_object_index(ids):
                     dim = object.dimension
                     space_idx = object.space
                     obj_idx = object.index
-                    space = find_index_match_in_aos_identifier(
-                        grid_ggd.space, space_idx
-                    )
+                    space = find_structure_by_index(grid_ggd.space, space_idx)
                     assert (
                         len(space.objects_per_dimension[dim._obj - 1].object) >= obj_idx
                     )
@@ -279,108 +382,39 @@ def validate_grid_subset_obj_dimension(ids):
 
 
 # GGD rules
-
-
-def get_ggd(ids):
-    """Get all GGD base nodes"""
-    ggd_list = []
-    for node in Select(ids, "(^|/)ggd$", leaf_only=False):
-        if node.metadata.name == "ggd":
-            parent_node = imaspy.util.get_parent(node._obj)
-            if parent_node.metadata.name != "ggd":
-                ggd_list.append(node)
-    return ggd_list
-
-
 @validator("*")
 def validate_ggd_length(ids):
-    """Validate that the dimensions of the GGD match the number of time steps."""
-    ggd_list = get_ggd(ids)
+    """Validate that the dimensions of the GGD AoS
+    matches the number of time steps."""
+    ggd_list = get_ggd_aos(ids)
     for ggd_aos in ggd_list:
         assert len(ggd_aos) == len(ids.time)
 
 
 @validator("*")
 def validate_ggd_time_homogeneous(ids):
-    """Validate that there if the IDS has homogeneous time, the individual ggd time nodes are not filled."""
-    ggd_list = get_ggd(ids)
+    """Validate that there if the IDS has homogeneous time,
+    the time nodes of the individual GGD structures are not filled."""
+    ggd_list = get_ggd_aos(ids)
     if ids.ids_properties.homogeneous_time == IDS_TIME_MODE_HOMOGENEOUS:
         for ggd_aos in ggd_list:
             for ggd in ggd_aos:
                 assert not ggd.time.has_value
 
 
-# GGD array rules
-def get_filled_ggd_arrays(ids):
-    ggd_list = get_ggd(ids)
-    scalar_arrays = []
-    vector_arrays = []
-    for ggd_aos in ggd_list:
-        for ggd in ggd_aos:
-
-            recursive_ggd_path_search(
-                ggd._obj,
-                scalar_arrays,
-                vector_arrays,
-            )
-
-    return scalar_arrays, vector_arrays
-
-
-def recursive_ggd_path_search(quantity, scalar_array, vector_array):
-    """Recursively searches through the metadata of an IDS node for scalar GGD arrays
-    (real & complex) and vector GGD arrays (regular and rphiz), and appends the paths of
-    these to the scalar_array_paths and vector_array_paths respectively.
-
-    Args:
-        quantity_metadata: The metadata of an IDS node
-        scalar_array_paths: The IDSPaths of GGD scalar arrays (real & complex)
-        vector_array_paths: The IDSPaths of GGD vector arrays (regular and rphiz)
-    """
-    for subquantity in quantity:
-        if subquantity.metadata.data_type == IDSDataType.STRUCT_ARRAY:
-            # Get scalar and complex scalar array quantities
-            if (
-                subquantity.metadata.structure_reference
-                in [
-                    "generic_grid_scalar",
-                    "generic_grid_scalar_complex",
-                ]
-                and subquantity.has_value
-            ):
-                scalar_array.append(subquantity)
-
-            # Get vector and rzphi-vector array quantities
-            # From DDv4 onward `generic_grid_vector_components_rzphi` will be
-            # replaced by `generic_grid_vector_components_rphiz`
-            elif (
-                subquantity.metadata.structure_reference
-                in [
-                    "generic_grid_vector_components",
-                    "generic_grid_vector_components_rzphi",
-                    "generic_grid_vector_components_rphiz",
-                ]
-                and subquantity.has_value
-            ):
-                vector_array.append(subquantity)
-
-        if subquantity.metadata.data_type == IDSDataType.STRUCTURE:
-            recursive_ggd_path_search(
-                subquantity,
-                scalar_array,
-                vector_array,
-            )
-
-
 @validator("edge_profiles")
 def validate_ggd_array_match_element(ids):
-    return
+    """Validate that the number of values in a GGD array match the number of elements
+    in the corresponding subset. However, if the subset contains all nodes by
+    definition, which occurs for the ggd subsets named nodes, edges, cells and
+    volumes in the reference identifier, the elements can be left empty.
+    """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
             grid_subset_index = sub_array.grid_subset_index
             matching_grid_ggd = get_matching_grid_ggd(ids, array)
-            grid_subset = find_index_match_in_aos_identifier(
+            grid_subset = find_structure_by_index(
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
             if grid_subset is None:
@@ -397,6 +431,7 @@ def validate_ggd_array_match_element(ids):
 
 @validator("*")
 def validate_ggd_array_filled_indices(ids):
+    """Validate that all GGD arrays have filled grid_index and grid_subset_index"""
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
@@ -404,15 +439,11 @@ def validate_ggd_array_filled_indices(ids):
             assert sub_array.grid_subset_index.has_value
 
 
-def get_matching_grid_ggd(ids, array):
-    path = array._path
-    match = re.search(r"ggd\[(\d+)\]", path)
-    matching_grid_ggd = ids.grid_ggd[int(match.group(1))]
-    return matching_grid_ggd
-
-
 @validator("*")
 def validate_ggd_array_valid_grid_index(ids):
+    """Validate that for the grid_index of a GGD array, the
+    identifier of the corresponding grid_ggd matches.
+    """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
@@ -424,6 +455,9 @@ def validate_ggd_array_valid_grid_index(ids):
 
 @validator("*")
 def validate_ggd_array_valid_grid_subset_index(ids):
+    """Validate that for the grid_subset_index of a GGD array matches
+    with the identifier index of a grid subset.
+    """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
@@ -432,24 +466,10 @@ def validate_ggd_array_valid_grid_subset_index(ids):
             is_index_in_aos_identifier(matching_grid_ggd.grid_subset, grid_subset_index)
 
 
-def recursive_label_search(ggd, label_list):
-    for node in ggd:
-        if node.metadata.name == "label":
-            label_list.append(node)
-        if (
-            node.metadata.data_type == IDSDataType.STRUCTURE
-            or node.metadata.data_type == IDSDataType.STRUCT_ARRAY
-        ):
-            recursive_label_search(
-                node,
-                label_list,
-            )
-
-
 @validator("*")
 def validate_ggd_array_labels_filled(ids):
     """Validate that the labels of ions/neutrals are filled."""
-    ggd_list = get_ggd(ids)
+    ggd_list = get_ggd_aos(ids)
     label_list = []
     for ggd_aos in ggd_list:
         for ggd in ggd_aos:
