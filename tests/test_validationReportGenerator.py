@@ -28,7 +28,7 @@ def test_error_result() -> None:
         IDSValidationRule(Path("/dummy/path/to/rule.py"), dummy_rule_function, "*"),
         [("core_profiles", 0)],
         traceback.extract_stack(),
-        {},
+        {("core_profiles",0):set(["failed/node/path"])},
         exc=RuntimeError("Dummy exception"),
     )
 
@@ -47,9 +47,9 @@ def test_error_result() -> None:
 (f'''<testsuites id="1" name="ids_validator" tests="1" failures="1">
 	<testsuite id="1.1" name="core_profiles:0">
 		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0">
-			<failure message="" type="" nodes_count="0" nodes="">{tb}
+			<failure message="" type="" nodes_count="1" nodes="failed/node/path">{tb}
 
-Affected nodes: </failure>
+Affected nodes: failed/node/path</failure>
 		</testcase>
 	</testsuite>
 </testsuites>
@@ -73,8 +73,8 @@ Affected nodes: </failure>
         f"RULE: to/rule.py:dummy_rule_function"
         f"MESSAGE:"
         f"TRACEBACK: {last_tb}"
-        f"NODES COUNT: 0"
-        f"NODES: []"
+        f"NODES COUNT: 1"
+        f"NODES: ['failed/node/path']"
         # f"Coverage map:"
     ).replace(
         "\t", ""
