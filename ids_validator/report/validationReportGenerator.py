@@ -217,13 +217,17 @@ class ValidationReportGenerator:
                 if len(custom_rule_object.failed_nodes) == 0:
                     continue  # print only failed rules
 
+                non_empty_failed_nodes = [
+                    node for node in custom_rule_object.failed_nodes if node
+                ]  # node can be empty string if rule does not affect any nodes
+
                 txt_report_body += f"\tRULE: {custom_rule_object.rule_name}\n"
                 txt_report_body += f"\t\tMESSAGE: {custom_rule_object.message}\n"
                 txt_report_body += (
                     f"\t\tTRACEBACK: " f"{custom_rule_object.traceback}\n"
                 )
                 txt_report_body += (
-                    f"\t\tNODES COUNT: " f"{len(custom_rule_object.failed_nodes)}\n"
+                    f"\t\tNODES COUNT: " f"{len(non_empty_failed_nodes)}\n"
                 )
                 txt_report_body += (
                     f"\t\tNODES: " f"{custom_rule_object.failed_nodes}" f"\n\n"

@@ -125,7 +125,10 @@ def convert_result_into_custom_collection(
                 if result_object.success:
                     target_custom_rule_object.passed_nodes += affected_nodes
                 else:
-                    target_custom_rule_object.failed_nodes += affected_nodes
+                    if affected_nodes:
+                        target_custom_rule_object.failed_nodes += affected_nodes
+                    else:  # if rule failed, but no node is affected, add empty string
+                        target_custom_rule_object.failed_nodes.append("")
 
     # sort result collection alphabetically
     result_collection = sorted(result_collection, key=lambda x: (x.ids, x.occurrence))
