@@ -15,10 +15,10 @@ class CustomRuleObject:
     """
 
     rule_name: str
-    success: bool
     message: str
     traceback: str
-    nodes: List[str]
+    passed_nodes: List[str]
+    failed_nodes: List[str]
 
 
 @dataclass
@@ -100,17 +100,20 @@ def convert_result_into_custom_collection(
                 custom_rule_object.rule_name
                 for custom_rule_object in custom_result_collection.rules
             ]:
-                custom_result_collection.rules.append(
-                    CustomRuleObject(
-                        rule_name=result_object.rule.name,
-                        success=result_object.success,
-                        message=result_object.msg,
-                        traceback=str(result_object.tb[-1])
-                        .replace("<", "")
-                        .replace(">", ""),
-                        nodes=affected_nodes,
-                    )
+                new_custom_rule_object = CustomRuleObject(
+                    rule_name=result_object.rule.name,
+                    message=result_object.msg,
+                    traceback=str(result_object.tb[-1])
+                    .replace("<", "")
+                    .replace(">", ""),
+                    passed_nodes=[],
+                    failed_nodes=[],
                 )
+                if result_object.success:
+                    new_custom_rule_object.passed_nodes += affected_nodes
+                else:
+                    new_custom_rule_object.failed_nodes += affected_nodes
+                custom_result_collection.rules.append(new_custom_rule_object)
 
             else:
                 # If CustomRuleObject already exists, just append list of affected nodes
@@ -119,5 +122,22 @@ def convert_result_into_custom_collection(
                     for rule_object in custom_result_collection.rules
                     if rule_object.rule_name == result_object.rule.name
                 )
-                target_custom_rule_object.nodes += affected_nodes
+                if result_object.success:
+                    target_custom_rule_object.passed_nodes += affected_nodes
+                else:
+                    target_custom_rule_object.failed_nodes += affected_nodes
+
+    # sort result collection alphabetically
+    result_collection = sorted(result_collection, key=lambda x: (x.ids, x.occurrence))
+
+    # sort rule lists alphabetically
+    for custom_result_collection in result_collection:
+        custom_result_collection.rules = sorted(
+            custom_result_collection.rules, key=lambda x: x.rule_name
+        )
+
+        for rule_object in custom_result_collection.rules:
+            rule_object.passed_nodes.sort()
+            rule_object.failed_nodes.sort()
+
     return result_collection
