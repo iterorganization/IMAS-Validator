@@ -30,18 +30,17 @@ SUPPORTED_IDS_NAMES = (
 
 
 # Helper functions
-def multi_validator(*names):
+def multi_validator(*ids_names):
     """Decorator to apply the @validator decorator for multiple IDSs."""
 
     def decorator(func):
-        for name in names:
+        for name in ids_names:
             func = validator(name)(func)
         return func
 
     return decorator
 
 
-# Assertion helper functions
 def assert_identifier_filled(identifier):
     """Asserts that an identifier has its name, index and description fields filled."""
     assert identifier.name.has_value
