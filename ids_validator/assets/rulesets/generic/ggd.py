@@ -7,8 +7,6 @@ from imaspy import identifiers
 from imaspy.ids_data_type import IDSDataType
 from imaspy.ids_defs import IDS_TIME_MODE_HOMOGENEOUS
 
-# TODO: only test on GGD IDS instead of all
-
 SUPPORTED_IDS_NAMES = (
     "edge_profiles",
     "edge_sources",
@@ -19,10 +17,10 @@ SUPPORTED_IDS_NAMES = (
     "wall",
 )
 
-# Some IDSs do not have the grid structure in a separate `grid_ggd` object, as
-# described by the GGD guidelines. They are for now denoted as experimental IDS, as they
-# are currently not covered by the unit tests. If the DD for these stays like this, they
-# will need to be handled separately. GGD grid locations for each IDS:
+# TODO: Some IDSs do not have the grid structure in a separate `grid_ggd` object, as
+# described by the GGD guidelines. They are currently not covered by the validations.
+# If the DD for these IDSs stays like this, they will need to be handled separately.
+# GGD grid locations for each IDS:
 # equilibrium (grids_ggd/grid)
 # distribution_sources (source/ggd/grid)
 # distributions (distribution/ggd/grid)
@@ -200,7 +198,7 @@ def validate_space_identifier(ids):
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_space_coordinates_type_identifier(ids):
     """Validate that the space.coordinate_types match with ones that
-    are in the reference identifier list."""
+    are in the coordinate identifier reference list."""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             for coord_type in space.coordinates_type:
@@ -221,8 +219,8 @@ def validate_space_geometry_type_identifier(ids):
 # Objects_per_dimension rules
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_obj_per_dim_geometry_content(ids):
-    """Validate that the geometry_content values match
-    the reference ggd_geometry_content_identifier"""
+    """Validate that if the geometry_content is filled, its values match
+    the reference ggd_geometry_content_identifier."""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
@@ -235,9 +233,10 @@ def validate_obj_per_dim_geometry_content(ids):
                     elif dim == 2:
                         assert geometry_content in {31, 32}
                     else:
-                        assert (
-                            False
-                        ), "Geometry content undefined for n-dimensional objects with n>2"
+                        assert False, (
+                            "geometry_content undefined for "
+                            "n-dimensional objects with n > 2"
+                        )
 
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
@@ -246,7 +245,7 @@ def validate_obj_per_dim_geometry_length(ids):
     its geometry_content."""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
-            for obj_per_dim in space.objects_per_dimension:
+            for dim, obj_per_dim in enumerate(space.objects_per_dimension):
                 geometry_content = obj_per_dim.geometry_content
                 for obj in obj_per_dim.object:
                     geometry = obj.geometry
@@ -267,10 +266,11 @@ def validate_obj_per_dim_geometry_length(ids):
                             assert len(geometry) == 3
                         elif geometry_content == 32:
                             # contains coordinate indices (ix, iy), volume after
-                            # extension, connection length, and distance in poloidal plane
+                            # extension, connection length, and distance
+                            # in the poloidal plane
                             assert len(geometry) == 5
                     else:
-                        if geometry.has_value:
+                        if geometry.has_value and dim == 0:
                             assert len(geometry) == len(space.coordinates_type)
 
 
@@ -305,7 +305,8 @@ def validate_obj_per_dim_nodes_length(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_obj_per_dim_nodes(ids):
-    """Validate that the filled object nodes point to existing nodes in the grid."""
+    """Validate that the filled nodes of an object point to
+    existing nodes in the grid."""
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             len_0D_obj = len(space.objects_per_dimension[0].object)
@@ -329,7 +330,7 @@ def validate_obj_per_dim_measure_empty(ids):
 # Grid subset rules
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_grid_subset_identifier(ids):
-    """Validate the grid subset identifier."""
+    """Validate that grid subset identifier is filled."""
     for grid_ggd in ids.grid_ggd:
         for grid_subset in grid_ggd.grid_subset:
             assert_identifier_filled(grid_subset.identifier)
@@ -355,7 +356,8 @@ def validate_grid_subset_space_index(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_grid_subset_dimension_index(ids):
-    """Validate that the dimension in the subset points to an existing dimension in the grid."""
+    """Validate that the dimension in the grid subset points to
+    an existing dimension in the grid."""
     for grid_ggd in ids.grid_ggd:
         for grid_subset in grid_ggd.grid_subset:
             for element in grid_subset.element:
@@ -368,7 +370,8 @@ def validate_grid_subset_dimension_index(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_grid_subset_object_index(ids):
-    """Validate that the object index in the subset points to an existing object in the grid."""
+    """Validate that the object index in the grid subset points to an existing
+    object in the grid."""
     for grid_ggd in ids.grid_ggd:
         for grid_subset in grid_ggd.grid_subset:
             for element in grid_subset.element:
@@ -384,7 +387,8 @@ def validate_grid_subset_object_index(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_grid_subset_obj_dimension(ids):
-    """Validate that the dimensions of the object are not larger than the object of the grid subset."""
+    """Validate that the dimensions of the objects of which a grid subset is composed
+    are not larger than the dimension of the grid subset itself."""
     for grid_ggd in ids.grid_ggd:
         for grid_subset in grid_ggd.grid_subset:
             subset_dim = grid_subset.dimension
@@ -406,7 +410,7 @@ def validate_ggd_length(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_ggd_time_homogeneous(ids):
-    """Validate that there if the IDS has homogeneous time,
+    """Validate that if the IDS has homogeneous time,
     the time nodes of the individual GGD structures are not filled."""
     ggd_list = get_ggd_aos(ids)
     if ids.ids_properties.homogeneous_time == IDS_TIME_MODE_HOMOGENEOUS:
@@ -415,12 +419,13 @@ def validate_ggd_time_homogeneous(ids):
                 assert not ggd.time.has_value
 
 
-@validator("edge_profiles")
+# GGD array rules
+@multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_ggd_array_match_element(ids):
     """Validate that the number of values in a GGD array match the number of elements
-    in the corresponding subset. However, if the subset contains all nodes by
-    definition, which occurs for the ggd subsets named nodes, edges, cells and
-    volumes in the reference identifier, the elements can be left empty.
+    in the corresponding subset. If the subset contains all nodes by
+    definition, which occurs for the ggd subsets named 'nodes', 'edges', 'cells' and
+    'volumes' in the reference identifier, the elements can be left empty.
     """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
@@ -431,8 +436,10 @@ def validate_ggd_array_match_element(ids):
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
             if grid_subset is None:
-                return
-            if not grid_subset.identifier.index in [1, 2, 5, 43]:
+                raise ValueError(
+                    f"Could not find a grid_index with index {grid_subset_index}"
+                )
+            if grid_subset.identifier.index not in [1, 2, 5, 43]:
                 for quantity in sub_array:
                     if (
                         quantity.has_value
@@ -444,7 +451,7 @@ def validate_ggd_array_match_element(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_ggd_array_filled_indices(ids):
-    """Validate that all GGD arrays have filled grid_index and grid_subset_index"""
+    """Validate that all GGD arrays have filled grid_index and grid_subset_index."""
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
@@ -455,7 +462,7 @@ def validate_ggd_array_filled_indices(ids):
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_ggd_array_valid_grid_index(ids):
     """Validate that for the grid_index of a GGD array, the
-    identifier of the corresponding grid_ggd matches.
+    identifier index of the corresponding grid_ggd matches.
     """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
@@ -468,7 +475,7 @@ def validate_ggd_array_valid_grid_index(ids):
 
 @multi_validator(*SUPPORTED_IDS_NAMES)
 def validate_ggd_array_valid_grid_subset_index(ids):
-    """Validate that for the grid_subset_index of a GGD array matches
+    """Validate that the grid_subset_index of a GGD array matches
     with the identifier index of a grid subset.
     """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
