@@ -136,7 +136,7 @@ def recursive_label_search(ggd, label_list):
     """Recursively searches through a GGD structure for quantities which
     have the metadata name 'label', and appends these to the given label_list."""
     for node in ggd:
-        if node.metadata.name == "label":
+        if node.metadata.name == "label" or node.metadata.name == "name":
             label_list.append(node)
         if (
             node.metadata.data_type == IDSDataType.STRUCTURE
