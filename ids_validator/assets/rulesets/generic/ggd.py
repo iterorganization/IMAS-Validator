@@ -136,7 +136,7 @@ def recursive_label_search(ggd, label_list):
     """Recursively searches through a GGD structure for quantities which
     have the metadata name 'label', and appends these to the given label_list."""
     for node in ggd:
-        if node.metadata.name == "label" or node.metadata.name == "name":
+        if node.metadata.name == "label":
             label_list.append(node)
         if (
             node.metadata.data_type == IDSDataType.STRUCTURE
@@ -461,6 +461,9 @@ def validate_ggd_array_match_element(ids):
                 raise ValueError(
                     f"Could not find a grid_index with index {grid_subset_index}"
                 )
+            # The identifiers corresponding to nodes (1), edges (2), cells (5),
+            # and volumes (43), contain all nodes by definition. Therefore,
+            # the elements corresponding to these grid subsets may be left empty.
             if grid_subset.identifier.index not in [1, 2, 5, 43]:
                 for quantity in sub_array:
                     if (
