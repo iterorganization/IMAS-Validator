@@ -1,8 +1,5 @@
 """Rules applying to all IDSs containing GGDs"""
 
-import re
-
-import imaspy
 from imaspy import identifiers
 from imaspy.ids_data_type import IDSDataType
 from imaspy.ids_defs import IDS_TIME_MODE_HOMOGENEOUS
@@ -463,7 +460,8 @@ def validate_ggd_array_match_element(ids):
             )
             if grid_subset is None:
                 raise ValueError(
-                    f"Could not find a matching grid subset with index {grid_subset_index}"
+                    "Could not find a matching grid subset"
+                    f"with index {grid_subset_index}"
                 )
             for quantity in sub_array.iter_nonempty_():
                 if (
