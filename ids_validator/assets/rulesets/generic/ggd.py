@@ -56,7 +56,10 @@ def assert_index_in_aos_identifier(aos, index):
     """Asserts that a given index appears exactly once in the index identifiers of
     a structure of an AoS."""
     matches = sum(1 for structure in aos if structure.identifier.index == index)
-    assert matches == 1
+    assert matches == 1, (
+        f"{aos} should contain exactly one element with "
+        f"`identifier.index` equal to {index}, but found {matches} elements instead."
+    )
 
 
 def find_structure_by_index(aos, index):
