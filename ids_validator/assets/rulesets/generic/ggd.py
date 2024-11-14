@@ -475,17 +475,6 @@ def validate_ggd_array_match_element(ids):
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_ggd_array_filled_indices(ids):
-    """Validate that all GGD arrays have filled grid_index and grid_subset_index."""
-    assert_homogeneous_time_mode(ids)
-    scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
-    for array in scalar_arrays + vector_arrays:
-        for sub_array in array:
-            assert sub_array.grid_index.has_value
-            assert sub_array.grid_subset_index.has_value
-
-
-@multi_validator(SUPPORTED_IDS_NAMES)
 def validate_ggd_array_valid_grid_index(ids):
     """Validate that for the grid_index of a GGD array, the
     identifier index of the corresponding grid_ggd matches.
@@ -494,6 +483,7 @@ def validate_ggd_array_valid_grid_index(ids):
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
+            assert sub_array.grid_index.has_value
             grid_index = sub_array.grid_index
             matching_grid_ggd = get_matching_grid_ggd(ids, sub_array)
             grid_ggd_index = matching_grid_ggd.identifier.index
@@ -509,6 +499,7 @@ def validate_ggd_array_valid_grid_subset_index(ids):
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
+            assert sub_array.grid_subset_index.has_value
             grid_subset_index = sub_array.grid_subset_index
             matching_grid_ggd = get_matching_grid_ggd(ids, array)
             assert_index_in_aos_identifier(
