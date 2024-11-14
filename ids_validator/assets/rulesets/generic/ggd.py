@@ -317,7 +317,8 @@ def validate_obj_per_dim_nodes(ids):
             for obj_per_dim in space.objects_per_dimension:
                 for obj in obj_per_dim.object:
                     if obj.nodes.has_value:
-                        assert 0 < obj.nodes <= len_0D_obj
+                        assert (0 < obj.nodes).all()
+                        assert (obj.nodes <= len_0D_obj).all()
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
