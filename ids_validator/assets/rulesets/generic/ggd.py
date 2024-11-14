@@ -143,7 +143,7 @@ def get_filled_ggd_arrays(ids):
         for ggd in ggd_aos:
 
             recursive_ggd_path_search(
-                ggd._obj,
+                ggd,
                 scalar_arrays,
                 vector_arrays,
             )
