@@ -444,17 +444,12 @@ def validate_ggd_array_match_element(ids):
                 raise ValueError(
                     f"Could not find a grid_index with index {grid_subset_index}"
                 )
-            # The identifiers corresponding to nodes (1), edges (2), cells (5),
-            # and volumes (43), contain all nodes by definition. Therefore,
-            # the elements corresponding to these grid subsets may be left empty.
-            if grid_subset.identifier.index not in [1, 2, 5, 43]:
-                for quantity in sub_array:
-                    if (
-                        quantity.has_value
-                        and quantity.metadata.name != "grid_index"
-                        and quantity.metadata.name != "grid_subset_index"
-                    ):
-                        assert len(grid_subset.element) == len(quantity)
+            for quantity in sub_array.iter_nonempty_():
+                if (
+                    quantity.metadata.name != "grid_index"
+                    and quantity.metadata.name != "grid_subset_index"
+                ):
+                    assert len(grid_subset.element) == len(quantity)
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
