@@ -390,9 +390,7 @@ def validate_grid_subset_object_index(ids):
                     obj_idx = object.index
                     space = find_structure_by_index(grid_ggd.space, space_idx)
                     assert (
-                        len(space.objects_per_dimension[dim._obj - 1].object)
-                        >= obj_idx
-                        > 0
+                        len(space.objects_per_dimension[dim - 1].object) >= obj_idx > 0
                     )
 
 

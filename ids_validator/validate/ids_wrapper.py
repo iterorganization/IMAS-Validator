@@ -118,6 +118,9 @@ class IDSWrapper:
     def __str__(self) -> str:
         return str(self._obj)
 
+    def __int__(self) -> int:
+        return int(self._obj)
+
     # comparison operators
     __eq__ = _binary_wrapper(operator.eq, "eq")
     __ne__ = _binary_wrapper(operator.ne, "ne")
