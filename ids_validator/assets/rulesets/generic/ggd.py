@@ -119,11 +119,10 @@ def get_ggd_aos(ids):
     """Get a list containing all GGD AoS nodes in the IDS"""
     ggd_list = []
     for node in Select(ids, "(^|/)ggd$", leaf_only=False):
-        if node.metadata.name == "ggd":
-            parent_node = imaspy.util.get_parent(node._obj)
-            # Do not include structures of GGD, i.e. ggd[0]
-            if parent_node.metadata.name != "ggd":
-                ggd_list.append(node)
+        parent_node = Parent(node)
+        # Do not include structures of GGD, i.e. ggd[0]
+        if parent_node.metadata.name != "ggd":
+            ggd_list.append(node)
     return ggd_list
 
 
