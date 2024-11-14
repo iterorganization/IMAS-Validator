@@ -118,14 +118,6 @@ def get_ggd_aos(ids):
     return ggd_list
 
 
-def get_matching_grid_ggd(ids, array):
-    """Get the matching grid_ggd structure on which a GGD array is defined."""
-    path = array._path
-    match = re.search(r"ggd\[(\d+)\]", path)
-    matching_grid_ggd = ids.grid_ggd[int(match.group(1))]
-    return matching_grid_ggd
-
-
 def get_filled_ggd_arrays(ids):
     """Get a list of each filled scalar and vector GGD array in the IDS."""
     ggd_list = get_ggd_aos(ids)
@@ -435,14 +427,19 @@ def validate_ggd_array_match_element(ids):
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
+            grid_index = sub_array.grid_index
             grid_subset_index = sub_array.grid_subset_index
-            matching_grid_ggd = get_matching_grid_ggd(ids, array)
+            matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
+            if matching_grid_ggd is None:
+                raise ValueError(
+                    f"Could not find a matching grid with index {grid_index}"
+                )
             grid_subset = find_structure_by_index(
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
             if grid_subset is None:
                 raise ValueError(
-                    f"Could not find a grid_index with index {grid_subset_index}"
+                    f"Could not find a matching grid subset with index {grid_subset_index}"
                 )
             for quantity in sub_array.iter_nonempty_():
                 if (
@@ -463,7 +460,7 @@ def validate_ggd_array_valid_grid_index(ids):
         for sub_array in array:
             assert sub_array.grid_index.has_value
             grid_index = sub_array.grid_index
-            matching_grid_ggd = get_matching_grid_ggd(ids, sub_array)
+            matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
             grid_ggd_index = matching_grid_ggd.identifier.index
             assert grid_index == grid_ggd_index
 
@@ -478,8 +475,9 @@ def validate_ggd_array_valid_grid_subset_index(ids):
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
             assert sub_array.grid_subset_index.has_value
+            grid_index = sub_array.grid_index
             grid_subset_index = sub_array.grid_subset_index
-            matching_grid_ggd = get_matching_grid_ggd(ids, array)
+            matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
             assert_index_in_aos_identifier(
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
