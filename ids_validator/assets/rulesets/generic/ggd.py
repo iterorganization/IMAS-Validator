@@ -80,31 +80,23 @@ def recursive_ggd_path_search(quantity, scalar_list, vector_list):
     (real & complex) and vector GGD arrays (regular and rphiz), and stores
     these in the scalar and vector lists, respectively.
     """
-    for subquantity in quantity:
+    for subquantity in quantity.iter_nonempty_():
         if subquantity.metadata.data_type == IDSDataType.STRUCT_ARRAY:
             # Get scalar and complex scalar array quantities
-            if (
-                subquantity.metadata.structure_reference
-                in [
-                    "generic_grid_scalar",
-                    "generic_grid_scalar_complex",
-                ]
-                and subquantity.has_value
-            ):
+            if subquantity.metadata.structure_reference in [
+                "generic_grid_scalar",
+                "generic_grid_scalar_complex",
+            ]:
                 scalar_list.append(subquantity)
 
             # Get vector and rzphi-vector array quantities
             # From DDv4 onward `generic_grid_vector_components_rzphi` will be
             # replaced by `generic_grid_vector_components_rphiz`
-            elif (
-                subquantity.metadata.structure_reference
-                in [
-                    "generic_grid_vector_components",
-                    "generic_grid_vector_components_rzphi",
-                    "generic_grid_vector_components_rphiz",
-                ]
-                and subquantity.has_value
-            ):
+            elif subquantity.metadata.structure_reference in [
+                "generic_grid_vector_components",
+                "generic_grid_vector_components_rzphi",
+                "generic_grid_vector_components_rphiz",
+            ]:
                 vector_list.append(subquantity)
 
         if subquantity.metadata.data_type == IDSDataType.STRUCTURE:
