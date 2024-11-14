@@ -132,22 +132,6 @@ def get_matching_grid_ggd(ids, array):
     return matching_grid_ggd
 
 
-def recursive_label_search(ggd, label_list):
-    """Recursively searches through a GGD structure for quantities which
-    have the metadata name 'label', and appends these to the given label_list."""
-    for node in ggd:
-        if node.metadata.name == "label":
-            label_list.append(node)
-        if (
-            node.metadata.data_type == IDSDataType.STRUCTURE
-            or node.metadata.data_type == IDSDataType.STRUCT_ARRAY
-        ):
-            recursive_label_search(
-                node,
-                label_list,
-            )
-
-
 def get_filled_ggd_arrays(ids):
     """Get a list of each filled scalar and vector GGD array in the IDS."""
     ggd_list = get_ggd_aos(ids)
@@ -184,7 +168,7 @@ def validate_grid_ggd_length(ids):
 
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_grid_ggd_time_homogeneous(ids):
-    """Validate that there if the IDS has homogeneous time,
+    """Validate that if the IDS has homogeneous time,
     the time nodes in the individual grid_ggd structures are not filled."""
     assert_homogeneous_time_mode(ids)
     for grid_ggd in ids.grid_ggd:
@@ -235,6 +219,11 @@ def validate_obj_per_dim_geometry_content(ids):
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
                 geometry_content = obj_per_dim.geometry_content
                 if geometry_content.has_value and geometry_content != 0:
+                    # When the geometry content is filled, they should adhere to
+                    # the indices provided in the ggd_geometry_content_identifier.
+                    # These determine what information is stored in the geometry nodes.
+                    # What each of these geometry content indices mean, is described in
+                    # more detail in validate_obj_per_dim_geometry_length()
                     if dim == 0:
                         assert geometry_content in {1, 11}
                     elif dim == 1:
@@ -326,8 +315,7 @@ def validate_obj_per_dim_nodes(ids):
             for obj_per_dim in space.objects_per_dimension:
                 for obj in obj_per_dim.object:
                     if obj.nodes.has_value:
-                        for node in obj.nodes:
-                            assert node <= len_0D_obj
+                        assert 0 < obj.nodes <= len_0D_obj
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
@@ -400,7 +388,9 @@ def validate_grid_subset_object_index(ids):
                     obj_idx = object.index
                     space = find_structure_by_index(grid_ggd.space, space_idx)
                     assert (
-                        len(space.objects_per_dimension[dim._obj - 1].object) >= obj_idx
+                        len(space.objects_per_dimension[dim._obj - 1].object)
+                        >= obj_idx
+                        > 0
                     )
 
 
@@ -511,10 +501,5 @@ def validate_ggd_array_valid_grid_subset_index(ids):
 def validate_ggd_array_labels_filled(ids):
     """Validate that the labels of ions/neutrals are filled."""
     assert_homogeneous_time_mode(ids)
-    ggd_list = get_ggd_aos(ids)
-    label_list = []
-    for ggd_aos in ggd_list:
-        for ggd in ggd_aos:
-            recursive_label_search(ggd._obj, label_list)
-    for label in label_list:
+    for label in Select(ids, "/label$"):
         assert label.has_value
