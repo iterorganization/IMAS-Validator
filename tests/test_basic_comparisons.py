@@ -219,3 +219,11 @@ def test_bool_non_numpy_array():
     cp.time = [1, 2, 3]
     wrapper = IDSWrapper(cp)
     assert bool(wrapper.time) is True
+
+
+def test_transfer_ids_nodes_between_arrays():
+    wrapper = IDSWrapper([1, 2, 3], ids_nodes=['a'])
+    index = IDSWrapper(0, ids_nodes=['b'])
+    assert wrapper[0]._ids_nodes == ['a']
+    assert wrapper[index]._ids_nodes == ['a', 'b']
+    assert not isinstance([1, 2, 3][index], IDSWrapper)

@@ -110,7 +110,12 @@ class IDSWrapper:
         return IDSWrapper(self._obj(*args, **kwargs), ids_nodes=self._ids_nodes)
 
     def __getitem__(self, item: Any) -> "IDSWrapper":
+        if isinstance(item, IDSWrapper):
+            self._ids_nodes.extend(item._ids_nodes)
         return IDSWrapper(self._obj[item], ids_nodes=self._ids_nodes)
+
+    def __index__(self) -> int:
+        return int(self._obj)
 
     def __repr__(self) -> str:
         return f"IDSWrapper({self._obj!r})"
