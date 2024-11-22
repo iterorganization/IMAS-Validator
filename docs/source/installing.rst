@@ -85,7 +85,7 @@ Ubuntu installation
 
 * Install IMASPy.
 
-  Follow the instructions from `IMASPy installation docs <https://git.iter.org/projects/IMAS/repos/imaspy/browse/docs/source/installing.rst>`_
+  Follow the instructions from `IMASPy installation docs <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IMASPy-doc/installing.html>`_
 
 * Test the installation
 
