@@ -26,7 +26,7 @@ Testing
 Build docs
     This job builds the Sphinx documentation.
 
-    The CI script executed in this job is: ``ci/build_docs_and_dist.sh``, which expects the
+    The CI script executed in this job is: ``ci/build_docs.sh``, which expects the
     modules it needs to load as arguments.
 
 
