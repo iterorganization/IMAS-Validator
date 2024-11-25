@@ -9,7 +9,7 @@ of the CI Plan and deployment projects.
 CI Plan
 -------
 
-The `IDS-validator CI plan <https://ci.iter.org/browse/IC-PYM>`_ consists of 3 types of jobs:
+The `IDS-validator CI plan <https://ci.iter.org/browse/IMEX-IVALID>`_ consists of 3 types of jobs:
 
 Linting 
     Run ``black``, ``flake8``, ``mypy`` and ``isort`` on the IDS-validator code base.
