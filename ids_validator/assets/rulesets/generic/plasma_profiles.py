@@ -12,18 +12,25 @@ def validate_electroneutrality_1d(ids):
             ni_zi,
         ), "Electroneutrality is not verified"
 
+
 @validator("plasma_profiles")
 def validate_electroneutrality_ggd(ids):
     """Validate that electroneutrality is verified in the PLASMA_PROFILES IDS (ggd)"""
     for ggd in ids.ggd:
-        if len(ggd.ion) == 0 or len(ggd.ion[0].density)==0 or len(ggd.electrons.density)==0 or not len(ggd.ion[0].density)==len(ggd.electrons.density):
+        if (
+            len(ggd.ion) == 0
+            or len(ggd.ion[0].density) == 0
+            or len(ggd.electrons.density) == 0
+            or not len(ggd.ion[0].density) == len(ggd.electrons.density)
+        ):
             continue
         for subset in range(len(ggd.electrons.density)):
-           ni_zi = sum(ion.density[subset].values * ion.z_ion for ion in ggd.ion)
-           assert Approx(
-            ggd.electrons.density[subset].values,
-            ni_zi,
-           ), "Electroneutrality is not verified"
+            ni_zi = sum(ion.density[subset].values * ion.z_ion for ion in ggd.ion)
+            assert Approx(
+                ggd.electrons.density[subset].values,
+                ni_zi,
+            ), "Electroneutrality is not verified"
+
 
 @validator("plasma_profiles")
 def validate_z_ion(ids):
