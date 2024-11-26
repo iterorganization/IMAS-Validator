@@ -19,4 +19,4 @@ def validate_z_ion(ids):
                     )
                     assert (
                         0 < abs(ion.z_ion) <= zi
-                    ), "Average ion charge above the summed nuclear charge of ion elements"
+                    ), "Average ion charge above the summed nuclear charge of elements"
