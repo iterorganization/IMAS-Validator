@@ -2,7 +2,7 @@
 
 @validator("plasma_profiles")
 def validate_electroneutrality_1d(ids):
-    """Validate that electroneutrality is verified in the EDGE_PROFILES IDS (profiles_1d)"""
+    """Validate that electroneutrality is verified in the PLASMA_PROFILES IDS (profiles_1d)"""
     for profiles_1d in ids.profiles_1d:
         if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].density.has_value:
             continue
@@ -14,7 +14,7 @@ def validate_electroneutrality_1d(ids):
 
 @validator("plasma_profiles")
 def validate_electroneutrality_ggd(ids):
-    """Validate that electroneutrality is verified in the EDGE_PROFILES IDS (ggd)"""
+    """Validate that electroneutrality is verified in the PLASMA_PROFILES IDS (ggd)"""
     for ggd in ids.ggd:
         if len(ggd.ion) == 0 or len(ggd.ion[0].density)==0 or len(ggd.electrons.density)==0 or not len(ggd.ion[0].density)==len(ggd.electrons.density):
             continue
@@ -28,11 +28,22 @@ def validate_electroneutrality_ggd(ids):
 @validator("plasma_profiles")
 def validate_z_ion(ids):
     """Validate that the ion average charge z_ion is consistent
-    with ion elements in the EDGE_PROFILES IDS"""
+    with ion elements in the PLASMA_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].z_ion.has_value:
             continue
         for ion in profiles_1d.ion:
+            if len(ion.element) == 0:
+                assert len(ion.element) > 0, "ion/element structure must be allocated"
+            else:
+                zi = sum(abs(element.z_n) * element.atoms_n for element in ion.element)
+                assert (
+                    0 < abs(ion.z_ion) <= zi
+                ), "Average ion charge above the summed nuclear charge of ion elements"
+    for ggd in ids.ggd:
+        if len(ggd.ion) == 0 or not ggd.ion[0].z_ion.has_value:
+            continue
+        for ion in ggd.ion:
             if len(ion.element) == 0:
                 assert len(ion.element) > 0, "ion/element structure must be allocated"
             else:
@@ -45,7 +56,7 @@ def validate_z_ion(ids):
 @validator("plasma_profiles")
 def validate_pressure_thermal_electron_plasma_profiles(ids):
     """Validate that the electron thermal pressure is consistent
-    with density_thermal and temperature in the EDGE_PROFILES IDS"""
+    with density_thermal and temperature in the PLASMA_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if not (
             profiles_1d.electrons.temperature.has_value
@@ -64,7 +75,7 @@ def validate_pressure_thermal_electron_plasma_profiles(ids):
 @validator("plasma_profiles")
 def validate_zeff(ids):
     """Validate that the effective charge zeff is consistent
-    with ion densities in the EDGE_PROFILES IDS"""
+    with ion densities in the PLASMA_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if (
             len(profiles_1d.ion) == 0
@@ -85,7 +96,7 @@ def validate_zeff(ids):
 @validator("plasma_profiles")
 def validate_n_i_total_over_n_e(ids):
     """Validate that the total density ratio is consistent
-    with ion and electron densities in the EDGE_PROFILES IDS"""
+    with ion and electron densities in the PLASMA_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if (
             len(profiles_1d.ion) == 0
