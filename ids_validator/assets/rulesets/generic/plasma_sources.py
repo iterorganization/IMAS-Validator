@@ -19,7 +19,7 @@ def validate_z_ion(ids):
                     )
                     assert (
                         0 < abs(ion.z_ion) <= zi
-                    ), "Average ion charge above the summed nuclear charge of ion elements"
+                    ), "Average ion charge above the summed nuclear charge of elements"
         for ggd in source.ggd:
             if len(ggd.ion) == 0 or not ggd.ion[0].z_ion.has_value:
                 continue
@@ -34,4 +34,4 @@ def validate_z_ion(ids):
                     )
                     assert (
                         0 < abs(ion.z_ion) <= zi
-                    ), "Average ion charge above the summed nuclear charge of ion elements"
+                    ), "Average ion charge above the summed nuclear charge of elements"

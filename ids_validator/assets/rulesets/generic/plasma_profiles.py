@@ -2,7 +2,7 @@
 
 @validator("plasma_profiles")
 def validate_electroneutrality_1d(ids):
-    """Validate that electroneutrality is verified in the PLASMA_PROFILES IDS (profiles_1d)"""
+    """Validate that electroneutrality is verified in the PLASMA_PROFILES IDS"""
     for profiles_1d in ids.profiles_1d:
         if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].density.has_value:
             continue
@@ -11,11 +11,6 @@ def validate_electroneutrality_1d(ids):
             profiles_1d.electrons.density,
             ni_zi,
         ), "Electroneutrality is not verified"
-
-
-@validator("plasma_profiles")
-def validate_electroneutrality_ggd(ids):
-    """Validate that electroneutrality is verified in the PLASMA_PROFILES IDS (ggd)"""
     for ggd in ids.ggd:
         if (
             len(ggd.ion) == 0
