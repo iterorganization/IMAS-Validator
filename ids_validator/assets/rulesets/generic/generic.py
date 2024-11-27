@@ -126,5 +126,7 @@ def validate_density_positive(ids):
 def validate_temperature_positive(ids):
     """Validate that temperature and energy values are positive"""
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
-        if node.metadata.units == "eV" and not ("derivative" in str(node.metadata.path)):
+        if node.metadata.units == "eV" and not (
+            "derivative" in str(node.metadata.path)
+        ):
             assert node >= 0, "Negative value found for a temperature or energy"
