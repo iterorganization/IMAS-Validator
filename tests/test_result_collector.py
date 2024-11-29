@@ -13,7 +13,9 @@ from ids_validator.validate_options import ValidateOptions
 
 @pytest.fixture
 def res_collector():
-    res_col = ResultCollector(validate_options=ValidateOptions(track_node_dict=True), imas_uri="")
+    res_col = ResultCollector(
+        validate_options=ValidateOptions(track_node_dict=True), imas_uri=""
+    )
     return res_col
 
 
@@ -61,7 +63,7 @@ def check_attrs(val_result, success):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == "cool_func_name"
     assert val_result.idss == [("core_profiles", 0)]
-    assert val_result.tb[-1].lineno == 24
+    assert val_result.tb[-1].lineno == 26
     assert val_result.exc is None
 
 
@@ -70,7 +72,7 @@ def check_attrs_error(val_result):
     assert val_result.msg == ""
     assert val_result.rule.func.__name__ == val_result.tb[-1].name == "func_error"
     assert val_result.idss == [("core_profiles", 0)]
-    assert val_result.tb[-1].lineno == 35
+    assert val_result.tb[-1].lineno == 37
     assert isinstance(val_result.exc, ZeroDivisionError)
 
 
