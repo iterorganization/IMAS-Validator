@@ -63,6 +63,7 @@ def validate(
     rule_executor.apply_rules_to_data()
     results_collection = result_collector.result_collection()
     logger.info(f"{len(results_collection.results)} results obtained")
+    dbentry.close()
     return results_collection
 
 
