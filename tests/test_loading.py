@@ -182,7 +182,11 @@ def test_filter_rulesets_explore(caplog):
         Path(f"{base}/generic"),
         Path(f"{base}/test-ruleset"),
     ]
-    filtered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/test-ruleset"), Path(base)]
+    filtered_rulesets = [
+        Path(f"{base}/generic"),
+        Path(f"{base}/test-ruleset"),
+        Path(base),
+    ]
     validate_options = ValidateOptions(
         rulesets=[],
         apply_generic=True,
