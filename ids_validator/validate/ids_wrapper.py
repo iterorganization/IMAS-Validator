@@ -115,7 +115,7 @@ class IDSWrapper:
     def __repr__(self) -> str:
         return f"IDSWrapper({self._obj!r})"
 
-    def __iter__(self) -> Iterator[int]:
+    def __iter__(self) -> Iterator[Any]:
         return iter(self._obj)
 
     def __str__(self) -> str:
