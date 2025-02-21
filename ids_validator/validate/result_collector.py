@@ -171,6 +171,8 @@ class ResultCollector:
         visited_nodes_dict = self.visited_nodes_dict
         filled_nodes_dict = self.filled_nodes_dict
         for key in filled_nodes_dict.keys():
+            if key not in self.visited_nodes_dict.keys():
+                self.visited_nodes_dict[key] = set()
             filled = filled_nodes_dict[key]
             visited = visited_nodes_dict[key]
             coverage_dict[key] = CoverageMap(

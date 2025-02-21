@@ -106,7 +106,7 @@ class ValidationReportGenerator:
                 testcase.setAttribute("classname", testsuite.getAttribute("name"))
 
                 # if rule failed
-                if not custom_rule_object.success:
+                if len(custom_rule_object.failed_nodes) > 0:
                     failure = xml.createElement("failure")
 
                     failure_message = custom_rule_object.message
@@ -115,23 +115,25 @@ class ValidationReportGenerator:
 
                     failure.setAttribute("type", "")
                     failure.setAttribute(
-                        "nodes_count", f"{len(custom_rule_object.nodes)}"
+                        "nodes_count", f"{len(custom_rule_object.failed_nodes)}"
                     )
                     failure.setAttribute(
-                        "nodes", f"{' ' .join(custom_rule_object.nodes)}"
+                        "nodes", f"{' ' .join(custom_rule_object.failed_nodes)}"
                     )
 
                     custom_traceback_message = custom_rule_object.traceback
                     custom_traceback_message += "\n\nAffected nodes: "
-                    if len(custom_rule_object.nodes) > 10:
+                    if len(custom_rule_object.failed_nodes) > 10:
                         custom_traceback_message += " ".join(
-                            custom_rule_object.nodes[:5]
+                            custom_rule_object.failed_nodes[:5]
                         )
                         custom_traceback_message += (
-                            f" and {len(custom_rule_object.nodes) - 5} more..."
+                            f" and {len(custom_rule_object.failed_nodes) - 5} more..."
                         )
                     else:
-                        custom_traceback_message += " ".join(custom_rule_object.nodes)
+                        custom_traceback_message += " ".join(
+                            custom_rule_object.failed_nodes
+                        )
 
                     failure.appendChild(xml.createTextNode(custom_traceback_message))
                     testcase.appendChild(failure)
@@ -212,8 +214,12 @@ class ValidationReportGenerator:
             )
 
             for custom_rule_object in custom_result_object.rules:
-                if custom_rule_object.success:
+                if len(custom_rule_object.failed_nodes) == 0:
                     continue  # print only failed rules
+
+                non_empty_failed_nodes = [
+                    node for node in custom_rule_object.failed_nodes if node
+                ]  # node can be empty string if rule does not affect any nodes
 
                 txt_report_body += f"\tRULE: {custom_rule_object.rule_name}\n"
                 txt_report_body += f"\t\tMESSAGE: {custom_rule_object.message}\n"
@@ -221,9 +227,11 @@ class ValidationReportGenerator:
                     f"\t\tTRACEBACK: " f"{custom_rule_object.traceback}\n"
                 )
                 txt_report_body += (
-                    f"\t\tNODES COUNT: " f"{len(custom_rule_object.nodes)}\n"
+                    f"\t\tNODES COUNT: " f"{len(non_empty_failed_nodes)}\n"
                 )
-                txt_report_body += f"\t\tNODES: " f"{custom_rule_object.nodes}" f"\n\n"
+                txt_report_body += (
+                    f"\t\tNODES: " f"{custom_rule_object.failed_nodes}" f"\n\n"
+                )
 
         # --------- generate coverage map ---------
         if validation_result.coverage_dict.items():

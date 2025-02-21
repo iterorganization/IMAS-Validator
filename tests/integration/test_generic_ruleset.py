@@ -26,4 +26,8 @@ def test_generic_tests_with_randomly_generated_ids(ids_name, tmp_path):
     results_collection = validate(uri)
     assert len(results_collection.results) > 0
     for result in results_collection.results:
-        assert result.exc is None  # Generic tests should not lead to an Exception
+        # Generic tests should generally not lead to an Exception
+        # fill_consistent might create incompatible ggd ion and density data
+        assert result.exc is None or (
+            "operands could not be broadcast together" in str(result.exc)
+        )
