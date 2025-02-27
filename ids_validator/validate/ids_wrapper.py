@@ -120,8 +120,9 @@ class IDSWrapper:
     def __repr__(self) -> str:
         return f"IDSWrapper({self._obj!r})"
 
-    def __iter__(self) -> Iterator[Any]:
-        return iter(self._obj)
+    def __iter__(self) -> Iterator["IDSWrapper"]:
+        for item in self._obj:
+            yield IDSWrapper(item, ids_nodes=self._ids_nodes)
 
     def __str__(self) -> str:
         return str(self._obj)
