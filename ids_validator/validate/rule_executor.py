@@ -6,7 +6,7 @@ IDS data
 import logging
 import pdb
 import sys
-from typing import Iterator, List, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 from imaspy import DBEntry
 from imaspy.ids_toplevel import IDSToplevel
@@ -107,6 +107,8 @@ class RuleExecutor:
         t1 = self.progress.add_task("[red]Processing...", total=len(ids_list))
         for ids_name, occurrence in ids_list:
             ids_instance = self._load_ids_instance(ids_name, occurrence)
+            if ids_instance is None:
+                continue
             ids_version = Version(ids_instance[0]._dd_version)
             # match with first ids_name to prevent matching the same rule multiple
             # times for multi-ids
@@ -125,18 +127,37 @@ class RuleExecutor:
                 for name, occ in zip(rule.ids_names[1:], rule.ids_occs[1:]):
                     assert occ is not None
                     instance = self._load_ids_instance(name, occ)
+                    if instance is None:
+                        continue
                     idss.append(instance)
                 if not len(idss) == len(rule.ids_names):
-                    raise ValueError("Number of inputs not the same as required")
+                    if self.validate_options.stop_at_load_error:
+                        raise ValueError("Number of inputs not the same as required")
+                    else:
+                        continue
                 yield idss, rule
         self.progress_stop()
 
-    def _load_ids_instance(self, ids_name: str, occurrence: int) -> IDSInstance:
-        return (
-            self.db_entry.get(ids_name, occurrence, autoconvert=False),
-            ids_name,
-            occurrence,
-        )
+    def _load_ids_instance(
+        self, ids_name: str, occurrence: int
+    ) -> Optional[IDSInstance]:
+        logger.debug(f"Processing IDS: {ids_name}, occurrence = {occurrence}")
+        try:
+            ids_instance = (
+                self.db_entry.get(ids_name, occurrence, autoconvert=False),
+                ids_name,
+                occurrence,
+            )
+        except Exception as e:
+            logger.error(
+                f"Unable to load IDS: {ids_name}, occurrence = {occurrence}, "
+                f"uri: {self.db_entry.uri}"
+            )
+            if self.validate_options.stop_at_load_error:
+                raise e
+            else:
+                ids_instance = None
+        return ids_instance
 
     def _get_ids_list(self) -> List[Tuple[str, int]]:
         """Get list of all ids occurrences combined with their corresponding names

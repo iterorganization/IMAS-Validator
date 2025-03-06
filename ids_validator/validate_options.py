@@ -55,3 +55,5 @@ class ValidateOptions:
     """Whether this is an explore run or validate run."""
     track_node_dict: bool = False
     """Whether or not a node coverage dictionary should be created."""
+    stop_at_load_error: bool = False
+    """Whether or not to raise an error when an IDS cannot be loaded."""
