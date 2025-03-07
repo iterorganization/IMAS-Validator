@@ -96,8 +96,8 @@ def convert_result_into_custom_collection(
             )
             # If there is no CustomRuleObject in CustomResultCollection.rules
             # that matches result_object.rule.name: create new CustomRuleObject
-            if result_object.rule.name not in [
-                custom_rule_object.rule_name
+            if (result_object.rule.name, result_object.msg) not in [
+                (custom_rule_object.rule_name, custom_rule_object.message)
                 for custom_rule_object in custom_result_collection.rules
             ]:
                 new_custom_rule_object = CustomRuleObject(
@@ -121,6 +121,7 @@ def convert_result_into_custom_collection(
                     rule_object
                     for rule_object in custom_result_collection.rules
                     if rule_object.rule_name == result_object.rule.name
+                    and rule_object.message == result_object.msg
                 )
                 if result_object.success:
                     target_custom_rule_object.passed_nodes += affected_nodes
