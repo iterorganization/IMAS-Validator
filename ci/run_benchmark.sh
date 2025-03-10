@@ -37,8 +37,8 @@ cp -rf /mnt/bamboo_deploy/ids-validator/benchmarks/results .asv/
 asv machine --yes
 
 # Run ASV for the current commit, develop and main
-asv run --skip-existing-successful HEAD^!
-asv run --skip-existing-successful develop^!
+asv run --skip-existing-successful HEAD^! -v
+asv run --skip-existing-successful develop^! -v
 
 # Compare results
 if [ `git rev-parse --abbrev-ref HEAD` == develop ]
