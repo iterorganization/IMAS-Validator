@@ -5,15 +5,20 @@ requires = ["setuptools>=61", "wheel", "packaging", "tomli;python_version<'3.11'
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ids_validator"
+name = "imas-ids-validator"
 authors = [
   {name = "IDS Validator Developers"},
   {name = "Olivier Hoenen", email = "olivier.hoenen@iter.org"},
+  {name = "Sanders Mike", email = "msanders@ignitioncomputing.com"},
+  {name = "Blokhuizen Sebbe", email = "sblokhuizen@ignitioncomputing.com"},
+  {name = "Sebregts Maarten EXT", email = "msebregts@ignitioncomputing.com"},
+  {name = "ITER Organization"},
+  {email = "imas-support@iter.org"},
 ]
 description = "Data validation for IMAS IDS data"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.7"
-license = {file = "LICENSE.md"}
+license = {file = "LICENSE.txt"}
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -27,9 +32,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: System Administrators",
-# The license is prepended by private which makes it a valid trove classifier,
-# it will also prevent uploading to package indices such as PyPI
-    "Private :: License :: ITER License",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Natural Language :: English",
     "Operating System :: POSIX",
     "Operating System :: POSIX :: Linux",
