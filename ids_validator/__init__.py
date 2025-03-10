@@ -3,15 +3,14 @@ from pathlib import Path
 
 from ids_validator.setup_logging import connect_formatter
 
-from . import _version
+from ._version import version  # noqa: F401
+from ._version import version_tuple  # noqa: F401
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 connect_formatter(logger)
 
-__version__ = _version.get_versions()["version"]
-
-version = __version__
+__version__ = version
 
 
 def get_project_root() -> Path:
