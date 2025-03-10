@@ -3,7 +3,7 @@
 # Note: this script should be run from the root of the git repository
 
 # Debuggging:
-set -e -o pipefail
+# set -e -o pipefail
 echo "Loading modules..."
 
 # Set up environment such that module files can be loaded
