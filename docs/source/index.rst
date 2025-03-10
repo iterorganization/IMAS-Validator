@@ -55,7 +55,7 @@ Manual
 LICENSE
 -------
 
-.. literalinclude:: ../../LICENSE.md
+.. literalinclude:: ../../LICENSE.txt
    :language: text
 
 
