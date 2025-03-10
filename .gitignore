@@ -5,6 +5,7 @@ __pycache__/
 
 # Distribution / packaging
 *.egg-info/
+ids_validator/_version.py
 
 # Unit test / coverage reports
 .cache

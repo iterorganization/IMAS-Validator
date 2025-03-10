@@ -21,7 +21,7 @@
     // Customizable commands for building, installing, and
     // uninstalling the project. See asv.conf.json documentation.
     //
-    // "install_command": ["in-dir={env_dir} python -mpip install {wheel_file}[netcdf]"],
+    "install_command": ["in-dir={env_dir} python -mpip install {repo}"],
     // // "uninstall_command": ["return-code=any python -mpip uninstall -y {project}"],
     // "build_command": [
     //     // link data-dictionary and build folder so the DD source files remain cached
@@ -39,7 +39,7 @@
     // List of branches to benchmark. If not provided, defaults to "master"
     // (for git) or "default" (for mercurial).
     // TODO: Add Master/develop
-    "branches": ["develop", "main"],
+    "branches": ["github_preparation", "main"],
 
     // The DVCS being used.  If not set, it will be automatically
     // determined from "repo" by looking at the protocol in the URL
