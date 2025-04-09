@@ -39,5 +39,5 @@ There is currently one Bamboo deployment project for imas-validator:
     Deploy the documentation created in the `Build docs` job to `Sharepoint
     <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/imas-validator/index.html#>`_.
 
-    This deployment project runs for after each successful CI build of the imas-validator main
+    This deployment project runs for after each successful CI build of the IMAS-Validator main
     branch.
