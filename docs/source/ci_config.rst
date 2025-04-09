@@ -12,7 +12,7 @@ CI Plan
 The `imas-validator CI plan <https://ci.iter.org/browse/IMEX-IVALID>`_ consists of 3 types of jobs:
 
 Linting 
-    Run ``black``, ``flake8``, ``mypy`` and ``isort`` on the imas-validator code base.
+    Run ``black``, ``flake8``, ``mypy`` and ``isort`` on the IMAS-Validator code base.
     See :ref:`code style and linting`.
 
     The CI script executed in this job is ``ci/linting.sh``.
