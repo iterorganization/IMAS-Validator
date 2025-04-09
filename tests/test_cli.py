@@ -1,7 +1,10 @@
 import argparse
 from pathlib import Path
 
-import imaspy
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
 import pytest
 
 from ids_validator.cli import ids_validator_cli
@@ -33,7 +36,7 @@ def test_non_existing_pulsefile(tmp_path):
     argv = ["validate", f"imas:hdf5?path={empty_db_dir}"]
 
     # When using imas_core >= 5.2, this raises an ALException. In earlier AL versions
-    # IMASPy raises a LowlevelError.
+    # IMAS-Python raises a LowlevelError.
     with pytest.raises(SystemExit):
         ids_validator_cli.main(argv)
 
@@ -43,7 +46,7 @@ def test_existing_pulsefile(tmp_path):
     db_dir.mkdir()
 
     uri = f"imas:hdf5?path={db_dir}"
-    entry = imaspy.DBEntry(uri=uri, mode="x")
+    entry = imas.DBEntry(uri=uri, mode="x")
     entry.close()
 
     argv = ["validate", uri]

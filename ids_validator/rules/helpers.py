@@ -2,13 +2,15 @@
 This file describes the helper functions for the validation rules
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import operator
 from typing import Any, Callable, Iterator, List
 
 import numpy as np
-from imaspy.ids_base import IDSBase
-from imaspy.ids_toplevel import IDSToplevel
-from imaspy.util import find_paths, visit_children
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
@@ -42,7 +44,7 @@ class Select:
         Args:
             wrapped: IDS toplevel or structure element
             query: Regular expression to match the paths of child elements to. See also
-                :py:func:`imaspy.util.find_paths`.
+                :py:func:`imas.util.find_paths`.
 
         Keyword Args:
             has_value: When True, children without value are not included. Set to False
@@ -56,23 +58,23 @@ class Select:
 
         if not isinstance(wrapped, IDSWrapper):
             raise TypeError("First argument of Select must be an IDS node")
-        self._node: IDSBase = wrapped._obj
-        if not isinstance(self._node, IDSBase):
+        self._node: imas.ids_base.IDSBase = wrapped._obj
+        if not isinstance(self._node, imas.ids_base.IDSBase):
             raise TypeError("First argument of Select must be an IDS node")
 
         self._matches: List[IDSWrapper] = []
-        self._matching_paths = set(find_paths(self._node, self._query))
+        self._matching_paths = set(imas.util.find_paths(self._node, self._query))
 
         # Loop over all elements in self._node, and append matches to self._matches.
         # Note: this is not very efficient when a lot of nodes are filled and only a
         # small number match the query. We can improve performance later if it is a
         # bottleneck.
-        visit_children(
+        imas.util.visit_children(
             self._visitor, self._node, leaf_only=leaf_only, visit_empty=not has_value
         )
 
-    def _visitor(self, node: IDSBase) -> None:
-        """Visitor function used in imaspy.util.visit_children."""
+    def _visitor(self, node: imas.ids_base.IDSBase) -> None:
+        """Visitor function used in imas.util.visit_children."""
         if node.metadata.path_string in self._matching_paths:
             self._matches.append(IDSWrapper(node))
 
@@ -170,10 +172,10 @@ def Parent(wrapped: IDSWrapper, level: int = 1) -> IDSWrapper:
     if not isinstance(wrapped, IDSWrapper):
         raise TypeError("First argument must be an IDS node")
     node = wrapped._obj
-    if not isinstance(node, IDSBase):
+    if not isinstance(node, imas.ids_base.IDSBase):
         raise TypeError("First argument must be an IDS node")
     for _ in range(level):
-        if isinstance(node, IDSToplevel):
+        if isinstance(node, imas.ids_toplevel.IDSToplevel):
             raise ValueError(f"Cannot get the parent of {node!r}")
         node = node._parent
     return IDSWrapper(node)

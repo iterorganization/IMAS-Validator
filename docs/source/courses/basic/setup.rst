@@ -3,7 +3,7 @@
 IDS validator 101: setup
 ========================
 
-For these training excercises you will need an installation of ids_validator and access to IMASPy.
+For these training excercises you will need an installation of ids_validator and access to IMAS-Python.
 Have a look at the :ref:`installing` page for more details on installing IDS validator.
 To check if your installation worked, try
 
@@ -12,7 +12,7 @@ To check if your installation worked, try
     $ python -c 'import ids_validator; print(ids_validator.__version__)'
     0.3.0
 
-Some IMASpy DBEntry objects and custom validation rulesets were built specifically for this training course.
+Some IMAS-Python DBEntry objects and custom validation rulesets were built specifically for this training course.
 You can build them by running
 
 .. code-block:: console

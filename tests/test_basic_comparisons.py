@@ -1,4 +1,7 @@
-import imaspy
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
 import numpy
 import pytest
 
@@ -215,7 +218,7 @@ def test_validate_flt_3d(test_data_waves):
 
 
 def test_bool_non_numpy_array():
-    cp = imaspy.IDSFactory().core_profiles()
+    cp = imas.IDSFactory().core_profiles()
     cp.time = [1, 2, 3]
     wrapper = IDSWrapper(cp)
     assert bool(wrapper.time) is True

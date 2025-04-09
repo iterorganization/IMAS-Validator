@@ -1,11 +1,14 @@
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+    
 import logging
 from functools import lru_cache
 from pathlib import Path
 from unittest.mock import patch
 
 import numpy
-from imaspy import IDSFactory
-from imaspy.exception import DataEntryException
 
 from ids_validator.validate.result import IDSValidationResult
 from ids_validator.validate.validate import validate
@@ -25,9 +28,9 @@ def list_all_occurrences(ids_name: str):
 def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
     # Trying to get an IDS that isn't filled is an error:
     if occurrence not in list_all_occurrences(ids_name):
-        raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
+        raise imas.exception.DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
 
-    ids = IDSFactory("3.40.1").new(ids_name)
+    ids = imas.IDSFactory("3.40.1").new(ids_name)
     ids.ids_properties.comment = f"Test IDS: {ids_name}/{occurrence}"
     ids.ids_properties.homogeneous_time = 1
     # TODO: if needed, we can fill IDSs with specific data
@@ -43,7 +46,7 @@ def test_validate(caplog):
         list_all_occurrences=list_all_occurrences,
         get=get,
         uri="",
-        factory=IDSFactory("3.40.1"),
+        factory=imas.IDSFactory("3.40.1"),
     ), patch(f"{module}._check_imas_version"):
         validate_options = ValidateOptions(
             rulesets=["test-ruleset"],

@@ -1,18 +1,21 @@
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 from typing import List
 
-import imaspy
+
 import numpy as np
 import pytest
-from imaspy.ids_base import IDSBase
-from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.rules.helpers import Approx, Decreasing, Increasing, Parent, Select
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
 
 @pytest.fixture
-def select_ids() -> IDSToplevel:
-    ids = imaspy.IDSFactory("3.40.1").new("core_profiles")
+def select_ids() -> imas.ids_toplevel.IDSToplevel:
+    ids = imas.IDSFactory("3.40.1").new("core_profiles")
     ids.ids_properties.homogeneous_time = 0
     ids.ids_properties.comment = "Test comment"
     ids.time = [0.0, 1.1, 2.2]
@@ -33,7 +36,7 @@ def test_select(select_ids):
     Select(IDSWrapper(select_ids.time), "")
 
 
-def assert_select_matches(selection: Select, expected: List[IDSBase]) -> None:
+def assert_select_matches(selection: Select, expected: List[imas.ids_base.IDSBase]) -> None:
     """Test helper for asserting that the selection matches expected IDS elements"""
     unwrapped_selections = sorted((wrapped._obj for wrapped in selection), key=id)
     expected.sort(key=id)

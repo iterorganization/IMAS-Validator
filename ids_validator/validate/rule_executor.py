@@ -3,13 +3,16 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import logging
 import pdb
 import sys
 from typing import Iterator, List, Optional, Tuple
 
-from imaspy import DBEntry
-from imaspy.ids_toplevel import IDSToplevel
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 from rich.progress import Progress
@@ -21,7 +24,7 @@ from ids_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
 
-IDSInstance = Tuple[IDSToplevel, str, int]
+IDSInstance = Tuple[imas.ids_toplevel.IDSToplevel, str, int]
 
 
 class RuleExecutor:
@@ -29,7 +32,7 @@ class RuleExecutor:
 
     def __init__(
         self,
-        db_entry: DBEntry,
+        db_entry: imas.DBEntry,
         rules: List[IDSValidationRule],
         result_collector: ResultCollector,
         validate_options: ValidateOptions,
@@ -64,7 +67,11 @@ class RuleExecutor:
             logger.info(f"Running {rule.name} on {idss_str}")
             self.run(rule, ids_toplevels)
 
-    def run(self, rule: IDSValidationRule, ids_toplevels: List[IDSToplevel]) -> None:
+    def run(
+        self,
+        rule: IDSValidationRule,
+        ids_toplevels: List[imas.ids_toplevel.IDSToplevel],
+    ) -> None:
         res_num = len(self.result_collector.results)
         try:
             rule.apply_func(ids_toplevels)

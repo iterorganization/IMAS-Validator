@@ -1,7 +1,12 @@
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import logging
 import os
 
-import imaspy
+
 import numpy
 import pytest
 
@@ -13,7 +18,7 @@ os.environ.pop("RULESET_PATH", "")
 
 @pytest.fixture
 def test_data_core_profiles():
-    cp = imaspy.IDSFactory("3.40.1").core_profiles()
+    cp = imas.IDSFactory("3.40.1").core_profiles()
     # Fill some properties:
     cp.ids_properties.homogeneous_time = 0  # INT_0D
     cp.ids_properties.comment = "Comment"  # STR_0D
@@ -37,7 +42,7 @@ def test_data_core_profiles():
 
 @pytest.fixture
 def test_data_waves():
-    wv = imaspy.IDSFactory("3.40.1").waves()
+    wv = imas.IDSFactory("3.40.1").waves()
     # Fill some properties:
     wv.ids_properties.homogeneous_time = 0  # INT_0D
     # Fill some data

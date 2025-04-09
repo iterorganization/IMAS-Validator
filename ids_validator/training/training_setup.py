@@ -2,24 +2,26 @@
 This file describes the functions needed for the training course
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import os
 import shutil
 from pathlib import Path
 
-import imaspy
 import numpy
-from imaspy import DBEntry
-from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator import get_project_root
 
 
-def training_core_profiles(new_version: bool = False) -> IDSToplevel:
+def training_core_profiles(new_version: bool = False) -> imas.ids_toplevel.IDSToplevel:
     if new_version:
         version = "3.42.0"
     else:
         version = "3.40.1"
-    cp = imaspy.IDSFactory(version).core_profiles()
+    cp = imas.IDSFactory(version).core_profiles()
     # Fill some properties:
     cp.ids_properties.homogeneous_time = 0  # INT_0D
     cp.ids_properties.comment = "Comment"  # STR_0D
@@ -57,12 +59,12 @@ def training_core_profiles(new_version: bool = False) -> IDSToplevel:
     return cp
 
 
-def training_data_waves(new_version: bool = False) -> IDSToplevel:
+def training_data_waves(new_version: bool = False) -> imas.ids_toplevel.IDSToplevel:
     if new_version:
         version = "3.42.0"
     else:
         version = "3.40.1"
-    wv = imaspy.IDSFactory(version).waves()
+    wv = imas.IDSFactory(version).waves()
     # Fill some properties:
     wv.ids_properties.homogeneous_time = 0  # INT_0D
     # Fill some data
@@ -102,7 +104,7 @@ def training_data_waves(new_version: bool = False) -> IDSToplevel:
 def create_training_db_entries() -> None:
     cp = training_core_profiles()
     wv = training_data_waves()
-    with DBEntry(
+    with imas.DBEntry(
         "imas:hdf5?path=ids-validator-course/good", "w", dd_version="3.40.1"
     ) as entry:
         entry.put(cp)
@@ -110,13 +112,13 @@ def create_training_db_entries() -> None:
         print(entry.uri)
     cp.time = [1.0, 0.0]
     wv.time = [1.0, 0.0]
-    with DBEntry(
+    with imas.DBEntry(
         "imas:hdf5?path=ids-validator-course/bad", "w", dd_version="3.40.1"
     ) as entry:
         entry.put(cp)
         entry.put(wv)
         print(entry.uri)
-    with DBEntry(
+    with imas.DBEntry(
         "imas:hdf5?path=ids-validator-course/new", "w", dd_version="3.42.0"
     ) as entry:
         cp = training_core_profiles(new_version=True)

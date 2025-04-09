@@ -57,7 +57,7 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
 
 .. code-block:: python
 
-  from imaspy import DBEntry
+  from imas import DBEntry
 
   from ids_validator.validate_options import ValidateOptions, RuleFilter
   from ids_validator.rules.loading import load_rules

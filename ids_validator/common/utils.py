@@ -1,7 +1,10 @@
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import argparse
 from typing import Any, List
-
-import imaspy
 
 from ids_validator.validate_options import RuleFilter
 
@@ -10,7 +13,7 @@ def get_all_ids_names() -> List[str]:
     """
     Returns list of strings representing all IDSs from Data Dictionary
     """
-    return imaspy.IDSFactory().ids_names()
+    return imas.IDSFactory().ids_names()
 
 
 def flatten_2d_list_or_return_empty(list_2d: List[List[Any]]) -> List[Any]:

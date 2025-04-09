@@ -24,7 +24,7 @@ These are python functions structured like:
    decorator specifying which IDSs to target with the function.
 2. Function definition accepting IDS instances as arguments.
 3. Docstring with a short description of the tests.
-4. The tests, which can use standard python logic, IMASPy IDSs and predefined
+4. The tests, which can use standard python logic, IMAS-Python IDSs and predefined
    :py:class:`helper methods<ids_validator.rules.helpers>`. ``assert`` statements
    describe which conditions should be adhered to.
 

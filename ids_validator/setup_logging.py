@@ -1,9 +1,12 @@
 """Create a default log handler for ids_validator
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore # noqa: F401
 import logging
 
-import imaspy  # noqa: F401, imported to overwrite logging handlers at correct timing
 from rich.logging import RichHandler
 
 
@@ -51,12 +54,12 @@ def setup_rich_log_handler(quiet: bool) -> None:
     """Setup rich.logging.RichHandler on the root logger.
 
     Args:
-        quiet: When True: set log level of the `imaspy` logger to WARNING or higher.
+        quiet: When True: set log level of the `imas` logger to WARNING or higher.
     """
-    # Disable default imaspy log handler
-    imaspy_logger = logging.getLogger("imaspy")
-    for handler in imaspy_logger.handlers:
-        imaspy_logger.removeHandler(handler)
-    if quiet:  # Silence IMASPy INFO messages
+    # Disable default imas log handler
+    imas_logger = logging.getLogger("imas_python")
+    for handler in imas_logger.handlers:
+        imas_logger.removeHandler(handler)
+    if quiet:  # Silence IMAS INFO messages
         # If loglevel is less than WARNING, set it to WARNING:
-        imaspy_logger.setLevel(max(logging.WARNING, imaspy_logger.getEffectiveLevel()))
+        imas_logger.setLevel(max(logging.WARNING, imas_logger.getEffectiveLevel()))

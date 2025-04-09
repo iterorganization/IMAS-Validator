@@ -2,11 +2,15 @@
 This file describes the overload class for the operators
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import operator
 from typing import Any, Callable, Collection, List, Optional, Tuple
 
 import numpy as np
-from imaspy.ids_primitive import IDSPrimitive
 
 
 def _binary_wrapper(op: Callable, name: str) -> Callable:
@@ -53,7 +57,10 @@ class IDSWrapper:
     """
 
     def __init__(
-        self, obj: Any, *, ids_nodes: Optional[List[IDSPrimitive]] = None
+        self,
+        obj: Any,
+        *,
+        ids_nodes: Optional[List[imas.ids_primitive.IDSPrimitive]] = None,
     ) -> None:
         """Initialize IDSWrapper
 
@@ -67,7 +74,7 @@ class IDSWrapper:
             raise ValueError("Cannot wrap already wrapped object")
         self._obj = obj
         self._ids_nodes = ids_nodes or []
-        if isinstance(obj, IDSPrimitive):
+        if isinstance(obj, imas.ids_primitive.IDSPrimitive):
             self._ids_nodes = self._ids_nodes + [obj]
 
     def __array_ufunc__(
@@ -94,7 +101,7 @@ class IDSWrapper:
             if isinstance(value, IDSWrapper):
                 ids_nodes.extend(value._ids_nodes)
                 value = value._obj
-                if isinstance(value, IDSPrimitive):
+                if isinstance(value, imas.ids_primitive.IDSPrimitive):
                     value = value.value
             unpacked_args.append(value)
         # Pass unpacked inputs to the function:

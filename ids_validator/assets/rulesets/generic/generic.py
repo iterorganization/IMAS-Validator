@@ -23,8 +23,8 @@ def validate_homogeneous_time(ids):
     if ids.ids_properties.homogeneous_time == 2:
         # Loop over all filled quantities and assert they are not dynamic
         for node in Select(ids, ".*", has_value=True):
-            # Use IMASPy's metadata to check that this quantity is not dynamic
-            # https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IMASPy-doc/generated/imaspy.ids_metadata.IDSType.html#imaspy.ids_metadata.IDSType
+            # Use IMAS-Python's metadata to check that this quantity is not dynamic
+            # https://imas-python.readthedocs.io/en/stable/generated/imas.ids_metadata.IDSType.html#imas.ids_metadata.IDSType
             assert (
                 not node.metadata.type.is_dynamic
             ), "Dynamic quantity may not be filled when homogeneous_time == 2"

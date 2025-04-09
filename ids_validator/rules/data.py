@@ -3,10 +3,13 @@ This file describes the data class for rules that are saved and generated for
 the validation tool
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
-
-from imaspy.ids_toplevel import IDSToplevel
 
 from ids_validator.validate.ids_wrapper import IDSWrapper
 
@@ -40,7 +43,7 @@ class IDSValidationRule:
         self.kwfields = kwfields
         # kwfields explicitly parsed
 
-    def apply_func(self, ids_instances: List[IDSToplevel]) -> None:
+    def apply_func(self, ids_instances: List[imas.ids_toplevel.IDSToplevel]) -> None:
         """Run the validation function with wrapped input arguments
 
         Args:

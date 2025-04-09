@@ -7,9 +7,10 @@ import logging
 import traceback
 from typing import Any, List, Tuple
 
-import imaspy.util
-from imaspy.ids_primitive import IDSPrimitive
-from imaspy.ids_toplevel import IDSToplevel
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
 
 from ids_validator.exceptions import InternalValidateDebugException
 from ids_validator.rules.data import IDSValidationRule
@@ -47,7 +48,9 @@ class ResultCollector:
         self.filled_nodes_dict: NodesDict = {}
 
     def set_context(
-        self, rule: IDSValidationRule, idss: List[Tuple[IDSToplevel, str, int]]
+        self,
+        rule: IDSValidationRule,
+        idss: List[Tuple[imas.ids_toplevel.IDSToplevel, str, int]],
     ) -> None:
         """Set which rule and IDSs should be stored in results
 
@@ -120,7 +123,9 @@ class ResultCollector:
         if self.validate_options.use_pdb and not res_bool:
             raise InternalValidateDebugException()
 
-    def create_nodes_dict(self, ids_nodes: List[IDSPrimitive]) -> NodesDict:
+    def create_nodes_dict(
+        self, ids_nodes: List[imas.ids_primitive.IDSPrimitive]
+    ) -> NodesDict:
         """
         Create dict with list of touched nodes for the IDSValidationResult object
 
@@ -138,7 +143,9 @@ class ResultCollector:
         return nodes_dict
 
     def append_nodes_dict(
-        self, nodes_dict: NodesDict, idss: List[Tuple[IDSToplevel, str, int]]
+        self,
+        nodes_dict: NodesDict,
+        idss: List[Tuple[imas.ids_toplevel.IDSToplevel, str, int]],
     ) -> None:
         """
         Add touched nodes and filled nodes to nodes_dicts during assert
@@ -155,7 +162,7 @@ class ResultCollector:
             key = (name, occ)
             if key not in self.filled_nodes_dict.keys():
                 self.filled_nodes_dict[key] = set()
-                imaspy.util.visit_children(
+                imas.util.visit_children(
                     lambda node: self.filled_nodes_dict[key].add(node._path),
                     ids_instance,
                     leaf_only=True,

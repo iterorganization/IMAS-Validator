@@ -26,8 +26,8 @@ SDCC installation
 
   .. code-block:: bash
 
-    # load IMAS and IMASPy before install
-    module load IMAS IMASPy
+    # load IMAS and IMAS-Python before install
+    module load IMAS-Python # or IMASPy
     python3 -m venv ./venv
     . venv/bin/activate
     pip install --upgrade pip
@@ -40,7 +40,7 @@ SDCC installation
   .. code-block:: bash
 
     # Load modules every time you use ids_validator
-    module load IMAS IMASPy
+    module load IMAS-Python # or IMASPy
     # And activate the Python virtual environment every time you use ids_validator
     . venv/bin/activate
 
@@ -83,9 +83,9 @@ Ubuntu installation
     # For development an installation in editable mode may be more convenient
     pip install .[all]
 
-* Install IMASPy.
+* Install IMAS-Python.
 
-  Follow the instructions from `IMASPy installation docs <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IMASPy-doc/installing.html>`_
+  Follow the instructions from `IMAS-Python installation docs <https://imas-python.readthedocs.io/en/latest/installing.html>`_
 
 * Test the installation
 

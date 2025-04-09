@@ -1,3 +1,8 @@
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import logging
 from functools import lru_cache, reduce
 from pathlib import Path
@@ -5,8 +10,6 @@ from unittest.mock import Mock, call
 
 import numpy
 import pytest
-from imaspy import IDSFactory
-from imaspy.exception import DataEntryException
 
 from ids_validator.rules.data import IDSValidationRule
 from ids_validator.validate.ids_wrapper import IDSWrapper
@@ -38,9 +41,9 @@ def check_expected_calls(func, expected_call_list):
 def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
     # Trying to get an IDS that isn't filled is an error:
     if occurrence not in list_all_occurrences(ids_name):
-        raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
+        raise imas.exception.DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
 
-    ids = IDSFactory("3.40.1").new(ids_name)
+    ids = imas.IDSFactory("3.40.1").new(ids_name)
     ids.ids_properties.comment = f"Test IDS: {ids_name}:{occurrence}"
     ids.ids_properties.homogeneous_time = 1
     # TODO: if needed, we can fill IDSs with specific data
@@ -53,11 +56,11 @@ def list_all_occurrences(ids_name: str):
 
 @pytest.fixture
 def dbentry():
-    """Get a mocked imaspy.DBEntry."""
+    """Get a mocked imas.DBEntry."""
     db = Mock()
     db.list_all_occurrences = Mock(wraps=list_all_occurrences)
     db.get = Mock(wraps=get)
-    db.factory = IDSFactory("3.40.1")
+    db.factory = imas.IDSFactory("3.40.1")
     db.dd_version = "3.40.1"
     db.uri = ""
     return db
@@ -96,7 +99,7 @@ def test_dbentry_mock(dbentry):
     assert dbentry.list_all_occurrences("summary") == []
     assert numpy.array_equal(dbentry.list_all_occurrences("equilibrium"), [0, 1])
 
-    with pytest.raises(DataEntryException):
+    with pytest.raises(imas.exception.DataEntryException):
         dbentry.get("summary")
 
     cp = dbentry.get("core_profiles", autoconvert=False)

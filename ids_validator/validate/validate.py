@@ -2,17 +2,13 @@
 This file describes the main function for the IMAS IDS validation tool
 """
 
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+
 import logging
 import sys
-
-from imaspy import DBEntry
-from imaspy.exception import ALException, LowlevelError
-
-try:
-    from imaspy.imas_interface import has_imas, ll_interface
-except ImportError:
-    # Package is renamed in IMASPy 1.1
-    from imaspy.backends.imas_core.imas_interface import has_imas, ll_interface
 
 from packaging.version import Version
 
@@ -45,8 +41,8 @@ def validate(
 
     _check_imas_version()
     try:
-        dbentry = DBEntry(imas_uri, "r")
-    except (ALException, LowlevelError) as e:
+        dbentry = imas.DBEntry(imas_uri, "r")
+    except (imas.exception.ALException, imas.exception.LowlevelError) as e:
         logger.error(e)
         sys.exit(1)
 
@@ -70,7 +66,9 @@ def validate(
 def _check_imas_version() -> None:
     """Check if the installed IMAS version is sufficient."""
     # TODO: check if this is the best level to test for the IMAS version
-    if not has_imas:
+    if not imas.backends.imas_core.imas_interface.has_imas:
         raise IMASVersionError()
-    if ll_interface._al_version < Version("5.1"):
-        raise IMASVersionError(ll_interface._al_version)
+    if imas.backends.imas_core.imas_interface.ll_interface._al_version < Version("5.1"):
+        raise IMASVersionError(
+            imas.backends.imas_core.imas_interface.ll_interface._al_version
+        )
