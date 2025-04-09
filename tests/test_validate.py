@@ -41,7 +41,7 @@ def test_validate(caplog):
     module = "ids_validator.validate.validate"
     # patch _check_imas_version for now
     with patch(
-        f"{module}.DBEntry",
+        f"{module}.imas.DBEntry",
         spec=True,
         list_all_occurrences=list_all_occurrences,
         get=get,
