@@ -17,7 +17,7 @@ dependencies, snippet of code);
 4. apply relevant labels to the issue.
 
 ## You want to make or ask some change to the code
-1. use the [issue search](https://github.com/iterorganization/IMAS-imas-validator/issues)
+1. use the [issue search](https://github.com/iterorganization/IMAS-Validator/issues)
 to check if someone already proposed a similar idea/change;
 3. if not, create a **new issue** to describe what change you would like to see 
 implemented and specify it if you intend to work on it yourself or if some help 
