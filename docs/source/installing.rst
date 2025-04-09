@@ -1,6 +1,6 @@
 .. _`installing`:
 
-Installing the IMAS IDS validator
+Installing the IMAS IMAS validator
 =================================
 
 SDCC module load
@@ -8,7 +8,7 @@ SDCC module load
 
 .. code-block:: bash
 
-  module load IDS-Validator
+  module load imas-validator
 
 SDCC installation
 -----------------
@@ -19,8 +19,8 @@ SDCC installation
 
     mkdir projects
     cd projects
-    git clone ssh://git@git.iter.org/imex/ids-validator.git
-    cd ids-validator
+    git clone ssh://git@git.iter.org/imex/imas-validator.git
+    cd imas-validator
 
 * Setup a python virtual environment and install python dependencies
 
@@ -39,16 +39,16 @@ SDCC installation
 
   .. code-block:: bash
 
-    # Load modules every time you use ids_validator
+    # Load modules every time you use imas_validator
     module load IMAS-Python # or IMASPy
-    # And activate the Python virtual environment every time you use ids_validator
+    # And activate the Python virtual environment every time you use imas_validator
     . venv/bin/activate
 
 * Test the installation
 
   .. code-block:: bash
 
-    python -c "import ids_validator; print(ids_validator.__version__)"
+    python -c "import imas_validator; print(imas_validator.__version__)"
     python -m pytest
 
 
@@ -69,8 +69,8 @@ Ubuntu installation
 
     mkdir projects
     cd projects
-    git clone ssh://git@git.iter.org/imex/ids-validator.git
-    cd ids-validator
+    git clone ssh://git@git.iter.org/imex/imas-validator.git
+    cd imas-validator
 
 * Setup a python virtual environment and install python dependencies
 
@@ -91,10 +91,10 @@ Ubuntu installation
 
   .. code-block:: bash
 
-    python -c "import ids_validator; print(ids_validator.__version__)"
+    python -c "import imas_validator; print(imas_validator.__version__)"
     python -m pytest
 
-* To build the ids-validator documentation, execute:
+* To build the imas-validator documentation, execute:
 
   .. code-block:: bash
 

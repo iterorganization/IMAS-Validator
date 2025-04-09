@@ -5,17 +5,17 @@
    define TOC here, but it'll be put in the sidebar by the theme
 
 =========================
-IMAS IDS Validator Manual
+IMAS IMAS Validator Manual
 =========================
 
-IMAS IDS Validator is a tool to validate IMAS IDS's through the use of general
+IMAS IMAS Validator is a tool to validate IMAS IDS's through the use of general
 and case specific validation rules.
 
 
 README
 ------
 
-The README is best read on the `git page <https://git.iter.org/projects/IMEX/repos/ids-validator/browse>`_.
+The README is best read on the `git page <https://git.iter.org/projects/IMEX/repos/imas-validator/browse>`_.
 
 Manual
 ------

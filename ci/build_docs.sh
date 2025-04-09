@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bamboo CI script to build the ids-validator docs
+# Bamboo CI script to build the imas-validator docs
 # Note: this script should be run from the root of the git repository
 
 # Debuggging:

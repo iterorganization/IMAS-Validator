@@ -5,7 +5,7 @@ except ImportError:
 import numpy
 import pytest
 
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.ids_wrapper import IDSWrapper
 
 
 def check_test_result(test, expected):

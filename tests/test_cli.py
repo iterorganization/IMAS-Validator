@@ -7,13 +7,13 @@ except ImportError:
     import imas  # type: ignore
 import pytest
 
-from ids_validator.cli import ids_validator_cli
-from ids_validator.cli.commands import validate_command
+from imas_validator.cli import imas_validator_cli
+from imas_validator.cli.commands import validate_command
 
 
 def test_cli_no_arguments():
     with pytest.raises(SystemExit) as pytest_wrapped_e:
-        ids_validator_cli.main([])
+        imas_validator_cli.main([])
 
     assert pytest_wrapped_e.type == SystemExit
     assert pytest_wrapped_e.value.code == 0
@@ -23,7 +23,7 @@ def test_cli_wrong_command():
     argv = ["wrong_command"]
 
     with pytest.raises(SystemExit) as pytest_wrapped_e:
-        ids_validator_cli.main(argv)
+        imas_validator_cli.main(argv)
 
     assert pytest_wrapped_e.type == SystemExit
     assert pytest_wrapped_e.value.code == 2
@@ -38,7 +38,7 @@ def test_non_existing_pulsefile(tmp_path):
     # When using imas_core >= 5.2, this raises an ALException. In earlier AL versions
     # IMAS-Python raises a LowlevelError.
     with pytest.raises(SystemExit):
-        ids_validator_cli.main(argv)
+        imas_validator_cli.main(argv)
 
 
 def test_existing_pulsefile(tmp_path):
@@ -51,7 +51,7 @@ def test_existing_pulsefile(tmp_path):
 
     argv = ["validate", uri]
 
-    ids_validator_cli.main(argv)
+    imas_validator_cli.main(argv)
 
 
 def test_validate_command_str_cast():
@@ -83,4 +83,4 @@ def test_validate_command_str_cast():
 def test_explore_command():
     argv = ["explore"]
 
-    ids_validator_cli.main(argv)
+    imas_validator_cli.main(argv)

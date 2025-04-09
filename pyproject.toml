@@ -5,7 +5,7 @@ requires = ["setuptools>=61", "wheel", "packaging", "tomli;python_version<'3.11'
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ids_validator"
+name = "imas_validator"
 authors = [
   {name = "ITER Organization"},
   {email = "imas-support@iter.org"},
@@ -56,7 +56,7 @@ dependencies = [
 [project.optional-dependencies]
 # these self-dependencies are available since pip 21.2
 all = [
-    "ids-validator[docs,test,linting,benchmark]"
+    "imas-validator[docs,test,linting,benchmark]"
 ]
 docs = [
     "sphinx>=6.0.0,<7.0.0",
@@ -82,14 +82,14 @@ benchmark = [
 ]
 
 [project.scripts]
-ids_validator = "ids_validator.cli.ids_validator_cli:execute_cli"
+imas_validator = "imas_validator.cli.imas_validator_cli:execute_cli"
 
 [project.urls]
-homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"
+homepage = "https://git.iter.org/projects/IMEX/repos/imas-validator"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["ids_validator*"]
+include = ["imas_validator*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -97,15 +97,15 @@ addopts = "--strict-markers"
 testpaths = "tests"
 
 [tool.setuptools_scm]
-write_to = "ids_validator/_version.py"
+write_to = "imas_validator/_version.py"
 local_scheme = "no-local-version"
 
 [tool.black]
 # Exclude setuptools_scm generated file
-force-exclude = "ids_validator/_version.py"
+force-exclude = "imas_validator/_version.py"
 
 [tool.mypy]
-packages = "ids_validator"
+packages = "imas_validator"
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_untyped_decorators = true
@@ -113,7 +113,7 @@ disallow_untyped_decorators = true
 [[tool.mypy.overrides]]
 module = [
     "tests.*",
-    "ids_validator.assets.*",
+    "imas_validator.assets.*",
 ]
 ignore_errors = true
 
@@ -127,4 +127,4 @@ ignore_missing_imports = true
 
 [tool.isort]
 profile = "black"
-skip = ["ids_validator/_version.py"]
+skip = ["imas_validator/_version.py"]

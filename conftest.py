@@ -10,7 +10,7 @@ import os
 import numpy
 import pytest
 
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.ids_wrapper import IDSWrapper
 
 # Tests assume that this environment variable is not set, so ensure it isn't:
 os.environ.pop("RULESET_PATH", "")
@@ -64,5 +64,5 @@ def test_data_waves():
 
 @pytest.fixture(autouse=True)
 def set_caplog(caplog):
-    with caplog.at_level(logging.INFO, logger="ids_validator"):
+    with caplog.at_level(logging.INFO, logger="imas_validator"):
         yield

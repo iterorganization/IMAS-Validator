@@ -4,10 +4,10 @@
     "version": 1,
 
     // The name of the project being benchmarked
-    "project": "ids_validator",
+    "project": "imas_validator",
 
     // The project's homepage
-    "project_url": "https://git.iter.org/projects/IMEX/repos/ids-validator/browse",
+    "project_url": "https://git.iter.org/projects/IMEX/repos/imas-validator/browse",
 
     // The URL or local path of the source code repository for the
     // project being benchmarked
@@ -60,7 +60,7 @@
     //"install_timeout": 600,
 
     // the base URL to show a commit for the project.
-    "show_commit_url": "https://git.iter.org/projects/IMEX/repos/ids-validator/commits",
+    "show_commit_url": "https://git.iter.org/projects/IMEX/repos/imas-validator/commits",
 
     // The Pythons you'd like to test against.  If not provided, defaults
     // to the current version of Python used to run `asv`.

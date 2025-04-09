@@ -11,11 +11,11 @@ from unittest.mock import Mock, call
 import numpy
 import pytest
 
-from ids_validator.rules.data import IDSValidationRule
-from ids_validator.validate.ids_wrapper import IDSWrapper
-from ids_validator.validate.result_collector import ResultCollector
-from ids_validator.validate.rule_executor import RuleExecutor
-from ids_validator.validate_options import ValidateOptions
+from imas_validator.rules.data import IDSValidationRule
+from imas_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.result_collector import ResultCollector
+from imas_validator.validate.rule_executor import RuleExecutor
+from imas_validator.validate_options import ValidateOptions
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0, 1, 3, 5]),
@@ -163,7 +163,7 @@ def test_apply_rules_to_data_logging(rule_executor, caplog):
     empty_log_calls = [
         f"No assertions in t/all.py:Mock func 0. {fix_assert_str}",
     ]
-    module = "ids_validator.validate.rule_executor"
+    module = "imas_validator.validate.rule_executor"
     for val in start_log_calls:
         assert (module, logging.INFO, val) in caplog.record_tuples
     for val in empty_log_calls:

@@ -2,9 +2,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from ids_validator.validate.result_collector import ResultCollector
-from ids_validator.validate.rule_executor import RuleExecutor
-from ids_validator.validate_options import ValidateOptions
+from imas_validator.validate.result_collector import ResultCollector
+from imas_validator.validate.rule_executor import RuleExecutor
+from imas_validator.validate_options import ValidateOptions
 
 
 @pytest.fixture
@@ -62,7 +62,7 @@ def test_debug_true(rule, rule_executor, res_collector, test_data_core_profiles)
     my_pdb = Mock()
 
     with patch(
-        "ids_validator.validate.rule_executor.pdb",
+        "imas_validator.validate.rule_executor.pdb",
         post_mortem=my_pdb,
     ):
         res_collector.set_context(
@@ -77,7 +77,7 @@ def test_debug_false(rule, rule_executor, res_collector, test_data_core_profiles
     my_pdb = Mock()
 
     with patch(
-        "ids_validator.validate.rule_executor.pdb",
+        "imas_validator.validate.rule_executor.pdb",
         post_mortem=my_pdb,
     ):
         res_collector.set_context(
@@ -93,7 +93,7 @@ def test_debug_error(rule_error, rule_executor, res_collector, test_data_core_pr
     my_pdb = Mock()
 
     with patch(
-        "ids_validator.validate.rule_executor.pdb",
+        "imas_validator.validate.rule_executor.pdb",
         post_mortem=my_pdb,
     ):
         res_collector.set_context(

@@ -3,12 +3,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from ids_validator.rules.ast_rewrite import rewrite_assert
-from ids_validator.rules.data import ValidatorRegistry
-from ids_validator.validate.ids_wrapper import IDSWrapper
-from ids_validator.validate.result import CoverageMap
-from ids_validator.validate.result_collector import ResultCollector
-from ids_validator.validate_options import ValidateOptions
+from imas_validator.rules.ast_rewrite import rewrite_assert
+from imas_validator.rules.data import ValidatorRegistry
+from imas_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.result import CoverageMap
+from imas_validator.validate.result_collector import ResultCollector
+from imas_validator.validate_options import ValidateOptions
 
 
 @pytest.fixture

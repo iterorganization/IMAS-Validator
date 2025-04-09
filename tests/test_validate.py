@@ -10,9 +10,9 @@ from unittest.mock import patch
 
 import numpy
 
-from ids_validator.validate.result import IDSValidationResult
-from ids_validator.validate.validate import validate
-from ids_validator.validate_options import ValidateOptions
+from imas_validator.validate.result import IDSValidationResult
+from imas_validator.validate.validate import validate
+from imas_validator.validate_options import ValidateOptions
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0]),
@@ -38,7 +38,7 @@ def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
 
 
 def test_validate(caplog):
-    module = "ids_validator.validate.validate"
+    module = "imas_validator.validate.validate"
     # patch _check_imas_version for now
     with patch(
         f"{module}.imas.DBEntry",
@@ -85,7 +85,7 @@ def test_validate(caplog):
         assert results[2].exc is None
 
         assert caplog.record_tuples[-1] == (
-            "ids_validator.validate.validate",
+            "imas_validator.validate.validate",
             logging.INFO,
             "3 results obtained",
         )

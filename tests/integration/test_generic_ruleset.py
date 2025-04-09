@@ -7,7 +7,7 @@ except ImportError:
 import pytest
 from packaging.version import Version
 
-from ids_validator.validate.validate import validate
+from imas_validator.validate.validate import validate
 
 
 @pytest.mark.skipif(

@@ -9,8 +9,8 @@ from typing import List
 import numpy as np
 import pytest
 
-from ids_validator.rules.helpers import Approx, Decreasing, Increasing, Parent, Select
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.rules.helpers import Approx, Decreasing, Increasing, Parent, Select
+from imas_validator.validate.ids_wrapper import IDSWrapper
 
 
 @pytest.fixture
