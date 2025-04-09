@@ -1,7 +1,9 @@
 try:
     import imaspy as imas  # type: ignore
+    from imaspy.test.test_helpers import fill_consistent # type: ignore
 except ImportError:
     import imas  # type: ignore
+    from imas.test.test_helpers import fill_consistent # type: ignore
 import pytest
 from packaging.version import Version
 
@@ -18,7 +20,7 @@ def test_generic_tests_with_randomly_generated_ids(ids_name, tmp_path):
         pytest.skip("amns_data IDS is not supported by IMAS-Python's fill_consistent")
 
     ids = imas.IDSFactory().new(ids_name)
-    imas.test.test_helpers.fill_consistent(ids, leave_empty=0)
+    fill_consistent(ids, leave_empty=0)
 
     uri = f"imas:ascii?path={tmp_path}"
     dbentry = imas.DBEntry(uri, "w")

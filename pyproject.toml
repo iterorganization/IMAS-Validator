@@ -7,11 +7,6 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ids_validator"
 authors = [
-  {name = "IDS Validator Developers"},
-  {name = "Olivier Hoenen", email = "olivier.hoenen@iter.org"},
-  {name = "Sanders Mike", email = "msanders@ignitioncomputing.com"},
-  {name = "Blokhuizen Sebbe", email = "sblokhuizen@ignitioncomputing.com"},
-  {name = "Sebregts Maarten EXT", email = "msebregts@ignitioncomputing.com"},
   {name = "ITER Organization"},
   {email = "imas-support@iter.org"},
 ]
