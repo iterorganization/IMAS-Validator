@@ -12,7 +12,7 @@ to check if someone already created a similar issue;
 3. if not, make a **new issue** to describe your problem or question. 
 In the case of a bug suspiscion, please try to give all the relevant 
 information to allow reproducing the error or identifying 
-its root cause (version of the IMAS-imas-validator, OS and relevant 
+its root cause (version of the IMAS-Validator, OS and relevant 
 dependencies, snippet of code);
 4. apply relevant labels to the issue.
 
