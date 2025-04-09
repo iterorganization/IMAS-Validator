@@ -1,6 +1,6 @@
 # Contributing guidelines
 
-We welcome any kind of contribution to `IMAS-imas-validator`, 
+We welcome any kind of contribution to `IMAS-Validator`, 
 from a simple comment, a question or even a full fledged pull 
 request. 
 Please first make sure you read and follow the 
