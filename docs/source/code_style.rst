@@ -7,7 +7,7 @@ Code style and linting
 Code style
 ----------
 
-imas-validator follows `The Black Code Style
+IMAS-Validator follows `The Black Code Style
 <https://black.readthedocs.io/en/stable/the_black_code_style/index.html>`_. All Python
 files should be formatted with the ``black`` command line tool (this is checked in
 :ref:`CI <ci configuration>`).
