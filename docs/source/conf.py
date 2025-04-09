@@ -128,7 +128,7 @@ html_theme = "sphinx_immaterial"
 # and
 # https://sphinx-immaterial.readthedocs.io/en/latest/customization.html#confval-html_theme_options
 html_theme_options = {
-    "repo_url": "https://git.iter.org/projects/IMEX/repos/imas-validator",
+    "repo_url": "https://git.iter.org/projects/IMEX/repos/ids-validator",
     "repo_name": "IMAS Validator",
     "icon": {
         "repo": "fontawesome/brands/bitbucket",
