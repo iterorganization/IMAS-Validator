@@ -48,7 +48,7 @@ with pre-commit hooks):
 Linting
 -------
 
-imas-validator uses `flake8 <https://flake8.pycqa.org/en/latest/>`_ for linting (static code
+IMAS-Validator uses `flake8 <https://flake8.pycqa.org/en/latest/>`_ for linting (static code
 analysis). Flake8 should not report any violations when running it on the ``imas_validator``
 code base. Again, this is checked in CI.
 
