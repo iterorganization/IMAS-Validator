@@ -50,8 +50,8 @@ You can also set the environment variable `RULESET_PATH` to show the loading too
 
   export RULESET_PATH=path/to/my/custom/rule/dirs/rulesets:another/path/rulesets_custom
 
-Loading IDSValidationRules
---------------------------
+Loading IMASValidationRules
+---------------------------
 
 Provide a list of rulesets, whether or not to apply the generic ruleset and a list of paths where to look for rulesets.
 
