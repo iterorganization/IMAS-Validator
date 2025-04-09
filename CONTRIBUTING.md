@@ -7,7 +7,7 @@ Please first make sure you read and follow the
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## You think you found a bug in the code, or have a question in its use
-1. use the [issue search](https://github.com/iterorganization/IMAS-imas-validator/issues)
+1. use the [issue search](https://github.com/iterorganization/IMAS-Validator/issues)
 to check if someone already created a similar issue;
 3. if not, make a **new issue** to describe your problem or question. 
 In the case of a bug suspiscion, please try to give all the relevant 
