@@ -94,7 +94,7 @@ Ubuntu installation
     python -c "import imas_validator; print(imas_validator.__version__)"
     python -m pytest
 
-* To build the imas-validator documentation, execute:
+* To build the IMAS-Validator documentation, execute:
 
   .. code-block:: bash
 
