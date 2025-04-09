@@ -5,7 +5,7 @@ This page provides an auto-generated summary of imas-validator's API. For more d
 and examples, refer to the relevant chapters in the main part of the
 documentation.
 
-IMAS validator
+IMAS Validator
 --------------
 
 .. autosummary::
