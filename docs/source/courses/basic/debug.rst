@@ -1,7 +1,7 @@
 .. _`basic/debug`:
 
 Debugging with IMAS validator
-============================
+=============================
 
 In this section we zoom in on what you can do when a validation test fails
 

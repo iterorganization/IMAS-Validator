@@ -1,7 +1,7 @@
 .. _`basic/explore`:
 
 Exploring rulesets with IMAS validator
-=====================================
+======================================
 
 As more rules become available, we need a way to keep track of them.
 In this section of the training we look at the explore functionality of the IMAS validator tool.

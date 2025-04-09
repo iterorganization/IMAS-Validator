@@ -5,7 +5,7 @@ requires = ["setuptools>=61", "wheel", "packaging", "tomli;python_version<'3.11'
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "imas_validator"
+name = "imas-validator"
 authors = [
   {name = "ITER Organization"},
   {email = "imas-support@iter.org"},

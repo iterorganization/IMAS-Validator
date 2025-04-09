@@ -1,7 +1,7 @@
 .. _`basic/write`:
 
 Writing validation rulesets for IMAS validator
-=============================================
+==============================================
 
 This section explains how to write your own tests.
 First set up your ruledir with a ruleset folder and a rule file.

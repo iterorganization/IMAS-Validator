@@ -4,11 +4,11 @@
    Main "index". This will be converted to a landing index.html by sphinx. We
    define TOC here, but it'll be put in the sidebar by the theme
 
-=========================
-IMAS IMAS Validator Manual
-=========================
+=====================
+IMAS Validator Manual
+=====================
 
-IMAS IMAS Validator is a tool to validate IMAS IDS's through the use of general
+IMAS Validator is a tool to validate IMAS IDS's through the use of general
 and case specific validation rules.
 
 

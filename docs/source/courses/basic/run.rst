@@ -1,7 +1,7 @@
 .. _`basic/run`:
 
 Running validations with IMAS validator
-======================================
+=======================================
 
 In this section we start with the core functionality of the IMAS validator: running tests on IDS data.
 The easiest way of using the IMAS validator is by using the CLI from your terminal.

@@ -1,7 +1,7 @@
 .. _`IMAS validator 101`:
 
 IMAS validator 101
-=================
+==================
 
 In this IMAS validator training, we introduce you to the basic concepts and features of
 the IMAS validator. You will need some basic familiarity with Python. For a refresher, see

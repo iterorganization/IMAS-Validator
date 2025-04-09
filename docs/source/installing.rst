@@ -1,7 +1,7 @@
 .. _`installing`:
 
-Installing the IMAS IMAS validator
-=================================
+Installing the IMAS validator
+=============================
 
 SDCC module load
 ----------------

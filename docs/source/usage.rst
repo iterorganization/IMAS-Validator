@@ -1,7 +1,7 @@
 .. _`usage`:
 
-Using the IMAS IMAS validator
-============================
+Using the IMAS validator
+========================
 
 .. note::
   This is the API mostly for developers,  documentation for CLI usage will be added when it becomes available.
