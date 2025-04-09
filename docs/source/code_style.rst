@@ -93,7 +93,7 @@ Using mypy
 
 Import sorting
 --------------
-imas-validator uses `isort <https://pycqa.github.io/isort/>`_ for automatic import sorting separated by type.
+IMAS-Validator uses `isort <https://pycqa.github.io/isort/>`_ for automatic import sorting separated by type.
 
 Using isort
 '''''''''''
