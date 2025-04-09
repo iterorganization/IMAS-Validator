@@ -23,35 +23,32 @@ print("sys.path:", sys.path)
 
 # -- Project information -----------------------------------------------------
 # The documented project’s name
-project = src_project = PROJECT = "imas-validator"
+project = src_project = PROJECT = "IMAS-Validator"
 PACKAGE = "imas_validator"
-src_group = GROUP = "IMEX"
 
 # A copyright statement in the style '2008, Author Name'.
 copyright = f"2020-{datetime.datetime.now().year}, ITER Organization"
 # The author name(s) of the document
 author = "ITER Organization"
-src_host = "git.iter.org"
+src_host = "https://github.com/"
 
 # Parse urls here for convenience, to be re-used
 
 # ITER docs
-iter_projects = "https://git.iter.org/projects/"
-imas_repos = urljoin(iter_projects, "IMAS/")
-imex_repos = urljoin(iter_projects, "IMEX/")
-issue_url = jira_url = "https://jira.iter.org/browse/"
+iter_projects = "https://github.com/iterorganization"
+issue_url = jira_url = "https://github.com/iterorganization/IMAS-Validator/issues"
 
 # IMAS Validator
-repository_url = f"{iter_projects}/{src_group}/repos/{src_project}/"
-blob_url = urljoin(repository_url, "browse/")
-mr_url = urljoin(repository_url, "/pull-requests")
+repository_url = f"{iter_projects}/{src_project}/"
+blob_url = urljoin(repository_url, "blob/")
+mr_url = urljoin(repository_url, "pulls/")
 
 
 # Configuration of sphinx.ext.extlinks
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 # unique name: (base URL, label prefix)
 extlinks = {
-    "src": (blob_url + "%s", f"{src_group}/{src_project}/%s"),
+    "src": (blob_url + "%s", f"main/%s"),
 }
 
 full_version = Version(imas_validator.__version__)
@@ -128,7 +125,7 @@ html_theme = "sphinx_immaterial"
 # and
 # https://sphinx-immaterial.readthedocs.io/en/latest/customization.html#confval-html_theme_options
 html_theme_options = {
-    "repo_url": "https://git.iter.org/projects/IMEX/repos/ids-validator",
+    "repo_url": "https://github.com/iterorganization/IMAS-Validator",
     "repo_name": "IMAS Validator",
     "icon": {
         "repo": "fontawesome/brands/bitbucket",

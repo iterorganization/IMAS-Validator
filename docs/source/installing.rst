@@ -19,7 +19,7 @@ SDCC installation
 
     mkdir projects
     cd projects
-    git clone ssh://git@git.iter.org/imex/ids-validator.git
+    git clone ssh://git@github.com:iterorganization/IMAS-Validator.git
     cd imas-validator
 
 * Setup a python virtual environment and install python dependencies
@@ -69,7 +69,7 @@ Ubuntu installation
 
     mkdir projects
     cd projects
-    git clone ssh://git@git.iter.org/imex/ids-validator.git
+    git clone ssh://git@github.com:iterorganization/IMAS-Validator.git
     cd imas-validator
 
 * Setup a python virtual environment and install python dependencies

@@ -83,8 +83,7 @@ class IDSValidationRule:
             raise ValueError(
                 "No occurence numbers provided to '@validator' for multi-IDS "
                 "validation. For more information, visit: "
-                "https://sharepoint.iter.org/departments/POP/CM/IMDesign/"
-                "Code%20Documentation/imas-validator/defining_rules.html"
+                "https://imas-validator.readthedocs.io/en/stable/defining_rules.html"
             )
         return tuple(ids_names_list), tuple(ids_occs_list)
 

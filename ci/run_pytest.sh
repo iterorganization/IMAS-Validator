@@ -22,7 +22,7 @@ rm -rf venv  # Environment should be clean, but remove directory to be sure
 python -m venv venv
 source venv/bin/activate
 
-# Install imas_imas_validator and test dependencies
+# Install imas_validator and test dependencies
 pip install --upgrade pip setuptools wheel
 pip install .[test]
 
@@ -33,5 +33,5 @@ pip freeze
 # Clean artifacts created by pytest
 rm -f junit.xml
 rm -rf htmlcov
-export IMAS_VERSION="3.40.1" # set default version because IMAS-Python module on SDCC doesn't have latest one yet
+export IMAS_VERSION="3.40.1" 
 python -m pytest -n=auto --cov=imas_validator --cov-report=term-missing --cov-report=html --junit-xml=junit.xml

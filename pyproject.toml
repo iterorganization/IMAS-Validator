@@ -85,7 +85,7 @@ benchmark = [
 imas_validator = "imas_validator.cli.imas_validator_cli:execute_cli"
 
 [project.urls]
-homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"
+homepage = "https://github.com/iterorganization/IMAS-Validator"
 
 [tool.setuptools.packages.find]
 where = ["."]
