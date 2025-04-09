@@ -8,7 +8,7 @@ SDCC module load
 
 .. code-block:: bash
 
-  module load imas-validator
+  module load IMAS-Validator
 
 SDCC installation
 -----------------
