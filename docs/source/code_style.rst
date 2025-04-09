@@ -79,7 +79,7 @@ your code introduces any violations:
 
 Type checking
 -------------
-imas-validator uses typing hinting which is checked at compile time using `mypy 
+IMAS-Validator uses typing hinting which is checked at compile time using `mypy 
 <https://www.mypy-lang.org/>`_. This tool can spot typing bugs and makes
 for easier code maintenance and debugging.
 
