@@ -3,7 +3,7 @@
 # Note: this script should be run from the root of the git repository
 
 # Debuggging:
-set -e -o pipefail
+# set -e -o pipefail
 echo "Loading modules..."
 
 # Set up environment such that module files can be loaded
@@ -25,7 +25,7 @@ python -m venv venv
 # Install and run linters
 pip install --upgrade .[linting]
 
-black --check ids_validator
-flake8 ids_validator
-mypy ids_validator
-isort --check-only ids_validator
+black --check imas_validator
+flake8 imas_validator
+mypy imas_validator
+isort --check-only imas_validator

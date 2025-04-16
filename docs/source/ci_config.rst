@@ -3,16 +3,16 @@
 CI configuration
 ================
 
-IDS-validator uses `ITER Bamboo <https://ci.iter.org/>`_ for CI. This page provides an overview
+imas-validator uses `ITER Bamboo <https://ci.iter.org/>`_ for CI. This page provides an overview
 of the CI Plan and deployment projects.
 
 CI Plan
 -------
 
-The `IDS-validator CI plan <https://ci.iter.org/browse/IMEX-IVALID>`_ consists of 3 types of jobs:
+The `imas-validator CI plan <https://ci.iter.org/browse/IMEX-IVALID>`_ consists of 3 types of jobs:
 
 Linting 
-    Run ``black``, ``flake8``, ``mypy`` and ``isort`` on the IDS-validator code base.
+    Run ``black``, ``flake8``, ``mypy`` and ``isort`` on the IMAS-Validator code base.
     See :ref:`code style and linting`.
 
     The CI script executed in this job is ``ci/linting.sh``.
@@ -33,11 +33,11 @@ Build docs
 Deployment projects
 -------------------
 
-There is currently one Bamboo deployment project for IDS-validator:
+There is currently one Bamboo deployment project for imas-validator:
 
-`Deploy IDS-Validator-Doc <https://ci.iter.org/deploy/viewDeploymentProjectEnvironments.action?id=1908899843>`_
-    Deploy the documentation created in the `Build docs` job to `Sharepoint
-    <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IDS-Validator/index.html#>`_.
+`Deploy imas-validator-Doc <https://ci.iter.org/deploy/viewDeploymentProjectEnvironments.action?id=1908899843>`_
+    Deploy the documentation created in the `Build docs` job to `readthedocs
+    <https://imas-validator.readthedocs.io/en/stable/#>`_.
 
-    This deployment project runs for after each successful CI build of the IDS-validator main
+    This deployment project runs for after each successful CI build of the IMAS-Validator main
     branch.

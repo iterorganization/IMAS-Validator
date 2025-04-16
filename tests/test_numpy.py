@@ -1,6 +1,6 @@
 import numpy
 
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.ids_wrapper import IDSWrapper
 
 
 def test_idswrapper_ufunc(test_data_core_profiles):

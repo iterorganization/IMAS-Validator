@@ -5,15 +5,15 @@ from xml.dom import minidom
 
 import pytest
 
-from ids_validator.report.validationReportGenerator import ValidationReportGenerator
-from ids_validator.report.summaryReportGenerator import SummaryReportGenerator
-from ids_validator.rules.data import IDSValidationRule
-from ids_validator.validate.result import (
+from imas_validator.report.validationReportGenerator import ValidationReportGenerator
+from imas_validator.report.summaryReportGenerator import SummaryReportGenerator
+from imas_validator.rules.data import IDSValidationRule
+from imas_validator.validate.result import (
     CoverageMap,
     IDSValidationResult,
     IDSValidationResultCollection,
 )
-from ids_validator.validate_options import ValidateOptions
+from imas_validator.validate_options import ValidateOptions
 
 
 def dummy_rule_function() -> None:
@@ -43,7 +43,7 @@ def test_error_result_without_affected_nodes() -> None:
     tb = str(failed_result.tb[-1]).replace("<", "").replace(">", "")
 
     assert result_generator.xml == (
-        f"""<testsuites id="1" name="ids_validator" tests="1" failures="1">
+        f"""<testsuites id="1" name="imas_validator" tests="1" failures="1">
 	<testsuite id="1.1" name="core_profiles:0">
 		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0">
 			<failure message="" type="" nodes_count="1" nodes="">{tb}
@@ -125,7 +125,7 @@ def test_error_result() -> None:
 
     tb = str(failed_result.tb[-1]).replace("<", "").replace(">", "")
 
-    expected_xml = f"""<testsuites id="1" name="ids_validator" tests="2" failures="1">
+    expected_xml = f"""<testsuites id="1" name="imas_validator" tests="2" failures="1">
 	<testsuite id="1.1" name="core_profiles:0">
 		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0">
 			<failure message="" type="" nodes_count="1" nodes="some/node/path">{tb}
@@ -200,7 +200,7 @@ def test_successful_assert() -> None:
     result_generator = ValidationReportGenerator(result_collection)
 
     assert result_generator.xml == (
-        f"""<testsuites id="1" name="ids_validator" tests="1" failures="0">
+        f"""<testsuites id="1" name="imas_validator" tests="1" failures="0">
 	<testsuite id="1.1" name="core_profiles:0">
 		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0"/>
 	</testsuite>
@@ -252,7 +252,7 @@ def test_failed_assert() -> None:
     tb = str(result.tb[-1]).replace("<", "").replace(">", "")
 
     assert result_generator.xml == (
-        f"""<testsuites id="1" name="ids_validator" tests="1" failures="1">
+        f"""<testsuites id="1" name="imas_validator" tests="1" failures="1">
 	<testsuite id="1.1" name="core_profiles:0">
 		<testcase id="1.1.1" name="to/rule.py:dummy_rule_function" classname="core_profiles:0">
 			<failure message="Optional message" type="" nodes_count="3" nodes="a b c">{tb}

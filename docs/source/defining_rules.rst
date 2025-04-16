@@ -4,7 +4,7 @@ Defining validation rules
 ===========================
 
 On this page we explain the structure of rules. For a step-by-step guide to
-creating new rules, see the :ref:`training<IDS validator 101>`.
+creating new rules, see the :ref:`training<IMAS validator 101>`.
 
 Rule grouping
 -------------
@@ -35,7 +35,7 @@ explain how rules are grouped together:
 
   Rules that check the validity of the data according to the generic Data
   Dictionary definition are grouped in a special rule set called ``generic``.
-  This generic ruleset is built in to the IDS validator and enabled by default.
+  This generic ruleset is built in to the IMAS validator and enabled by default.
   You can specifically disable the generic tests by supplying the
   ``--no-generic`` flag to the Command Line Interface.
 
@@ -47,7 +47,7 @@ See below code block for an example directory structure. We can interpret the
 folder structure as follows:
 
 - Directories containing **rule sets** (``rule_dir``, ``rule_dir_custom``). The
-  IDS Validator can find the rule sets in these directories through the Command
+  IMAS Validator can find the rule sets in these directories through the Command
   Line Interface argument ``--extra-rule-dirs /path/to/rule_dir
   /path/to/rule_dir_custom`` or through by setting the environment variable
   ``RULESET_PATH=/path/to/rule_dir:/path/to/rule_dir_custom``.
@@ -98,7 +98,7 @@ Validation rules are defined inside the python files as follows:
    apply the validator function to. This is done like ``@validator('summary')``,
    ``@validator('summary:0')`` or ``@validator('summary:0', 'equilibrium:0')``.
    More details on this decorator can be found in the API documentation:
-   :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`.
+   :py:class:`@validator<imas_validator.rules.data.ValidatorRegistry.validator>`.
 2. The ``@validator`` decorator is followed by a Python function definition:
    ``def <rule_name>(arguments...):``. This sets the name of the rule, which
    should be unique.
@@ -120,7 +120,7 @@ Validation rules are defined inside the python files as follows:
 
 4. The checks are written in the function body of the rule. Use ``assert``
    statements to check criteria. Several :py:mod:`helper methods
-   <ids_validator.rules.helpers>` are available for common types of checks.
+   <imas_validator.rules.helpers>` are available for common types of checks.
 
    You can write an assertion as follows: ``assert <check>[, "optional
    message"]``, see below examples. When the check evaluates to ``False``, this
@@ -151,8 +151,8 @@ Validation rules are defined inside the python files as follows:
 .. attention::
 
   The ``@validator`` decorator and all :py:mod:`helper methods
-  <ids_validator.rules.helpers>` are automatically available in rule files. You
-  should not try to import them manually from the ``ids_validator`` package.
+  <imas_validator.rules.helpers>` are automatically available in rule files. You
+  should not try to import them manually from the ``imas_validator`` package.
 
   Your IDE might complain about undefined variables, but you can safely ignore
   that.

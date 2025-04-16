@@ -1,16 +1,16 @@
 .. _`basic/explore`:
 
-Exploring rulesets with IDS validator
-=====================================
+Exploring rulesets with IMAS validator
+======================================
 
 As more rules become available, we need a way to keep track of them.
-In this section of the training we look at the explore functionality of the IDS validator tool.
+In this section of the training we look at the explore functionality of the IMAS validator tool.
 
 The explore functionality can be called from the terminal by 
 
 .. code-block:: console
 
-    $ ids_validator explore
+    $ imas_validator explore
 
 It can use the same filtering flags as the validate module.
 
@@ -21,21 +21,21 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        1) Call the IDS validator explore tool.
+        1) Call the IMAS validator explore tool.
 
-        2) Call the IDS validator explore tool including the custom tests in 'ids-validator-training-rulesets/custom-rulesets'.
+        2) Call the IMAS validator explore tool including the custom tests in 'imas-validator-training-rulesets/custom-rulesets'.
 
-        3) Call the IDS validator explore tool filtering only for tests with 'errorbars' in the name.
+        3) Call the IMAS validator explore tool filtering only for tests with 'errorbars' in the name.
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ ids_validator explore
+            $ imas_validator explore
 
-            $ ids_validator explore -e ids-validator-training-rulesets/ -r custom_ruleset
+            $ imas_validator explore -e imas-validator-training-rulesets/ -r custom_ruleset
 
-            $ ids_validator explore -f errorbars
+            $ imas_validator explore -f errorbars
 
         The output should be a summary of the bundled rules.
 
@@ -55,9 +55,9 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        1) Call the IDS validator explore tool showing the empty folders and files.
+        1) Call the IMAS validator explore tool showing the empty folders and files.
 
-        2) Call the IDS validator explore tool for different verbosity levels
+        2) Call the IMAS validator explore tool for different verbosity levels
 
         3) What are the differences?
 
@@ -65,11 +65,11 @@ Exercise 2
 
         .. code-block:: console
 
-            $ ids_validator explore --show-empty
+            $ imas_validator explore --show-empty
 
-            $ ids_validator explore --verbose
+            $ imas_validator explore --verbose
 
-            $ ids_validator explore --no-docstring
+            $ imas_validator explore --no-docstring
         
        --show-empty will show some folders without any tests.
        --verbose will show full docstrings for all tests.  

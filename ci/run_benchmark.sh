@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bamboo CI script to install ids-validator and run all benchmarks
+# Bamboo CI script to install imas-validator and run all benchmarks
 # Note: this script should be run from the root of the git repository
 
 # Debuggging:
@@ -24,21 +24,21 @@ rm -rf venv  # Environment should be clean, but remove directory to be sure
 python -m venv venv
 source venv/bin/activate
 
-# Install asv and ids-validator
+# Install asv and imas-validator
 pip install --upgrade pip setuptools wheel
 pip install virtualenv .[benchmark]
 
 # Copy previous results (if any)
-mkdir -p /mnt/bamboo_deploy/ids-validator/benchmarks/results
+mkdir -p /mnt/bamboo_deploy/imas-validator/benchmarks/results
 mkdir -p .asv
-cp -rf /mnt/bamboo_deploy/ids-validator/benchmarks/results .asv/
+cp -rf /mnt/bamboo_deploy/imas-validator/benchmarks/results .asv/
 
 # Ensure there is a machine configuration
 asv machine --yes
 
 # Run ASV for the current commit, develop and main
-asv run --skip-existing-successful HEAD^!
-asv run --skip-existing-successful develop^!
+asv run --skip-existing-successful HEAD^! -v
+asv run --skip-existing-successful develop^! -v
 
 # Compare results
 if [ `git rev-parse --abbrev-ref HEAD` == develop ]
@@ -53,4 +53,4 @@ fi
 asv publish
 
 # And persistently store them
-cp -rf .asv/{results,html} /mnt/bamboo_deploy/ids-validator/benchmarks/
+cp -rf .asv/{results,html} /mnt/bamboo_deploy/imas-validator/benchmarks/

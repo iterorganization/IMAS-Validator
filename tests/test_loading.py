@@ -5,17 +5,17 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from ids_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
-from ids_validator.rules.ast_rewrite import run_path
-from ids_validator.rules.data import ValidatorRegistry
-from ids_validator.rules.docs_dataclass import (
+from imas_validator.exceptions import InvalidRulesetName, InvalidRulesetPath
+from imas_validator.rules.ast_rewrite import run_path
+from imas_validator.rules.data import ValidatorRegistry
+from imas_validator.rules.docs_dataclass import (
     ExplorerData,
     RuleData,
     RuleDirData,
     RuleFileData,
     RuleSetData,
 )
-from ids_validator.rules.loading import (
+from imas_validator.rules.loading import (
     discover_rule_modules,
     discover_rulesets,
     filter_rules,
@@ -23,7 +23,7 @@ from ids_validator.rules.loading import (
     load_docs,
     load_rules_from_path,
 )
-from ids_validator.validate_options import RuleFilter, ValidateOptions
+from imas_validator.validate_options import RuleFilter, ValidateOptions
 
 
 @pytest.fixture(scope="function")
@@ -78,7 +78,7 @@ def test_discover_rulesets_explicit(caplog):
         "filter_test, generic, test-ruleset, validate-test"
     )
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_text)
+        ("imas_validator.rules.loading", logging.INFO, log_text)
     ]
 
 
@@ -95,7 +95,7 @@ def test_discover_rulesets_env_var(monkeypatch, caplog):
     )
     log_test = "Found 3 rulesets: generic, generic, test-ruleset"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_test)
+        ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
 
 
@@ -129,7 +129,7 @@ def test_filter_rulesets_all(caplog):
     ) == Counter(filtered_rulesets)
     log_test = "Using 2 / 3 rulesets"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_test)
+        ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
 
 
@@ -150,7 +150,7 @@ def test_filter_rulesets_none(caplog):
     ) == Counter(filtered_rulesets)
     log_test = "Using 0 / 3 rulesets"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_test)
+        ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
 
 
@@ -171,7 +171,7 @@ def test_filter_rulesets_apply_generic(caplog):
     ) == Counter(filtered_rulesets)
     log_test = "Using 1 / 3 rulesets"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_test)
+        ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
 
 
@@ -197,7 +197,7 @@ def test_filter_rulesets_explore(caplog):
     ) == Counter(filtered_rulesets)
     log_test = "Using 3 / 3 rulesets"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_test)
+        ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
 
 
@@ -218,7 +218,7 @@ def test_filter_rulesets_with_rulesets(caplog):
     ) == Counter(filtered_rulesets)
     log_test = "Using 1 / 3 rulesets"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.INFO, log_test)
+        ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
 
 
@@ -268,7 +268,7 @@ def test_load_rules_from_path_empty_file(res_collector, caplog):
     assert len(rules) == 0
     log_test = f"No rules in rule file {path}"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.WARNING, log_test)
+        ("imas_validator.rules.loading", logging.WARNING, log_test)
     ]
 
 
@@ -283,7 +283,7 @@ def test_load_rules_file_extension_error(res_collector, caplog):
     load_rules_from_path(path, res_collector)
     log_test = f"Ignoring ruleset file: {str(path)!r} is not a python file"
     assert caplog.record_tuples == [
-        ("ids_validator.rules.loading", logging.WARNING, log_test)
+        ("imas_validator.rules.loading", logging.WARNING, log_test)
     ]
 
 

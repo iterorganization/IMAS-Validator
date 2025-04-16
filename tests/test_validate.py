@@ -1,15 +1,18 @@
+try:
+    import imaspy as imas  # type: ignore
+except ImportError:
+    import imas  # type: ignore
+    
 import logging
 from functools import lru_cache
 from pathlib import Path
 from unittest.mock import patch
 
 import numpy
-from imaspy import IDSFactory
-from imaspy.exception import DataEntryException
 
-from ids_validator.validate.result import IDSValidationResult
-from ids_validator.validate.validate import validate
-from ids_validator.validate_options import ValidateOptions
+from imas_validator.validate.result import IDSValidationResult
+from imas_validator.validate.validate import validate
+from imas_validator.validate_options import ValidateOptions
 
 _occurrence_dict = {
     "core_profiles": numpy.array([0]),
@@ -25,9 +28,9 @@ def list_all_occurrences(ids_name: str):
 def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
     # Trying to get an IDS that isn't filled is an error:
     if occurrence not in list_all_occurrences(ids_name):
-        raise DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
+        raise imas.exception.DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
 
-    ids = IDSFactory("3.40.1").new(ids_name)
+    ids = imas.IDSFactory("3.40.1").new(ids_name)
     ids.ids_properties.comment = f"Test IDS: {ids_name}/{occurrence}"
     ids.ids_properties.homogeneous_time = 1
     # TODO: if needed, we can fill IDSs with specific data
@@ -35,15 +38,15 @@ def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
 
 
 def test_validate(caplog):
-    module = "ids_validator.validate.validate"
+    module = "imas_validator.validate.validate"
     # patch _check_imas_version for now
     with patch(
-        f"{module}.DBEntry",
+        f"{module}.imas.DBEntry",
         spec=True,
         list_all_occurrences=list_all_occurrences,
         get=get,
         uri="",
-        factory=IDSFactory("3.40.1"),
+        factory=imas.IDSFactory("3.40.1"),
     ), patch(f"{module}._check_imas_version"):
         validate_options = ValidateOptions(
             rulesets=["test-ruleset"],
@@ -82,7 +85,7 @@ def test_validate(caplog):
         assert results[2].exc is None
 
         assert caplog.record_tuples[-1] == (
-            "ids_validator.validate.validate",
+            "imas_validator.validate.validate",
             logging.INFO,
             "3 results obtained",
         )

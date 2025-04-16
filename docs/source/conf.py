@@ -15,7 +15,7 @@ import sphinx_autosummary_accessors
 from jinja2.defaults import DEFAULT_FILTERS
 from packaging.version import Version
 
-import ids_validator
+import imas_validator
 
 
 print("python exec:", sys.executable)
@@ -23,38 +23,35 @@ print("sys.path:", sys.path)
 
 # -- Project information -----------------------------------------------------
 # The documented project’s name
-project = src_project = PROJECT = "ids-validator"
-PACKAGE = "ids_validator"
-src_group = GROUP = "IMEX"
+project = src_project = PROJECT = "IMAS-Validator"
+PACKAGE = "imas_validator"
 
 # A copyright statement in the style '2008, Author Name'.
 copyright = f"2020-{datetime.datetime.now().year}, ITER Organization"
 # The author name(s) of the document
 author = "ITER Organization"
-src_host = "git.iter.org"
+src_host = "https://github.com/"
 
 # Parse urls here for convenience, to be re-used
 
 # ITER docs
-iter_projects = "https://git.iter.org/projects/"
-imas_repos = urljoin(iter_projects, "IMAS/")
-imex_repos = urljoin(iter_projects, "IMEX/")
-issue_url = jira_url = "https://jira.iter.org/browse/"
+iter_projects = "https://github.com/iterorganization"
+issue_url = jira_url = "https://github.com/iterorganization/IMAS-Validator/issues"
 
-# IDS Validator
-repository_url = f"{iter_projects}/{src_group}/repos/{src_project}/"
-blob_url = urljoin(repository_url, "browse/")
-mr_url = urljoin(repository_url, "/pull-requests")
+# IMAS Validator
+repository_url = f"{iter_projects}/{src_project}/"
+blob_url = urljoin(repository_url, "blob/")
+mr_url = urljoin(repository_url, "pulls/")
 
 
 # Configuration of sphinx.ext.extlinks
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 # unique name: (base URL, label prefix)
 extlinks = {
-    "src": (blob_url + "%s", f"{src_group}/{src_project}/%s"),
+    "src": (blob_url + "%s", f"main/%s"),
 }
 
-full_version = Version(ids_validator.__version__)
+full_version = Version(imas_validator.__version__)
 
 # version: The major project version, used as the replacement for |version|.
 #   For example, for the Python documentation, this may be something like 2.6.
@@ -128,8 +125,8 @@ html_theme = "sphinx_immaterial"
 # and
 # https://sphinx-immaterial.readthedocs.io/en/latest/customization.html#confval-html_theme_options
 html_theme_options = {
-    "repo_url": "https://git.iter.org/projects/IMEX/repos/ids-validator",
-    "repo_name": "IDS Validator",
+    "repo_url": "https://github.com/iterorganization/IMAS-Validator",
+    "repo_name": "IMAS Validator",
     "icon": {
         "repo": "fontawesome/brands/bitbucket",
     },
@@ -252,7 +249,7 @@ html_last_updated_fmt = today_fmt
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "ids_validator_doc"
+htmlhelp_basename = "imas_validator_doc"
 
 
 # -- Extension configuration -------------------------------------------------
@@ -297,4 +294,4 @@ def escape_underscores(string):
 
 def setup(app):
     DEFAULT_FILTERS["escape_underscores"] = escape_underscores
-    app.add_css_file("ids_validator.css")
+    app.add_css_file("imas_validator.css")

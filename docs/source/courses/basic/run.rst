@@ -1,17 +1,17 @@
 .. _`basic/run`:
 
-Running validations with IDS validator
-======================================
+Running validations with IMAS validator
+=======================================
 
-In this section we start with the core functionality of the IDS validator: running tests on IDS data.
-The easiest way of using the IDS validator is by using the CLI from your terminal.
+In this section we start with the core functionality of the IMAS validator: running tests on IDS data.
+The easiest way of using the IMAS validator is by using the CLI from your terminal.
 The only required argument is the imas_uri of the DBentry object you want to validate.
 To print the report output directly to your terminal, add the ``--verbose`` option.
 
 .. code-block:: console
 
-    $ ids_validator validate <DBENTRY_URI>
-    $ ids_validator validate <DBENTRY_URI> --verbose
+    $ imas_validator validate <DBENTRY_URI>
+    $ imas_validator validate <DBENTRY_URI> --verbose
 
 .. note::
 
@@ -29,7 +29,7 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Run the IDS validator generic tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``
+        Run the IMAS validator generic tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/good``
 
         Run it again with the ``--verbose`` option.
 
@@ -37,7 +37,7 @@ Exercise 1
 
         .. code-block:: console
 
-            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good'
+            $ imas_validator validate 'imas:hdf5?path=imas-validator-course/good'
 
         The output should be a summary report showing that all tests passed.
         The IDSs tested were core_profiles and waves.
@@ -46,7 +46,7 @@ You might want to develop or simply use your own custom tests in addition to the
 bundled validation tests. You can add customly built tests to the validation process by adding CLI flags
 to determine in which ruleset folders the tool should look for IDS validation rules. 
 A ruleset is a folder that can contain multiple validation test files, typically grouped per use case.
-A rule directory is a folder containing multiple ruleset folders so that the IDS validator can be 
+A rule directory is a folder containing multiple ruleset folders so that the IMAS validator can be 
 easily told where to look.
 The structure of these rulesets folders is further explained in :ref:`defining rules`.
 You can find custom rule folders and rulesets with the flags:
@@ -56,7 +56,7 @@ You can find custom rule folders and rulesets with the flags:
 
 .. code-block:: console
 
-    $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e path/to/my_rule_folder -r my_ruleset
+    $ imas_validator validate 'imas:hdf5?path=imas-validator-course/good' -e path/to/my_rule_folder -r my_ruleset
 
 Exercise 2
 ----------
@@ -65,14 +65,14 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IDS validator including custom tests for the db_entry with uri ``imas:hdf5?path=ids-validator-course/good``.
-        The custom rules are defined in the ``ids-validator-training-rulesets/custom_ruleset`` ruleset folder.
+        Call the IMAS validator including custom tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/good``.
+        The custom rules are defined in the ``imas-validator-training-rulesets/custom_ruleset`` ruleset folder.
 
     .. md-tab-item:: Solution
 
         .. code-block:: console
 
-            $ ids_validator validate 'imas:hdf5?path=ids-validator-course/good' -e ids-validator-training-rulesets/ -r custom_ruleset
+            $ imas_validator validate 'imas:hdf5?path=imas-validator-course/good' -e imas-validator-training-rulesets/ -r custom_ruleset
 
         More tests should be added to the summary report compared to Exercise 1.
             
@@ -83,7 +83,7 @@ Exercise 3
 
     .. md-tab-item:: Exercise
 
-        What happens if you run the tests with the ``imas:hdf5?path=ids-validator-course/bad`` uri?
+        What happens if you run the tests with the ``imas:hdf5?path=imas-validator-course/bad`` uri?
 
     .. md-tab-item:: Solution
 
@@ -93,10 +93,10 @@ Exercise 3
             
 .. note::
 
-    The IDS validator tool is also integrated in `SimDB <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/simdb-doc/html/index.html>`_.
+    The IMAS validator tool is also integrated in `SimDB <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/simdb-doc/html/index.html>`_.
 
 .. note::
 
-    You can also run the IDS validator tool from a python script. This might be helpful if you want to automatically run your
+    You can also run the IMAS validator tool from a python script. This might be helpful if you want to automatically run your
     data through the validation tool after it is measured/generated.
     More information can be found in :ref:`usage`.

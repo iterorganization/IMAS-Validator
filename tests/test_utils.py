@@ -1,10 +1,10 @@
 import argparse
 
-from ids_validator.common.utils import (
+from imas_validator.common.utils import (
     flatten_2d_list_or_return_empty,
     prepare_rule_filter_object,
 )
-from ids_validator.validate_options import RuleFilter
+from imas_validator.validate_options import RuleFilter
 
 
 def test_flatten_2d_list_or_return_empty():

@@ -1,7 +1,7 @@
 .. _`basic/write`:
 
-Writing validation rulesets for IDS validator
-=============================================
+Writing validation rulesets for IMAS validator
+==============================================
 
 This section explains how to write your own tests.
 First set up your ruledir with a ruleset folder and a rule file.
@@ -20,12 +20,12 @@ For a quick reminder of the ruleset structure look at :ref:`defining rules`.
 If you have your new empty rule file, we need to define validation rules inside.
 These are python functions structured like:
 
-1. :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`
+1. :py:class:`@validator<imas_validator.rules.data.ValidatorRegistry.validator>`
    decorator specifying which IDSs to target with the function.
 2. Function definition accepting IDS instances as arguments.
 3. Docstring with a short description of the tests.
-4. The tests, which can use standard python logic, IMASPy IDSs and predefined
-   :py:class:`helper methods<ids_validator.rules.helpers>`. ``assert`` statements
+4. The tests, which can use standard python logic, IMAS-Python IDSs and predefined
+   :py:class:`helper methods<imas_validator.rules.helpers>`. ``assert`` statements
    describe which conditions should be adhered to.
 
 See :ref:`rule definition` for more information.
@@ -40,7 +40,7 @@ Exercise 1
     .. md-tab-item:: Exercise
 
         Write a simple test to determine whether all ``core_profiles`` IDSs have a comment in their ``ids_properties`` attribute.
-        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
+        Does the DBentry for ``imas:hdf5?path=imas-validator-course/good`` pass the test?
 
         .. note::
             If the assert statement is clear on its own, no need to add a custom message.
@@ -72,8 +72,8 @@ Exercise 2
     .. md-tab-item:: Exercise
 
         Write a test for ``core_profiles`` IDSs to determine whether the ``time`` array is strictly increasing.
-        Use the :py:class:`~ids_validator.rules.helpers.Increasing` helper function.
-        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
+        Use the :py:class:`~imas_validator.rules.helpers.Increasing` helper function.
+        Does the DBentry for ``imas:hdf5?path=imas-validator-course/good`` pass the test?
 
     .. md-tab-item:: Solution
 
@@ -95,8 +95,8 @@ Exercise 3
     .. md-tab-item:: Exercise
 
         Write a test for ``core_profiles`` IDSs to determine whether the profiles follow electroneutrality.
-        Use the :py:class:`~ids_validator.rules.helpers.Approx` helper function.
-        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
+        Use the :py:class:`~imas_validator.rules.helpers.Approx` helper function.
+        Does the DBentry for ``imas:hdf5?path=imas-validator-course/good`` pass the test?
         What if you use a comparison operator ``==`` instead of the ``Approx`` helper function?
 
     .. md-tab-item:: Tip
@@ -133,8 +133,8 @@ Exercise 4
     .. md-tab-item:: Exercise
 
         Write a test for all IDSs to determine whether any ``_error_lower`` values are positive.
-        Use the :py:class:`~ids_validator.rules.helpers.Select` helper function.
-        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
+        Use the :py:class:`~imas_validator.rules.helpers.Select` helper function.
+        Does the DBentry for ``imas:hdf5?path=imas-validator-course/good`` pass the test?
 
     .. md-tab-item:: Tip
 
@@ -164,8 +164,8 @@ Exercise 5
 
         Write a test for all IDSs to determine whether in any case where a ``_min`` and its corresponding ``_max``
         value both exist, the ``_min`` is lower than the ``_max``.
-        Use the :py:class:`~ids_validator.rules.helpers.Parent` helper function.
-        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
+        Use the :py:class:`~imas_validator.rules.helpers.Parent` helper function.
+        Does the DBentry for ``imas:hdf5?path=imas-validator-course/good`` pass the test?
 
     .. md-tab-item:: Tip
 
@@ -204,7 +204,7 @@ Exercise 6
         In the DD version ``3.41``, ``ids.ids_properties.provenance.node(i).sources(:)`` was changed to ``ids.ids_properties.provenance.node(i).reference(j)`` 
 
         1) Write a test that checks whether the length of references for all nodes is larger than zero for ``core_profiles``.
-        The DBEntry ``imas:hdf5?path=ids-validator-course/good`` has DD version ``3.40.1`` while ``imas:hdf5?path=ids-validator-course/new`` has version ``3.42.0``.
+        The DBEntry ``imas:hdf5?path=imas-validator-course/good`` has DD version ``3.40.1`` while ``imas:hdf5?path=imas-validator-course/new`` has version ``3.42.0``.
         Run your test for both.
 
         2) Specify a version in the ``@validator`` decorator so that it only covers tests after version ``3.41.0``.
@@ -245,11 +245,11 @@ Exercise 7
     .. md-tab-item:: Exercise
 
         Write a test that checks if the time arrays for core_profiles and waves are approximately the same.
-        Use the :py:class:`~ids_validator.rules.helpers.Approx` helper function.
+        Use the :py:class:`~imas_validator.rules.helpers.Approx` helper function.
         Keep in mind that the occurrence number of an IDS needs to be specified for multi-ids validation.
         You can specify the occurrence number by writing the ids name like
         ``core_profiles:0`` in the ``@validator`` decorator.
-        Does the DBentry for ``imas:hdf5?path=ids-validator-course/good`` pass the test?
+        Does the DBentry for ``imas:hdf5?path=imas-validator-course/good`` pass the test?
         What happens if you do not specify the occurrence number?
 
     .. md-tab-item:: Solution
