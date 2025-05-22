@@ -33,7 +33,7 @@ def test_non_existing_pulsefile(tmp_path):
     empty_db_dir = tmp_path / "empty_testdb"
     empty_db_dir.mkdir()
 
-    argv = ["validate", f"imas:hdf5?path={empty_db_dir}"]
+    argv = ["validate", f"imas:netcdf?path={empty_db_dir}"]
 
     # When using imas_core >= 5.2, this raises an ALException. In earlier AL versions
     # IMAS-Python raises a LowlevelError.
@@ -45,7 +45,7 @@ def test_existing_pulsefile(tmp_path):
     db_dir = tmp_path / "testdb"
     db_dir.mkdir()
 
-    uri = f"imas:hdf5?path={db_dir}"
+    uri = f"imas:netcdf?path={db_dir}"
     entry = imas.DBEntry(uri=uri, mode="x")
     entry.close()
 
@@ -57,7 +57,7 @@ def test_existing_pulsefile(tmp_path):
 def test_validate_command_str_cast():
     args = argparse.Namespace(
         command="Validate",
-        uri="imas:hdf5?path=testdb",
+        uri="imas:netcdf?path=testdb",
         ruleset=[["test_ruleset"]],
         extra_rule_dirs=[[""]],
         no_generic=True,
