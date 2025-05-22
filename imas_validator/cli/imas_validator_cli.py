@@ -212,7 +212,8 @@ def main(argv: List) -> None:
                 # save result for this URI
                 report_generator = ValidationReportGenerator(command.result)
                 report_filename = (
-                    f"{reports_path}/{today}/{command.result.imas_uri.replace('/','|')}"
+                    f"{reports_path}/{today}/"
+                    f"{command.result.imas_uri.replace('/', '|')}"
                 )
 
                 os.makedirs(os.path.dirname(report_filename), exist_ok=True)
@@ -246,8 +247,10 @@ def main(argv: List) -> None:
                 # display txt report if set to verbose output
                 if args.verbose:
                     cli_logger.info("See detailed report below:")
-                    cli_logger.info(f"{color_red}{'-'*50}\n{report_generator.txt}")
-                    cli_logger.info(f"{color_red}{'-'*50}")
+                    cli_logger.info(
+                        f"{color_red}{'-'*50}\n{report_generator.txt}"
+                    )  # noqa: E226
+                    cli_logger.info(f"{color_red}{'-'*50}")  # noqa: E226
 
         if not common_result_list:
             return
