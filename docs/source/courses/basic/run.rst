@@ -93,7 +93,7 @@ Exercise 3
             
 .. note::
 
-    The IMAS validator tool is also integrated in `SimDB <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/simdb-doc/html/index.html>`_.
+    The IMAS validator tool is also integrated in SimDB
 
 .. note::
 
