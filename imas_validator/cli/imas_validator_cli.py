@@ -248,8 +248,8 @@ def main(argv: List) -> None:
                 if args.verbose:
                     cli_logger.info("See detailed report below:")
                     cli_logger.info(
-                        f"{color_red}{'-'*50}\n{report_generator.txt}"
-                    )  # noqa: E226
+                        f"{color_red}{'-'*50}\n{report_generator.txt}" # noqa: E226
+                    )
                     cli_logger.info(f"{color_red}{'-'*50}")  # noqa: E226
 
         if not common_result_list:
