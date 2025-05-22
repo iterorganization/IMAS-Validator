@@ -22,7 +22,7 @@ def test_generic_tests_with_randomly_generated_ids(ids_name, tmp_path):
     ids = imas.IDSFactory().new(ids_name)
     fill_consistent(ids, leave_empty=0)
 
-    uri = f"imas:ascii?path={tmp_path}"
+    uri = f"imas:netcdf?path={tmp_path}"
     dbentry = imas.DBEntry(uri, "w")
     dbentry.put(ids)
     dbentry.close()
