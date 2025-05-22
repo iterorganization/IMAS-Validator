@@ -46,6 +46,7 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+    "imas-python",
     "numpy>=1.15.4",
     "importlib_resources",
     "rich",
@@ -59,12 +60,14 @@ all = [
     "imas-validator[docs,test,linting,benchmark]"
 ]
 docs = [
+    "imas-python",
     "sphinx>=6.0.0,<7.0.0",
     "sphinx-autosummary-accessors>=0.1.2",
     "sphinx_immaterial>=0.11.0,<0.12",
     "recommonmark>=0.6",
 ]
 test = [
+    "imas-python",
     "pytest>=5.4.1",
     "pytest-cov>=0.6",
     "pytest-xdist",
