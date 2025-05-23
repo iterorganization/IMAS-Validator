@@ -96,7 +96,7 @@ class SummaryReportGenerator:
             <br>
             <h3>Failed tests</h3>
             <ol>
-             {''.join([self._generate_uri_specific_html_element(result_collection)
+            {''.join([self._generate_uri_specific_html_element(result_collection)
                       for result_collection in failed_tests_list])}
             </ol>
         </div>
