@@ -128,7 +128,7 @@ html_theme_options = {
     "repo_url": "https://github.com/iterorganization/IMAS-Validator",
     "repo_name": "IMAS Validator",
     "icon": {
-        "repo": "fontawesome/brands/bitbucket",
+        "repo": "fontawesome/brands/github",
     },
     "features": [
         # "navigation.expand",
