@@ -1,5 +1,4 @@
-"""Create a default log handler for imas_validator
-"""
+"""Create a default log handler for imas_validator"""
 
 try:
     import imaspy as imas  # type: ignore
