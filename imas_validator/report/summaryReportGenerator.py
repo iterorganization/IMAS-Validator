@@ -71,7 +71,7 @@ class SummaryReportGenerator:
         </style>
 
         """
-        self._html = f"""
+        self._html = f"""  # noqa
         <!DOCTYPE html>
         <document>
         <head>
@@ -90,23 +90,23 @@ class SummaryReportGenerator:
         <div class="content">
             <h3>Passed tests</h3>
             <ol>
-                {''.join([
-                    self._generate_uri_specific_html_element(result_collection)
-                    for result_collection in passed_tests_list
-                ])}
+            {''.join([
+                self._generate_uri_specific_html_element(result_collection)
+                for result_collection in passed_tests_list
+            ])}
             </ol>
             <br>
             <h3>Failed tests</h3>
             <ol>
-                {''.join([
-                    self._generate_uri_specific_html_element(result_collection)
-                    for result_collection in failed_tests_list
-                ])}
+            {''.join([
+                self._generate_uri_specific_html_element(result_collection)
+                for result_collection in failed_tests_list
+            ])}
             </ol>
         </div>
         </body>
         </document>
-        """  # noqa: E128
+        """
 
     def _generate_uri_specific_html_element(
         self, validation_results: IDSValidationResultCollection
