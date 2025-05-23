@@ -28,7 +28,7 @@ class SummaryReportGenerator:
     def parse(self) -> None:
         self._generate_html()
 
-    def _generate_html(self) -> None:
+    def _generate_html(self) -> None:  # noqa
         """Generates full HTML report summary for validation results
         stored in self._validation_results"""
         num_failed_tests = 0
@@ -71,7 +71,7 @@ class SummaryReportGenerator:
         </style>
 
         """
-        self._html = f"""  # noqa
+        self._html = f"""
         <!DOCTYPE html>
         <document>
         <head>
@@ -90,18 +90,14 @@ class SummaryReportGenerator:
         <div class="content">
             <h3>Passed tests</h3>
             <ol>
-            {''.join([
-                self._generate_uri_specific_html_element(result_collection)
-                for result_collection in passed_tests_list
-            ])}
+            {''.join([self._generate_uri_specific_html_element(result_collection)
+                      for result_collection in passed_tests_list])}
             </ol>
             <br>
             <h3>Failed tests</h3>
             <ol>
-            {''.join([
-                self._generate_uri_specific_html_element(result_collection)
-                for result_collection in failed_tests_list
-            ])}
+             {''.join([self._generate_uri_specific_html_element(result_collection)
+                      for result_collection in failed_tests_list])}
             </ol>
         </div>
         </body>
