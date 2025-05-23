@@ -71,6 +71,19 @@ class SummaryReportGenerator:
         </style>
 
         """
+        passed_tests_html = "".join(
+            [
+                self._generate_uri_specific_html_element(result_collection)
+                for result_collection in passed_tests_list
+            ]
+        )
+
+        failed_tests_html = "".join(
+            [
+                self._generate_uri_specific_html_element(result_collection)
+                for result_collection in failed_tests_list
+            ]
+        )
         self._html = f"""
         <!DOCTYPE html>
         <document>
@@ -90,18 +103,12 @@ class SummaryReportGenerator:
         <div class="content">
             <h3>Passed tests</h3>
             <ol>
-            {''.join([
-            self._generate_uri_specific_html_element(result_collection)
-            for result_collection in passed_tests_list
-            ])}
+            {passed_tests_html}
             </ol>
             <br>
             <h3>Failed tests</h3>
             <ol>
-            {''.join([
-            self._generate_uri_specific_html_element(result_collection)
-            for result_collection in failed_tests_list
-            ])}
+            {failed_tests_html}
             </ol>
         </div>
         </body>
