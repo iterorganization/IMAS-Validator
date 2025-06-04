@@ -33,14 +33,6 @@ Deployment
   
 New tagged releases are automatically build and distribution packages are uploaded on `PyPI <https://pypi.org/project/imas-validator/>`_. This workflow is defined in `.github/workflows/publish_pypi.yml <https://github.com/iterorganization/IMAS-Validator/blob/develop/.github/workflows/publish_pypi.yml>`_.
 
+* ReadTheDocs
 
-`Deploy imas-validator-Doc <https://ci.iter.org/deploy/viewDeploymentProjectEnvironments.action?id=1908899843>`_
-    Deploy the documentation created in the `Build docs` job to `readthedocs
-    <https://imas-validator.readthedocs.io/en/stable/#>`_.
-
-    This deployment project runs for after each successful CI build of the IMAS-Validator main
-    branch.
-
- * ReadTheDocs
-
- Each new updates on the ``develop`` and ``main`` branches are deployed automatically on ReadTheDocs, respectively in the `latest <https://imas-validator.readthedocs.io/en/stable/#>`_ and `stable <https://imas-validator.readthedocs.io/en/stable/#>`_ versions. 
+Each new updates on the ``develop`` and ``main`` branches are deployed automatically on ReadTheDocs, respectively in the `latest <https://imas-validator.readthedocs.io/en/latest/#>`_ and `stable <https://imas-validator.readthedocs.io/en/stable/#>`_ versions. 
