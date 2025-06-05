@@ -22,7 +22,7 @@ cli_logger.setLevel(logging.INFO)
 def configure_argument_parser() -> argparse.ArgumentParser:
     # Management of input arguments
     parser = argparse.ArgumentParser(
-        description="IMAS validator",
+        description="IMAS-Validator",
         epilog="Validate command prints URIs that failed validation on stdout."
         "One can take advantage of this behaviour and pipe validator"
         " calls using xargs command eg.:"

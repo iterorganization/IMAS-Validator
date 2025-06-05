@@ -1,10 +1,10 @@
 .. _`basic/explore`:
 
-Exploring rulesets with IMAS validator
+Exploring rulesets with IMAS-Validator
 ======================================
 
 As more rules become available, we need a way to keep track of them.
-In this section of the training we look at the explore functionality of the IMAS validator tool.
+In this section of the training we look at the explore functionality of the IMAS-Validator tool.
 
 The explore functionality can be called from the terminal by 
 
@@ -21,11 +21,11 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        1) Call the IMAS validator explore tool.
+        1) Call the IMAS-Validator explore tool.
 
-        2) Call the IMAS validator explore tool including the custom tests in 'imas-validator-training-rulesets/custom-rulesets'.
+        2) Call the IMAS-Validator explore tool including the custom tests in 'imas-validator-training-rulesets/custom-rulesets'.
 
-        3) Call the IMAS validator explore tool filtering only for tests with 'errorbars' in the name.
+        3) Call the IMAS-Validator explore tool filtering only for tests with 'errorbars' in the name.
 
     .. md-tab-item:: Solution
 
@@ -55,9 +55,9 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        1) Call the IMAS validator explore tool showing the empty folders and files.
+        1) Call the IMAS-Validator explore tool showing the empty folders and files.
 
-        2) Call the IMAS validator explore tool for different verbosity levels
+        2) Call the IMAS-Validator explore tool for different verbosity levels
 
         3) What are the differences?
 

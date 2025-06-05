@@ -1,1 +1,1 @@
-"""Folder for bundled generic IMAS validator tests"""
+"""Folder for bundled generic IMAS-Validator tests"""

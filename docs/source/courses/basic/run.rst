@@ -1,10 +1,10 @@
 .. _`basic/run`:
 
-Running validations with IMAS validator
+Running validations with IMAS-Validator
 =======================================
 
-In this section we start with the core functionality of the IMAS validator: running tests on IDS data.
-The easiest way of using the IMAS validator is by using the CLI from your terminal.
+In this section we start with the core functionality of the IMAS-Validator: running tests on IDS data.
+The easiest way of using the IMAS-Validator is by using the CLI from your terminal.
 The only required argument is the imas_uri of the DBentry object you want to validate.
 To print the report output directly to your terminal, add the ``--verbose`` option.
 
@@ -29,7 +29,7 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Run the IMAS validator generic tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/good``
+        Run the IMAS-Validator generic tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/good``
 
         Run it again with the ``--verbose`` option.
 
@@ -46,7 +46,7 @@ You might want to develop or simply use your own custom tests in addition to the
 bundled validation tests. You can add customly built tests to the validation process by adding CLI flags
 to determine in which ruleset folders the tool should look for IDS validation rules. 
 A ruleset is a folder that can contain multiple validation test files, typically grouped per use case.
-A rule directory is a folder containing multiple ruleset folders so that the IMAS validator can be 
+A rule directory is a folder containing multiple ruleset folders so that the IMAS-Validator can be 
 easily told where to look.
 The structure of these rulesets folders is further explained in :ref:`defining rules`.
 You can find custom rule folders and rulesets with the flags:
@@ -65,7 +65,7 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IMAS validator including custom tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/good``.
+        Call the IMAS-Validator including custom tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/good``.
         The custom rules are defined in the ``imas-validator-training-rulesets/custom_ruleset`` ruleset folder.
 
     .. md-tab-item:: Solution
@@ -93,10 +93,10 @@ Exercise 3
             
 .. note::
 
-    The IMAS validator tool is also integrated in SimDB
+    The IMAS-Validator tool is also integrated in SimDB
 
 .. note::
 
-    You can also run the IMAS validator tool from a python script. This might be helpful if you want to automatically run your
+    You can also run the IMAS-Validator tool from a python script. This might be helpful if you want to automatically run your
     data through the validation tool after it is measured/generated.
     More information can be found in :ref:`usage`.

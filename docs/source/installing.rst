@@ -1,6 +1,6 @@
 .. _`installing`:
 
-Installing the IMAS Validator
+Installing the IMAS-Validator
 =============================
 
 To get started, you can install it from `pypi.org <https://pypi.org/project/imas-validator>`_:

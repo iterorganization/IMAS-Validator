@@ -5,10 +5,10 @@
    define TOC here, but it'll be put in the sidebar by the theme
 
 =====================
-IMAS Validator Manual
+IMAS-Validator Manual
 =====================
 
-IMAS Validator is a tool to validate IMAS IDS's through the use of general
+IMAS-Validator is a tool to validate IMAS IDS's through the use of general
 and case specific validation rules.
 
 

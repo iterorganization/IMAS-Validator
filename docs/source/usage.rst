@@ -1,6 +1,6 @@
 .. _`usage`:
 
-Using the IMAS validator
+Using the IMAS-Validator
 ========================
 
 .. note::

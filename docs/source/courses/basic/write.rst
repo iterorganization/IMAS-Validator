@@ -1,6 +1,6 @@
 .. _`basic/write`:
 
-Writing validation rulesets for IMAS validator
+Writing validation rulesets for IMAS-Validator
 ==============================================
 
 This section explains how to write your own tests.

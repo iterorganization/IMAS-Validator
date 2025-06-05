@@ -4,13 +4,12 @@ Defining validation rules
 ===========================
 
 On this page we explain the structure of rules. For a step-by-step guide to
-creating new rules, see the :ref:`training<IMAS validator 101>`.
+creating new rules, see the :ref:`training<IMAS-Validator 101>`.
 
 Rule grouping
 -------------
 
-IDS validation is done by applying rules to IDS structures. In this section we
-explain how rules are grouped together:
+The validation of IDS data is done by applying rules to IDS structures. In this section we explain how rules are grouped together:
 
 ..
 
@@ -35,7 +34,7 @@ explain how rules are grouped together:
 
   Rules that check the validity of the data according to the generic Data
   Dictionary definition are grouped in a special rule set called ``generic``.
-  This generic ruleset is built in to the IMAS validator and enabled by default.
+  This generic ruleset is built in to the IMAS-Validator and enabled by default.
   You can specifically disable the generic tests by supplying the
   ``--no-generic`` flag to the Command Line Interface.
 
@@ -47,7 +46,7 @@ See below code block for an example directory structure. We can interpret the
 folder structure as follows:
 
 - Directories containing **rule sets** (``rule_dir``, ``rule_dir_custom``). The
-  IMAS Validator can find the rule sets in these directories through the Command
+  IMAS-Validator can find the rule sets in these directories through the Command
   Line Interface argument ``--extra-rule-dirs /path/to/rule_dir
   /path/to/rule_dir_custom`` or through by setting the environment variable
   ``RULESET_PATH=/path/to/rule_dir:/path/to/rule_dir_custom``.

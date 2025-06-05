@@ -1,10 +1,10 @@
 .. _`basic/setup`:
 
-IMAS validator 101: setup
+IMAS-Validator 101: setup
 =========================
 
 For these training excercises you will need an installation of imas_validator and access to IMAS-Python.
-Have a look at the :ref:`installing` page for more details on installing IMAS validator.
+Have a look at the :ref:`installing` page for more details on installing IMAS-Validator.
 To check if your installation worked, try
 
 .. code-block:: console

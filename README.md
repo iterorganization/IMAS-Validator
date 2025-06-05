@@ -1,5 +1,5 @@
 # README
-IMAS Validator is a tool to validate IMAS IDS's through the use of general
+IMAS-Validator is a tool to validate IMAS IDS's through the use of general
 and case specific validation rules.
 
 # Installation

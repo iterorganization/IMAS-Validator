@@ -1,6 +1,6 @@
 .. _`basic/debug`:
 
-Debugging with IMAS validator
+Debugging with IMAS-Validator
 =============================
 
 In this section we zoom in on what you can do when a validation test fails
@@ -27,7 +27,7 @@ Exercise 1
 
     .. md-tab-item:: Exercise
 
-        Call the IMAS validator for the db_entry with uri ``imas:hdf5?path=imas-validator-course/bad``
+        Call the IMAS-Validator for the db_entry with uri ``imas:hdf5?path=imas-validator-course/bad``
 
         Run only the failing tests.
 
@@ -46,7 +46,7 @@ Exercise 1
         The summary report should only show the failing test for all IDS instances.
 
 Sometimes you want to take a closer look at the data when a test fails.
-The IMAS validator has an optional feature to drop into a Python debugger (`pdb <https://docs.python.org/3/library/pdb.html>`_) console when a test returns an assertion error.
+The IMAS-Validator has an optional feature to drop into a Python debugger (`pdb <https://docs.python.org/3/library/pdb.html>`_) console when a test returns an assertion error.
 This gives you access in the terminal to the stack traces and local variables in the code.
 While the documentation shows a lot more functionality, in this case we focus only on the local variables. 
 To activate the Python debugger, use the flag:
@@ -60,7 +60,7 @@ Exercise 2
 
     .. md-tab-item:: Exercise
 
-        Call the IMAS validator bundled tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/bad`` with the debugger argument. 
+        Call the IMAS-Validator bundled tests for the db_entry with uri ``imas:hdf5?path=imas-validator-course/bad`` with the debugger argument. 
         What is the problem with this DBEntry?
         
     .. md-tab-item:: Tip

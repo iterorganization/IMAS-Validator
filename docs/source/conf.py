@@ -38,7 +38,7 @@ src_host = "https://github.com/"
 iter_projects = "https://github.com/iterorganization"
 issue_url = jira_url = "https://github.com/iterorganization/IMAS-Validator/issues"
 
-# IMAS Validator
+# IMAS-Validator
 repository_url = f"{iter_projects}/{src_project}/"
 blob_url = urljoin(repository_url, "blob/")
 mr_url = urljoin(repository_url, "pulls/")
@@ -126,7 +126,7 @@ html_theme = "sphinx_immaterial"
 # https://sphinx-immaterial.readthedocs.io/en/latest/customization.html#confval-html_theme_options
 html_theme_options = {
     "repo_url": "https://github.com/iterorganization/IMAS-Validator",
-    "repo_name": "IMAS Validator",
+    "repo_name": "IMAS-Validator",
     "icon": {
         "repo": "fontawesome/brands/github",
     },
