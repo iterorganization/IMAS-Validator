@@ -1,9 +1,11 @@
-import imas  # type: ignore
-
-import logging  # isort: skip
 from pathlib import Path
 
+import imas  # type: ignore
+
 from imas_validator.setup_logging import connect_formatter
+
+import logging  # isort: skip
+
 
 try:
     from ._version import version as __version__  # noqa: F401

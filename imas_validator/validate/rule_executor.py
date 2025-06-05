@@ -3,13 +3,12 @@ This file describes the validation loop in which the rules are applied to the
 IDS data
 """
 
-import imas  # type: ignore
-
 import logging
 import pdb
 import sys
 from typing import Iterator, List, Optional, Tuple
 
+import imas  # type: ignore
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 from rich.progress import Progress

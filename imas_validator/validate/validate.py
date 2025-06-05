@@ -2,11 +2,10 @@
 This file describes the main function for the IMAS IDS validation tool
 """
 
-import imas  # type: ignore
-
 import logging
 import sys
 
+import imas  # type: ignore
 from packaging.version import Version
 
 # from imas_validator.exceptions import IMASVersionError

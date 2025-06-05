@@ -1,8 +1,8 @@
 """Create a default log handler for imas_validator"""
 
-import imas  # type: ignore # noqa: F401
 import logging
 
+import imas  # type: ignore # noqa: F401
 from rich.logging import RichHandler
 
 

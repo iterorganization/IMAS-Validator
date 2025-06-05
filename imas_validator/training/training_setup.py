@@ -2,12 +2,11 @@
 This file describes the functions needed for the training course
 """
 
-import imas  # type: ignore
-
 import os
 import shutil
 from pathlib import Path
 
+import imas  # type: ignore
 import numpy
 
 from imas_validator import get_project_root

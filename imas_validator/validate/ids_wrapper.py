@@ -2,11 +2,10 @@
 This file describes the overload class for the operators
 """
 
-import imas  # type: ignore
-
 import operator
 from typing import Any, Callable, Collection, List, Optional, Tuple
 
+import imas  # type: ignore
 import numpy as np
 
 

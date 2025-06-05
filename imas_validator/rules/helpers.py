@@ -2,11 +2,10 @@
 This file describes the helper functions for the validation rules
 """
 
-import imas  # type: ignore
-
 import operator
 from typing import Any, Callable, Iterator, List
 
+import imas  # type: ignore
 import numpy as np
 
 from imas_validator.validate.ids_wrapper import IDSWrapper

@@ -1,7 +1,7 @@
-import imas  # type: ignore
-
 import argparse
 from typing import Any, List
+
+import imas  # type: ignore
 
 from imas_validator.validate_options import RuleFilter
 
