@@ -1,13 +1,7 @@
-try:
-    from imas_validator.rules.loading import load_rules
-    from imas_validator.validate.result_collector import ResultCollector
-    from imas_validator.validate.validate import validate
-    from imas_validator.validate_options import RuleFilter, ValidateOptions
-except:
-    from ids_validator.rules.loading import load_rules
-    from ids_validator.validate.result_collector import ResultCollector
-    from ids_validator.validate.validate import validate
-    from ids_validator.validate_options import RuleFilter, ValidateOptions
+from imas_validator.rules.loading import load_rules
+from imas_validator.validate.result_collector import ResultCollector
+from imas_validator.validate.validate import validate
+from imas_validator.validate_options import RuleFilter, ValidateOptions
 
 uri_list = [
     "imas:hdf5?path=/work/imas/shared/imasdb/ITER/3/130505/3",
