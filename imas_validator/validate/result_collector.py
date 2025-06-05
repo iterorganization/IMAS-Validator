@@ -7,10 +7,7 @@ import logging
 import traceback
 from typing import Any, List, Tuple
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
+import imas  # type: ignore
 
 from imas_validator.exceptions import InternalValidateDebugException
 from imas_validator.rules.data import IDSValidationRule

@@ -1,9 +1,5 @@
-try:
-    import imaspy as imas  # type: ignore
-    from imaspy.test.test_helpers import fill_consistent # type: ignore
-except ImportError:
-    import imas  # type: ignore
-    from imas.test.test_helpers import fill_consistent # type: ignore
+import imas  # type: ignore
+from imas.test.test_helpers import fill_consistent # type: ignore
 import pytest
 from packaging.version import Version
 

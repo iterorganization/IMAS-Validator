@@ -2,10 +2,7 @@
 This file describes the overload class for the operators
 """
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
+import imas  # type: ignore
 
 import operator
 from typing import Any, Callable, Collection, List, Optional, Tuple

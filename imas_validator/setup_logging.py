@@ -1,9 +1,6 @@
 """Create a default log handler for imas_validator"""
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore # noqa: F401
+import imas  # type: ignore # noqa: F401
 import logging
 
 from rich.logging import RichHandler

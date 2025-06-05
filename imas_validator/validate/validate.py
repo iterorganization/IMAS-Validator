@@ -2,10 +2,7 @@
 This file describes the main function for the IMAS IDS validation tool
 """
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
+import imas  # type: ignore
 
 import logging
 import sys

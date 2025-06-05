@@ -3,10 +3,7 @@ This file describes the data class for rules that are saved and generated for
 the validation tool
 """
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
+import imas  # type: ignore
 
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple

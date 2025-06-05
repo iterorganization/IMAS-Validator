@@ -1,10 +1,7 @@
 import argparse
 from pathlib import Path
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
+import imas  # type: ignore
 import pytest
 
 from imas_validator.cli import imas_validator_cli

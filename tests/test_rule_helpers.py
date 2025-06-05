@@ -1,8 +1,4 @@
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
-
+import imas  # type: ignore
 from typing import List
 
 

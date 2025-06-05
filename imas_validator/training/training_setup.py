@@ -2,10 +2,7 @@
 This file describes the functions needed for the training course
 """
 
-try:
-    import imaspy as imas  # type: ignore
-except ImportError:
-    import imas  # type: ignore
+import imas  # type: ignore
 
 import os
 import shutil
