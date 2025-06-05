@@ -1,24 +1,33 @@
-import imaspy
+import imas  # type: ignore
+from imas.test.test_helpers import fill_consistent # type: ignore
 import pytest
-from imaspy.test.test_helpers import fill_consistent
+from packaging.version import Version
 
-from ids_validator.validate.validate import validate
+from imas_validator.validate.validate import validate
 
 
-@pytest.mark.parametrize("ids_name", imaspy.IDSFactory().ids_names())
+@pytest.mark.skipif(
+    Version(imas.__version__) < Version("1.1"),
+    reason="fill_consistent needs arg leave_empty",
+)
+@pytest.mark.parametrize("ids_name", imas.IDSFactory().ids_names())
 def test_generic_tests_with_randomly_generated_ids(ids_name, tmp_path):
     if ids_name == "amns_data":
-        pytest.skip("amns_data IDS is not supported by IMASPy's fill_consistent")
+        pytest.skip("amns_data IDS is not supported by IMAS-Python's fill_consistent")
 
-    ids = imaspy.IDSFactory().new(ids_name)
-    fill_consistent(ids)
+    ids = imas.IDSFactory().new(ids_name)
+    fill_consistent(ids, leave_empty=0)
 
-    uri = f"imas:ascii?path={tmp_path}"
-    dbentry = imaspy.DBEntry(uri, "w")
+    uri = f"{tmp_path}/pulse.nc"
+    dbentry = imas.DBEntry(uri, "w")
     dbentry.put(ids)
     dbentry.close()
 
-    results = validate(uri)
-    assert len(results) > 0
-    for result in results:
-        assert result.exc is None  # Generic tests should not lead to an Exception
+    results_collection = validate(uri)
+    assert len(results_collection.results) > 0
+    for result in results_collection.results:
+        # Generic tests should generally not lead to an Exception
+        # fill_consistent might create incompatible ggd ion and density data
+        assert result.exc is None or (
+            "operands could not be broadcast together" in str(result.exc)
+        )

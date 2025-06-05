@@ -1,2 +1,2 @@
 [run]
-omit = ids_validator/_version.py
+omit = imas_validator/_version.py

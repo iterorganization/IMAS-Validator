@@ -1,17 +1,17 @@
 API reference
 =============
 
-This page provides an auto-generated summary of ids-validator's API. For more details
+This page provides an auto-generated summary of imas-validator's API. For more details
 and examples, refer to the relevant chapters in the main part of the
 documentation.
 
-IDS validator
--------------
+IMAS-Validator
+--------------
 
 .. autosummary::
    :toctree: generated/
    :recursive:
    :template: custom-module-template.rst
 
-   ids_validator
+   imas_validator
    

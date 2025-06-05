@@ -1,19 +1,21 @@
+.. _`index`:
+
 .. 
    Main "index". This will be converted to a landing index.html by sphinx. We
    define TOC here, but it'll be put in the sidebar by the theme
 
-=========================
-IMAS IDS Validator Manual
-=========================
+=====================
+IMAS-Validator Manual
+=====================
 
-IMAS IDS Validator is a tool to validate IMAS IDS's through the use of general
+IMAS-Validator is a tool to validate IMAS IDS's through the use of general
 and case specific validation rules.
 
 
 README
 ------
 
-The README is best read on the `git page <https://git.iter.org/projects/IMEX/repos/ids-validator/browse>`_.
+The README is best read on the `git page <https://github.com/iterorganization/IMAS-Validator>`_.
 
 Manual
 ------
@@ -27,12 +29,7 @@ Manual
    defining_rules
    usage
    filter_rules
-
-.. toctree::
-   :caption: Tutorials
-   :maxdepth: 1
-
-   rule_tutorial
+   tips_and_tricks
 
 .. toctree::
    :caption: API docs
@@ -47,12 +44,18 @@ Manual
    code_style
    ci_config
 
+.. toctree::
+   :caption: Training
+   :maxdepth: 1
+
+   courses/basic_user_training
+
 
 
 LICENSE
 -------
 
-.. literalinclude:: ../../LICENSE.md
+.. literalinclude:: ../../LICENSE.txt
    :language: text
 
 

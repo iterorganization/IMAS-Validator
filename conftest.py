@@ -1,11 +1,13 @@
+import imas  # type: ignore
+
 import logging
 import os
 
-import imaspy
+
 import numpy
 import pytest
 
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.ids_wrapper import IDSWrapper
 
 # Tests assume that this environment variable is not set, so ensure it isn't:
 os.environ.pop("RULESET_PATH", "")
@@ -13,7 +15,7 @@ os.environ.pop("RULESET_PATH", "")
 
 @pytest.fixture
 def test_data_core_profiles():
-    cp = imaspy.IDSFactory("3.40.1").core_profiles()
+    cp = imas.IDSFactory("3.40.1").core_profiles()
     # Fill some properties:
     cp.ids_properties.homogeneous_time = 0  # INT_0D
     cp.ids_properties.comment = "Comment"  # STR_0D
@@ -37,7 +39,7 @@ def test_data_core_profiles():
 
 @pytest.fixture
 def test_data_waves():
-    wv = imaspy.IDSFactory("3.40.1").waves()
+    wv = imas.IDSFactory("3.40.1").waves()
     # Fill some properties:
     wv.ids_properties.homogeneous_time = 0  # INT_0D
     # Fill some data
@@ -59,5 +61,5 @@ def test_data_waves():
 
 @pytest.fixture(autouse=True)
 def set_caplog(caplog):
-    with caplog.at_level(logging.INFO, logger="ids_validator"):
+    with caplog.at_level(logging.INFO, logger="imas_validator"):
         yield

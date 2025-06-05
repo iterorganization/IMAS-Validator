@@ -1,5 +1,7 @@
-Using the IMAS IDS validator
-============================
+.. _`usage`:
+
+Using the IMAS-Validator
+========================
 
 .. note::
   This is the API mostly for developers,  documentation for CLI usage will be added when it becomes available.
@@ -12,22 +14,22 @@ You should provide:
 
 - IDS url
 - Names of rulesets to be applied (optional)
-- Whether or not to load the rulesets bundled with ids_validator (optional)
+- Whether or not to load the rulesets bundled with imas_validator (optional)
 - Paths where to look for rule sets (optional)
 - Whether or not to apply the generic ruleset (optional)
 - Whether or not to drop into debugger for failed tests (optional)
 - Filter criteria (optional)
 
-You can also set the logging level of the ids_validator tool.
+You can also set the logging level of the imas_validator tool.
 This can be set to 'WARNING' (default) to get messages when something is potentially wrong,
 or it can be set to 'INFO' to get more information for debugging purposes
 
 .. code-block:: python
 
   import logging
-  from ids_validator.validate_options import ValidateOptions, RuleFilter
-  from ids_validator.validate.validate import validate
-  logger = logging.getLogger('ids_validator')
+  from imas_validator.validate_options import ValidateOptions, RuleFilter
+  from imas_validator.validate.validate import validate
+  logger = logging.getLogger('imas_validator')
   logger.setLevel(logging.INFO)
 
 
@@ -48,18 +50,21 @@ You can also set the environment variable `RULESET_PATH` to show the loading too
 
   export RULESET_PATH=path/to/my/custom/rule/dirs/rulesets:another/path/rulesets_custom
 
-Loading IDSValidationRules
---------------------------
+Loading IMASValidationRules
+---------------------------
 
 Provide a list of rulesets, whether or not to apply the generic ruleset and a list of paths where to look for rulesets.
 
 .. code-block:: python
 
-  from ids_validator.validate_options import ValidateOptions, RuleFilter
-  from ids_validator.rules.loading import load_rules
-  from ids_validator.validate.result import ResultCollector
+  from imas import DBEntry
+
+  from imas_validator.validate_options import ValidateOptions, RuleFilter
+  from imas_validator.rules.loading import load_rules
+  from imas_validator.validate.result import ResultCollector
 
 
+  imas_uri = "imas:hdf5?path=path/to/data/entry"
   validate_options = ValidateOptions(
     rulesets = ['ITER-MD', 'MyCustomRules'],
     extra_rule_dirs = ['path/to/my/custom/rule/dirs/rulesets', 'another/path/rulesets_custom'],
@@ -67,5 +72,5 @@ Provide a list of rulesets, whether or not to apply the generic ruleset and a li
     use_pdb = False,
     rule_filter = RuleFilter(name = ['time'], ids = ['core_profile']),
   )
-  result_collector = ResultCollector(validate_options=validate_options)
+  result_collector = ResultCollector(validate_options=validate_options, imas_uri=imas_uri)
   rules_list = load_rules(validate_options=validate_options)

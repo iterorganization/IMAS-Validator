@@ -4,16 +4,14 @@ Defining validation rules
 ===========================
 
 On this page we explain the structure of rules. For a step-by-step guide to
-creating new rules, see the :ref:`rule tutorial`.
+creating new rules, see the :ref:`training<IMAS-Validator 101>`.
 
 Rule grouping
 -------------
 
-IDS validation is done by applying rules to IDS structures. In this section we
-explain how rules are grouped together:
+The validation of IDS data is done by applying rules to IDS structures. In this section we explain how rules are grouped together:
 
 ..
-  TODO: update Rule definition when multi-IDS validation is implemented
 
 **Rule**
   A Rule is a set of checks that logically belong together. Rules are defined in
@@ -36,7 +34,7 @@ explain how rules are grouped together:
 
   Rules that check the validity of the data according to the generic Data
   Dictionary definition are grouped in a special rule set called ``generic``.
-  This generic ruleset is built in to the IDS validator and enabled by default.
+  This generic ruleset is built in to the IMAS-Validator and enabled by default.
   You can specifically disable the generic tests by supplying the
   ``--no-generic`` flag to the Command Line Interface.
 
@@ -48,7 +46,7 @@ See below code block for an example directory structure. We can interpret the
 folder structure as follows:
 
 - Directories containing **rule sets** (``rule_dir``, ``rule_dir_custom``). The
-  IDS Validator can find the rule sets in these directories through the Command
+  IMAS-Validator can find the rule sets in these directories through the Command
   Line Interface argument ``--extra-rule-dirs /path/to/rule_dir
   /path/to/rule_dir_custom`` or through by setting the environment variable
   ``RULESET_PATH=/path/to/rule_dir:/path/to/rule_dir_custom``.
@@ -77,6 +75,17 @@ folder structure as follows:
           └── equilibrium.py
 
 
+.. note::
+
+  Make sure that anyone working with the tests or using the ``explore`` tool can 
+  properly understand your validation rules. Add docstrings explaining what kind of tests you have written.
+  Docstrings are surrounded by triple quotes (``"""my explanation docstring"""``) and are defined:
+
+  - At rule level (under function definition)
+  - At file level (top of validation rule file)
+  - At ruleset level (top of ``__init__.py`` file in ruleset folder)
+
+
 .. _`rule definition`:
 
 Rule definition
@@ -84,10 +93,11 @@ Rule definition
 
 Validation rules are defined inside the python files as follows:
 
-1. An ``@validator`` decorator indicates which IDS to apply the validator
-   function. More details on this decorator can be found in the API
-   documentation:
-   :py:class:`@validator<ids_validator.rules.data.ValidatorRegistry.validator>`.
+1. An ``@validator`` decorator indicates which IDSs (and optionally which occurrences) to 
+   apply the validator function to. This is done like ``@validator('summary')``,
+   ``@validator('summary:0')`` or ``@validator('summary:0', 'equilibrium:0')``.
+   More details on this decorator can be found in the API documentation:
+   :py:class:`@validator<imas_validator.rules.data.ValidatorRegistry.validator>`.
 2. The ``@validator`` decorator is followed by a Python function definition:
    ``def <rule_name>(arguments...):``. This sets the name of the rule, which
    should be unique.
@@ -109,7 +119,7 @@ Validation rules are defined inside the python files as follows:
 
 4. The checks are written in the function body of the rule. Use ``assert``
    statements to check criteria. Several :py:mod:`helper methods
-   <ids_validator.rules.helpers>` are available for common types of checks.
+   <imas_validator.rules.helpers>` are available for common types of checks.
 
    You can write an assertion as follows: ``assert <check>[, "optional
    message"]``, see below examples. When the check evaluates to ``False``, this
@@ -140,8 +150,8 @@ Validation rules are defined inside the python files as follows:
 .. attention::
 
   The ``@validator`` decorator and all :py:mod:`helper methods
-  <ids_validator.rules.helpers>` are automatically available in rule files. You
-  should not try to import them manually from the ``ids_validator`` package.
+  <imas_validator.rules.helpers>` are automatically available in rule files. You
+  should not try to import them manually from the ``imas_validator`` package.
 
   Your IDE might complain about undefined variables, but you can safely ignore
   that.
@@ -149,6 +159,8 @@ Validation rules are defined inside the python files as follows:
 
 .. code-block:: python
   :caption: Example rule file
+  
+  """This validation rule file shows example cases of how to define IDS validation rules"""
 
   @validator("*")
   def validate_ids_plugins_metadata(ids):
@@ -174,8 +186,38 @@ Validation rules are defined inside the python files as follows:
       assert False, "No electron species found"
 
   @validator("core_profiles")
-  def validate_ion_charge(cp):
+  def validate_ion_charge(cp, version=">=3.38.0, <4.0.0"):
     """Validate that profiles_1d/ion/z_ion is defined."""
     for p1d in cp.profiles_1d:
       for ion in p1d.ion:
         assert ion.z_ion.has_value
+
+  @validator("equilibrium:0")
+  def validate_has_comment(eq):
+    """Validate that first occurrence of equilibrium has a comment."""
+    assert eq.ids_properties.comment != ''
+
+.. note::
+
+  The dd_version formatting is done according to the
+  `packaging module specifiers <https://packaging.pypa.io/en/latest/specifiers.html>`_.
+  If a specific version number is required it is formatted as "==3.38.1"
+
+It is also possible to write rules that cross-validate multiple IDSs.
+This is done by specifying all the necessary IDS names in the ``@validator`` decorator.
+While specifying the occurrence number in the ``@validator`` decorator is optional 
+for single IDS validation, it is mandatory for multi-IDS validation.
+
+.. code-block:: python
+
+  @validator("summary:0", "core_profiles:0")
+  def cross_validate_summary_and_core_profiles(summary, core_profiles):
+      """
+      Validate that quantities defined in both 
+      summary and core_profiles are in agreement.
+      """
+      assert Approx(summary.time, core_profiles.time)
+      assert Approx(
+        summary.global_quantities.ip.value,
+        core_profiles.global_quantities.ip
+      )

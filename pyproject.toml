@@ -1,19 +1,19 @@
 [build-system]
 # Minimum requirements for the build system to execute.
-requires = ["setuptools>=61", "wheel", "packaging", "tomli;python_version<'3.11'", "versioneer[toml]"]
+requires = ["setuptools>=61", "wheel", "packaging", "tomli;python_version<'3.11'", "setuptools_scm>8"]
 
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ids_validator"
+name = "imas-validator"
 authors = [
-  {name = "IDS Validator Developers"},
-  {name = "Olivier Hoenen", email = "olivier.hoenen@iter.org"},
+  {name = "ITER Organization"},
+  {email = "imas-support@iter.org"},
 ]
 description = "Data validation for IMAS IDS data"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.7"
-license = {file = "LICENSE.md"}
+license = {file = "LICENSE.txt"}
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -27,9 +27,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: System Administrators",
-# The license is prepended by private which makes it a valid trove classifier,
-# it will also prevent uploading to package indices such as PyPI
-    "Private :: License :: ITER License",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Natural Language :: English",
     "Operating System :: POSIX",
     "Operating System :: POSIX :: Linux",
@@ -48,23 +46,30 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+    "imas-python",
+    "netCDF4>=1.4.1",
+    "h5py",
     "numpy>=1.15.4",
     "importlib_resources",
+    "rich",
     "packaging",
+    "junit2html"
 ]
 
 [project.optional-dependencies]
 # these self-dependencies are available since pip 21.2
 all = [
-    "ids-validator[docs,test,linting]"
+    "imas-validator[docs,test,linting,benchmark]"
 ]
 docs = [
+    "imas-python",
     "sphinx>=6.0.0,<7.0.0",
     "sphinx-autosummary-accessors>=0.1.2",
-    "sphinx_immaterial",
+    "sphinx_immaterial>=0.11.0,<0.12",
     "recommonmark>=0.6",
 ]
 test = [
+    "imas-python",
     "pytest>=5.4.1",
     "pytest-cov>=0.6",
     "pytest-xdist",
@@ -76,36 +81,36 @@ linting = [
     "mypy",
     "isort",
 ]
+benchmark = [
+    "asv==0.6.1",
+    "virtualenv",
+]
 
 [project.scripts]
-ids_validator = "ids_validator.cli.ids_validator_cli:execute_cli"
+imas_validator = "imas_validator.cli.imas_validator_cli:execute_cli"
 
 [project.urls]
-homepage = "https://git.iter.org/projects/IMEX/repos/ids-validator"
+homepage = "https://github.com/iterorganization/IMAS-Validator"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["ids_validator*"]
+include = ["imas_validator*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--strict-markers"
 testpaths = "tests"
 
-[tool.versioneer]
-VCS = "git"
-style = "pep440"
-versionfile_source = "ids_validator/_version.py"
-versionfile_build = "ids_validator/_version.py"
-tag_prefix = ""
-parentdir_prefix = ""
+[tool.setuptools_scm]
+write_to = "imas_validator/_version.py"
+local_scheme = "no-local-version"
 
 [tool.black]
-# Exclude versioneer-generated file
-force-exclude = "ids_validator/_version.py"
+# Exclude setuptools_scm generated file
+force-exclude = "imas_validator/_version.py"
 
 [tool.mypy]
-packages = "ids_validator"
+packages = "imas_validator"
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_untyped_decorators = true
@@ -113,16 +118,18 @@ disallow_untyped_decorators = true
 [[tool.mypy.overrides]]
 module = [
     "tests.*",
-    "ids_validator.assets.rulesets.*",
+    "imas_validator.assets.*",
 ]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = [
-    "imaspy.*",
+    "imas.*",
     "numpy.*",
+    "rich.*",
 ]
 ignore_missing_imports = true
 
 [tool.isort]
 profile = "black"
+skip = ["imas_validator/_version.py"]

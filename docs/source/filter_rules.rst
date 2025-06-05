@@ -45,4 +45,4 @@ Examples
 
     rule_filter = RuleFilter(name = ['temperature'], ids = ['equilibrium'])
 
-.. seealso:: API documentation for :py:class:`~ids_validator.validate_options.RuleFilter`.
+.. seealso:: API documentation for :py:class:`~imas_validator.validate_options.RuleFilter`.

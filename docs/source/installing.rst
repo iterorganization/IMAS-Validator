@@ -1,101 +1,43 @@
 .. _`installing`:
 
-Installing the IMAS IDS validator
-=================================
+Installing the IMAS-Validator
+=============================
 
-SDCC setup
-----------
+To get started, you can install it from `pypi.org <https://pypi.org/project/imas-validator>`_:
 
-.. note::
-  A module will become available on SDCC after the first release of IDS validator.
-  Use the following instructions to work with the latest development version.
+.. code-block:: bash
 
-.. 
-  Update SDCC setup on first release
-
-* Setup a project folder and clone git repository
-
-  .. code-block:: bash
-
-    mkdir projects
-    cd projects
-    git clone ssh://git@git.iter.org/imex/ids-validator.git
-    cd ids-validator
-
-* Setup a python virtual environment and install python dependencies
-
-  .. code-block:: bash
-
-    # load IMAS and IMASPy before install
-    module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
-    python3 -m venv ./venv
-    . venv/bin/activate
-    pip install --upgrade pip
-    pip install --upgrade wheel setuptools
-    # For development an installation in editable mode may be more convenient
-    pip install -e .[all]
-
-* Load IMAS and IMASPy
-
-  .. code-block:: bash
-
-    # Load modules every time you use ids_validator
-    module load IMAS/3.40.1-5.1.0-intel-2020b IMASPy
-    # And activate the Python virtual environment
-    . venv/bin/activate
-
-* Test the installation
-
-  .. code-block:: bash
-
-    python3 -c "import ids_validator; print(ids_validator.__version__)"
-    pytest
+    pip install imas-validator
 
 
-Ubuntu installation
--------------------
+Local installation from sources
+-------------------------------
 
-* Install system packages
+We recommend using a :external:py:mod:`venv`. Then, clone the IMAS-Validator repository
+and run `pip install`:
 
-  .. code-block:: bash
-
-    sudo apt update
-    sudo apt install build-essential git-all python3-dev python-is-python3 \
-      python3 python3-venv python3-pip python3-setuptools
-
-* Setup a project folder and clone git repository
-
-  .. code-block:: bash
-
-    mkdir projects
-    cd projects
-    git clone ssh://git@git.iter.org/imex/ids-validator.git
-    cd ids-validator
-
-* Setup a python virtual environment and install python dependencies
-
-  .. code-block:: bash
+.. code-block:: bash
 
     python3 -m venv ./venv
     . venv/bin/activate
+    
+    git clone git@github.com:iterorganization/IMAS-Validator.git
+    cd IMAS-Validator
     pip install --upgrade pip
     pip install --upgrade wheel setuptools
-    # For development an installation in editable mode may be more convenient
     pip install .[all]
 
-* Install IMASPy.
 
-  Follow the instructions from `IMASPy installation docs <https://git.iter.org/projects/IMAS/repos/imaspy/browse/docs/source/installing.rst>`_
-
-* Test the installation
+* To test the installation
 
   .. code-block:: bash
 
-    python3 -c "import ids_validator; print(ids_validator.__version__)"
-    pytest
+    python -c "import imas_validator; print(imas_validator.__version__)"
+    python -m pytest
 
-* To build the ids-validator documentation, execute:
+* To build the IMAS-Validator documentation, execute:
 
   .. code-block:: bash
 
     make -C docs html
+

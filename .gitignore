@@ -5,6 +5,7 @@ __pycache__/
 
 # Distribution / packaging
 *.egg-info/
+imas_validator/_version.py
 
 # Unit test / coverage reports
 .cache
@@ -16,3 +17,8 @@ venv
 build
 junit.xml
 .idea/
+.asv
+
+imas-validator-course
+imas-validator-training-rulesets
+validate_reports

@@ -1,7 +1,7 @@
 import unittest.mock
 from textwrap import dedent
 
-from ids_validator.rules.ast_rewrite import rewrite_assert
+from imas_validator.rules.ast_rewrite import rewrite_assert
 
 
 class WrapperClass:

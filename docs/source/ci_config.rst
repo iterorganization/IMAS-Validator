@@ -3,41 +3,36 @@
 CI configuration
 ================
 
-IDS-validator uses `ITER Bamboo <https://ci.iter.org/>`_ for CI. This page provides an overview
-of the CI Plan and deployment projects.
+IMAS-Validator uses `GitHub Actions <https://github.com/features/actions>`_ for CI. This page provides an overview
+of the CI Plan and deployment processes. 
+
 
 CI Plan
 -------
 
-The `IDS-validator CI plan <https://ci.iter.org/browse/IC-PYM>`_ consists of 3 types of jobs:
+The CI plan consists of 3 types of workflows:
 
-Linting 
-    Run ``black``, ``flake8``, ``mypy`` and ``isort`` on the IDS-validator code base.
+* Linting 
+    Runs ``black``, ``flake8``, ``mypy`` and ``isort`` on the IMAS-Validator code base.
     See :ref:`code style and linting`.
+    This workflow is defined in `.github/workflows/linting.yml <https://github.com/iterorganization/IMAS-Validator/blob/develop/.github/workflows/linting.yml>`_.
 
-    The CI script executed in this job is ``ci/linting.sh``.
+* Testing
+    This runs all unit tests with pytest, for various versions of Python.
+    This workflow is defined in `.github/workflows/test_with_pytest.yml <https://github.com/iterorganization/IMAS-Validator/blob/develop/.github/workflows/test_with_pytest.yml>`_.
 
-Testing
-    This runs all unit tests with pytest.
-
-    The CI script executed in this job is ``ci/run_pytest.sh``, which expects the
-    modules it needs to load as arguments.
-
-Build docs
-    This job builds the Sphinx documentation.
-
-    The CI script executed in this job is: ``ci/build_docs_and_dist.sh``, which expects the
-    modules it needs to load as arguments.
+* Build docs
+    This job checks that the Sphinx documentation builds correctly.
+    This workflow is defined in `.github/workflows/verify_sphinx_doc.yml <https://github.com/iterorganization/IMAS-Validator/blob/develop/.github/workflows/verify_sphinx_doc.yml>`_.
 
 
-Deployment projects
--------------------
+Deployment
+----------
 
-There is currently one Bamboo deployment project for IDS-validator:
+* PyPI
+  
+New tagged releases are automatically build and distribution packages are uploaded on `PyPI <https://pypi.org/project/imas-validator/>`_. This workflow is defined in `.github/workflows/publish_pypi.yml <https://github.com/iterorganization/IMAS-Validator/blob/develop/.github/workflows/publish_pypi.yml>`_.
 
-`Deploy IDS-Validator-Doc <https://ci.iter.org/deploy/viewDeploymentProjectEnvironments.action?id=1908899843>`_
-    Deploy the documentation created in the `Build docs` job to `Sharepoint
-    <https://sharepoint.iter.org/departments/POP/CM/IMDesign/Code%20Documentation/IDS-Validator/index.html#>`_.
+* ReadTheDocs
 
-    This deployment project runs for after each successful CI build of the IDS-validator main
-    branch.
+Each new updates on the ``develop`` and ``main`` branches are deployed automatically on ReadTheDocs, respectively in the `latest <https://imas-validator.readthedocs.io/en/latest/#>`_ and `stable <https://imas-validator.readthedocs.io/en/stable/#>`_ versions. 

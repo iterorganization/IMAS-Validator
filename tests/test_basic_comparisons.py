@@ -1,8 +1,8 @@
-import imaspy
+import imas  # type: ignore
 import numpy
 import pytest
 
-from ids_validator.validate.ids_wrapper import IDSWrapper
+from imas_validator.validate.ids_wrapper import IDSWrapper
 
 
 def check_test_result(test, expected):
@@ -215,7 +215,15 @@ def test_validate_flt_3d(test_data_waves):
 
 
 def test_bool_non_numpy_array():
-    cp = imaspy.IDSFactory().core_profiles()
+    cp = imas.IDSFactory().core_profiles()
     cp.time = [1, 2, 3]
     wrapper = IDSWrapper(cp)
     assert bool(wrapper.time) is True
+
+
+def test_transfer_ids_nodes_between_arrays():
+    wrapper = IDSWrapper([1, 2, 3], ids_nodes=["a"])
+    index = IDSWrapper(0, ids_nodes=["b"])
+    assert wrapper[0]._ids_nodes == ["a"]
+    assert wrapper[index]._ids_nodes == ["a", "b"]
+    assert not isinstance([1, 2, 3][index], IDSWrapper)
