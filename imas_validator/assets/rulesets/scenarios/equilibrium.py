@@ -61,9 +61,7 @@ def validate_cocos(ids):
             except Exception:
                 cocos = None
 
-            assert (
-                IDS_COCOS == cocos
-            ), (
+            assert IDS_COCOS == cocos, (
                 f"COCOS mismatch for time_slice {itime}, profiles_2d {i1}, "
                 f"Expected/Computed: {IDS_COCOS}/{cocos}"
             )
