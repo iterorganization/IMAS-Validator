@@ -28,7 +28,9 @@ def validate_mandatory_values(ids):
 
 @validator("equilibrium")
 def validate_cocos(ids):
-    """Validate that fields are provided and computed COCOS agrees with the one in DD."""
+    """
+    Validate that COCOS computed corresponds to the one in DD.
+    """
     from idstools.cocos import IDS_COCOS, compute_COCOS
 
     # time_slice[:]
@@ -53,11 +55,15 @@ def validate_cocos(ids):
 
             # Compute COCOS
             try:
-                # ids._obj instead of ids since '&' operator is not supported yet.
+                # ids._obj instead of ids since '&' operator not supported
+                # yet in IMAS-Validator
                 cocos = compute_COCOS(ids._obj, itime, i1)["COCOS"]
-            except Exception as e:
+            except Exception:
                 cocos = None
 
             assert (
                 IDS_COCOS == cocos
-            ), f"COCOS mismatch for time_slice {itime}, profiles_2d {i1}, Expected/Computed: {IDS_COCOS}/{cocos}"
+            ), (
+                f"COCOS mismatch for time_slice {itime}, profiles_2d {i1}, "
+                f"Expected/Computed: {IDS_COCOS}/{cocos}"
+            )
