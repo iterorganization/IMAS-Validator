@@ -18,10 +18,12 @@ class COCOS:
     """
     COCOS module in Python.
 
-    This module provides functionality related to coordinate conventions in tokamak physics.
+    This module provides functionality related to coordinate conventions
+    in tokamak physics.
 
     References:
-        O. Sauter and S. Yu. Medvedev, "Tokamak Coordinate Conventions: COCOS",Comput. Physics Commun 84 (2013), 293.
+        O. Sauter and S. Yu. Medvedev, "Tokamak Coordinate Conventions: COCOS",
+          Comput. Physics Commun 84 (2013), 293.
         `cocos_module.f90 (CHEASE)`.
 
     Attributes
@@ -294,9 +296,10 @@ class COCOS:
             c_v_o["sigma_rhothetaphi"] * c_v_i["sigma_rhothetaphi"]
         )
         #
-        # Note that sign(sigma_RphiZ*sigma_rhothetaphi) gives theta in clockwise or counter-clockwise respectively
-        # Thus sigma_RphiZ_eff*sigma_rhothetaphi_eff negative if the direction of
-        # theta has changed from cocos_in to _out
+        # Note that sign(sigma_RphiZ*sigma_rhothetaphi) gives theta in
+        # clockwise or counter-clockwise respectively.
+        # Thus sigma_RphiZ_eff*sigma_rhothetaphi_eff negative if the direction
+        # of theta has changed from cocos_in to _out
         #
         fact_psi = sigma_ip_eff * sigma_bp_eff * (2.0 * np.pi) ** exp_bp_eff
         fact_dpsi = sigma_ip_eff * sigma_bp_eff / (2.0 * np.pi) ** exp_bp_eff
