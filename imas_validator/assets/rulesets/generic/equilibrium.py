@@ -1,5 +1,7 @@
 """Generic rules applying to the equilibrium IDS"""
+
 from imas_validator.common.cocos import IDS_COCOS, compute_COCOS
+
 
 @validator("equilibrium")
 def validate_cocos(ids):
