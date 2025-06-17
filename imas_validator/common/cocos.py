@@ -1,11 +1,12 @@
+""" IMAS_COCOS module in Python """
+
 import logging
 import traceback
+from typing import Optional
 
-try:
-    import imaspy as imas
-except ImportError:
-    import imas
+import imas
 import numpy as np
+from imas.ids_toplevel import IDSToplevel
 
 # set cocos in the DD version from the environment
 IDS_COCOS = int(imas.dd_zip.dd_etree().find("cocos").text)
@@ -14,49 +15,76 @@ IDS_COCOS = int(imas.dd_zip.dd_etree().find("cocos").text)
 logger = logging.getLogger(f"module.{__name__}")
 
 
-class COCOS:
+class IMAS_COCOS:
     """
     COCOS module in Python.
 
-    This module provides functionality related to coordinate conventions in tokamak physics.
+    This module provides functionality related to coordinate conventions
+    in tokamak physics.
 
-    References:
-        O. Sauter and S. Yu. Medvedev, "Tokamak Coordinate Conventions: COCOS",Comput. Physics Commun 84 (2013), 293.
-        `cocos_module.f90 (CHEASE)`.
+    References
+    ----------
+    [1] O. Sauter and S. Yu. Medvedev, Comput. Physics Commun 84 (2013), 293.
+    [2] `cocos_module.f90 (CHEASE)`.
 
     Attributes
     ----------
-    COCOS: int
-    sigma_Ip: int
-    sigma_B0: int
-    exp_Bp: int
-    sigma_Bp: int
-    sigma_RphiZ: int
-    sigma_rhothetaphi: int
-    sign_q_pos: int
-    sign_pprime_pos: int
-    theta_sign_clockwise: int
+    COCOS : int
+        Coordinate convention identifier.
+    sigma_Ip : int
+        Sign of plasma current.
+    sigma_B0 : int
+        Sign of vacuum toroidal magnetic field.
+    exp_Bp : int
+        Power of 2*pi
+    sigma_Bp : int
+        Sign of poloidal magnetic field.
+    sigma_RphiZ : int
+        Sign convention for R-phi-Z coordinates.
+    sigma_rhothetaphi : int
+        Sign convention for rho-theta-phi coordinates.
+    sign_q_pos : int
+        Sign of safety factor (q).
+    sign_pprime_pos : int
+        Sign of pressure gradient.
+    theta_sign_clockwise : int
+        Indicates if theta is clockwise.
     """
 
-    def __init__(self, index=None, values=None):
+    # Initial values
+    COCOS: int = 0
+    sigma_ip_eff: float = 0.0
+    sigma_b0_eff: float = 0.0
+    sigma_bp_eff: float = 0.0
+    sigma_rhothetaphi_eff: float = 0.0
+    sigma_rphi_z_eff: float = 0.0
+    exp_bp_eff: float = 0.0
+    fact_psi: float = 0.0
+    fact_q: float = 0.0
+    fact_dpsi: float = 0.0
+    fact_dtheta: float = 0.0
+
+    def __init__(
+        self, index: Optional[dict] = None, values: Optional[dict] = None
+    ) -> None:
         """
         Initialize COCOS index using values, or values using COCOS index
 
         Parameters
         ----------
-        index: dict=None
+        index: dict={}
             COCOS index with signs of Ip and B0, e.g. index={"COCOS": 11}
-        values: dict=None
+        values: dict={}
             COCOS values
         """
 
         if (index is None) and (values is None):
-            raise ValueError("Initialize COCOS with either index or values: both not given")
-            return
+            raise ValueError(
+                "Initialize COCOS with either index or values: both not given"
+            )
 
         elif (index is not None) and (values is not None):
             raise ValueError("Initialize COCOS with either index or values: both given")
-            return
 
         # in case of init. by index
         elif index is not None:
@@ -95,7 +123,6 @@ class COCOS:
             else:
                 # Should not be here since all cases defined
                 raise ValueError(f"error: COCOS = {COCOS} does not exist")
-                return
 
             (
                 sigma_bp,
@@ -127,7 +154,7 @@ class COCOS:
             self.theta_sign_clockwise = theta_sign_clockwise
 
         # in case of init. by values
-        else:
+        elif values is not None:
 
             sigma_ip = values["ipsign"]
             sigma_b0 = values["b0sign"]
@@ -177,7 +204,6 @@ class COCOS:
             else:
                 # Should not be here since all cases defined
                 raise ValueError(f"error: COCOS Values not match {val}")
-                return
 
             theta_sign_clockwise = sigma_rphi_z * sigma_rhothetaphi
 
@@ -192,7 +218,7 @@ class COCOS:
             self.sign_pprime_pos = sign_pprime_pos
             self.theta_sign_clockwise = theta_sign_clockwise
 
-    def get(self):
+    def get(self) -> dict:
         """
         Return COCOS index and values
 
@@ -216,7 +242,15 @@ class COCOS:
         }
 
     @classmethod
-    def values_coefficients(self, COCOS_in, COCOS_out, ip_in, b0_in, ipsign_out, b0sign_out):
+    def values_coefficients(
+        cls,
+        COCOS_in: int,
+        COCOS_out: int,
+        ip_in: float,
+        b0_in: float,
+        ipsign_out: int,
+        b0sign_out: int,
+    ) -> dict:
         """
         Provide transformation values for a set of quantities for a given pair
         of input/output COCOS numbers
@@ -259,8 +293,12 @@ class COCOS:
         sigma_b0_in = np.sign(b0_in)
 
         # Get COCOS related parameters
-        c_v_i = COCOS(index={"COCOS": COCOS_in, "ipsign": sigma_ip_in, "b0sign": sigma_b0_in}).get()
-        c_v_o = COCOS(index={"COCOS": COCOS_out, "ipsign": ipsign_out, "b0sign": b0sign_out}).get()
+        c_v_i = IMAS_COCOS(
+            index={"COCOS": COCOS_in, "ipsign": sigma_ip_in, "b0sign": sigma_b0_in}
+        ).get()
+        c_v_o = IMAS_COCOS(
+            index={"COCOS": COCOS_out, "ipsign": ipsign_out, "b0sign": b0sign_out}
+        ).get()
 
         # Define effective variables: sigma_Ip_eff, si1gma_B0_eff, sigma_Bp_eff,
         # exp_Bp_eff as in Appendix C
@@ -282,43 +320,46 @@ class COCOS:
 
         sigma_bp_eff = float(c_v_o["sigma_Bp"] * c_v_i["sigma_Bp"])
         exp_bp_eff = float(c_v_o["exp_Bp"] - c_v_i["exp_Bp"])
-        sigma_rhothetaphi_eff = float(c_v_o["sigma_rhothetaphi"] * c_v_i["sigma_rhothetaphi"])
+        sigma_rhothetaphi_eff = float(
+            c_v_o["sigma_rhothetaphi"] * c_v_i["sigma_rhothetaphi"]
+        )
         #
-        # Note that sign(sigma_RphiZ*sigma_rhothetaphi) gives theta in clockwise or counter-clockwise respectively
-        # Thus sigma_RphiZ_eff*sigma_rhothetaphi_eff negative if the direction of
-        # theta has changed from cocos_in to _out
+        # Note that sign(sigma_RphiZ*sigma_rhothetaphi) gives theta in
+        # clockwise or counter-clockwise respectively.
+        # Thus sigma_RphiZ_eff*sigma_rhothetaphi_eff negative if the direction
+        # of theta has changed from cocos_in to _out
         #
         fact_psi = sigma_ip_eff * sigma_bp_eff * (2.0 * np.pi) ** exp_bp_eff
         fact_dpsi = sigma_ip_eff * sigma_bp_eff / (2.0 * np.pi) ** exp_bp_eff
         fact_q = sigma_ip_eff * sigma_b0_eff * sigma_rhothetaphi_eff
         fact_dtheta = sigma_rphi_z_eff * sigma_rhothetaphi_eff
 
-        self.sigma_ip_eff = sigma_ip_eff
-        self.sigma_b0_eff = sigma_b0_eff
-        self.sigma_bp_eff = sigma_bp_eff
-        self.sigma_rhothetaphi_eff = sigma_rhothetaphi_eff
-        self.sigma_rphi_z_eff = sigma_rphi_z_eff
-        self.exp_bp_eff = exp_bp_eff
-        self.fact_psi = fact_psi
-        self.fact_q = fact_q
-        self.fact_dpsi = fact_dpsi
-        self.fact_dtheta = fact_dtheta
+        cls.sigma_ip_eff = sigma_ip_eff
+        cls.sigma_b0_eff = sigma_b0_eff
+        cls.sigma_bp_eff = sigma_bp_eff
+        cls.sigma_rhothetaphi_eff = sigma_rhothetaphi_eff
+        cls.sigma_rphi_z_eff = sigma_rphi_z_eff
+        cls.exp_bp_eff = exp_bp_eff
+        cls.fact_psi = fact_psi
+        cls.fact_q = fact_q
+        cls.fact_dpsi = fact_dpsi
+        cls.fact_dtheta = fact_dtheta
 
         return {
-            "sigma_Ip_eff": self.sigma_ip_eff,
-            "sigma_B0_eff": self.sigma_b0_eff,
-            "sigma_Bp_eff": self.sigma_bp_eff,
-            "sigma_rhothetaphi_eff": self.sigma_rhothetaphi_eff,
-            "sigma_RphiZ_eff": self.sigma_rphi_z_eff,
-            "exp_Bp_eff": self.exp_bp_eff,
-            "fact_psi": self.fact_psi,
-            "fact_q": self.fact_q,
-            "fact_dpsi": self.fact_dpsi,
-            "fact_dtheta": self.fact_dtheta,
+            "sigma_Ip_eff": cls.sigma_ip_eff,
+            "sigma_B0_eff": cls.sigma_b0_eff,
+            "sigma_Bp_eff": cls.sigma_bp_eff,
+            "sigma_rhothetaphi_eff": cls.sigma_rhothetaphi_eff,
+            "sigma_RphiZ_eff": cls.sigma_rphi_z_eff,
+            "exp_Bp_eff": cls.exp_bp_eff,
+            "fact_psi": cls.fact_psi,
+            "fact_q": cls.fact_q,
+            "fact_dpsi": cls.fact_dpsi,
+            "fact_dtheta": cls.fact_dtheta,
         }
 
 
-def compute_COCOS(ids, itime=None, i1=0):
+def compute_COCOS(ids: IDSToplevel, itime: Optional[int] = None, i1: int = 0) -> dict:
     """Compute COCOS values using experimental data in IDS/equilibrium
 
     Parameters
@@ -332,7 +373,7 @@ def compute_COCOS(ids, itime=None, i1=0):
 
     Returns
     -------
-    cocos: COCOS
+    cocos: dict
     """
 
     # COCOS Values in the middle of time sequence
@@ -344,7 +385,10 @@ def compute_COCOS(ids, itime=None, i1=0):
     b0sign = np.sign(ids.vacuum_toroidal_field.b0[itime])
 
     # 1 Eq.(22)
-    dpsi = ids.time_slice[itime].profiles_1d.psi[-1] - ids.time_slice[itime].profiles_1d.psi[0]
+    dpsi = (
+        ids.time_slice[itime].profiles_1d.psi[-1]
+        - ids.time_slice[itime].profiles_1d.psi[0]
+    )
     sigma_bp = np.sign(dpsi) * ipsign
 
     # 2 Eq.(22)
@@ -388,7 +432,9 @@ def compute_COCOS(ids, itime=None, i1=0):
     w = np.where(np.isclose(cols, iz, rtol=0.1))
 
     twopi_exp_bp_sigma_rphi_z = np.zeros(bz.shape)
-    twopi_exp_bp_sigma_rphi_z = -sigma_bp * dpsi2drdr[rows[w], cols[w]] / bz[rows[w], cols[w]]
+    twopi_exp_bp_sigma_rphi_z = (
+        -sigma_bp * dpsi2drdr[rows[w], cols[w]] / bz[rows[w], cols[w]]
+    )
     sigma_rphi_z = np.sign(np.sum(np.sign(twopi_exp_bp_sigma_rphi_z)))
 
     # 6 exp_Bp from Eq.(19)
@@ -407,12 +453,14 @@ def compute_COCOS(ids, itime=None, i1=0):
         "sign_pprime_pos": int(sign_pprime_pos),
     }
 
-    cocos = COCOS(values=values).get()
+    cocos = IMAS_COCOS(values=values).get()
 
     return cocos
 
 
-def ids_compute_cocos(ids, itime=None, i1=0):
+def ids_compute_cocos(
+    ids: IDSToplevel, itime: Optional[int] = None, i1: int = 0
+) -> int:
     """Function Interface for computing COCOS
 
     Parameters
