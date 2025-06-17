@@ -36,7 +36,7 @@ class COCOS:
     theta_sign_clockwise: int
     """
 
-    def __init__(self, index=None, values=None):
+    def __init__(self, index: dict = None, values: dict = None) -> None:
         """
         Initialize COCOS index using values, or values using COCOS index
 
@@ -192,7 +192,7 @@ class COCOS:
             self.sign_pprime_pos = sign_pprime_pos
             self.theta_sign_clockwise = theta_sign_clockwise
 
-    def get(self):
+    def get(self) -> dict:
         """
         Return COCOS index and values
 
@@ -217,8 +217,14 @@ class COCOS:
 
     @classmethod
     def values_coefficients(
-        self, COCOS_in, COCOS_out, ip_in, b0_in, ipsign_out, b0sign_out
-    ):
+        self,
+        COCOS_in: int,
+        COCOS_out: int,
+        ip_in: float,
+        b0_in: float,
+        ipsign_out: int,
+        b0sign_out: int,
+    ) -> dict:
         """
         Provide transformation values for a set of quantities for a given pair
         of input/output COCOS numbers
@@ -327,7 +333,7 @@ class COCOS:
         }
 
 
-def compute_COCOS(ids, itime=None, i1=0):
+def compute_COCOS(ids, itime: int = None, i1: int = 0) -> dict:
     """Compute COCOS values using experimental data in IDS/equilibrium
 
     Parameters
@@ -341,7 +347,7 @@ def compute_COCOS(ids, itime=None, i1=0):
 
     Returns
     -------
-    cocos: COCOS
+    cocos: dict
     """
 
     # COCOS Values in the middle of time sequence
@@ -426,7 +432,7 @@ def compute_COCOS(ids, itime=None, i1=0):
     return cocos
 
 
-def ids_compute_cocos(ids, itime=None, i1=0):
+def ids_compute_cocos(ids, itime: int = None, i1: int = 0) -> int:
     """Function Interface for computing COCOS
 
     Parameters
