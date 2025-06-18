@@ -3,8 +3,9 @@
 import logging
 import traceback
 from typing import Optional
-import numpy as np
+
 import imas
+import numpy as np
 from imas.ids_toplevel import IDSToplevel
 
 # set cocos in the DD version from the environment
