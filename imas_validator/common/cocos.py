@@ -1,7 +1,11 @@
+""" COCOS module in Python """
+
 import logging
 import traceback
+from typing import Optional
 import numpy as np
 import imas
+from imas.ids_toplevel import IDSToplevel
 
 # set cocos in the DD version from the environment
 IDS_COCOS = int(imas.dd_zip.dd_etree().find("cocos").text)
@@ -36,15 +40,30 @@ class COCOS:
     theta_sign_clockwise: int
     """
 
-    def __init__(self, index: dict = None, values: dict = None) -> None:
+    # Initial values
+    COCOS: int = 0
+    sigma_ip_eff: float = 0.0
+    sigma_b0_eff: float = 0.0
+    sigma_bp_eff: float = 0.0
+    sigma_rhothetaphi_eff: float = 0.0
+    sigma_rphi_z_eff: float = 0.0
+    exp_bp_eff: float = 0.0
+    fact_psi: float = 0.0
+    fact_q: float = 0.0
+    fact_dpsi: float = 0.0
+    fact_dtheta: float = 0.0
+
+    def __init__(
+        self, index: Optional[dict] = None, values: Optional[dict] = None
+    ) -> None:
         """
         Initialize COCOS index using values, or values using COCOS index
 
         Parameters
         ----------
-        index: dict=None
+        index: dict={}
             COCOS index with signs of Ip and B0, e.g. index={"COCOS": 11}
-        values: dict=None
+        values: dict={}
             COCOS values
         """
 
@@ -52,11 +71,9 @@ class COCOS:
             raise ValueError(
                 "Initialize COCOS with either index or values: both not given"
             )
-            return
 
         elif (index is not None) and (values is not None):
             raise ValueError("Initialize COCOS with either index or values: both given")
-            return
 
         # in case of init. by index
         elif index is not None:
@@ -95,7 +112,6 @@ class COCOS:
             else:
                 # Should not be here since all cases defined
                 raise ValueError(f"error: COCOS = {COCOS} does not exist")
-                return
 
             (
                 sigma_bp,
@@ -127,7 +143,7 @@ class COCOS:
             self.theta_sign_clockwise = theta_sign_clockwise
 
         # in case of init. by values
-        else:
+        elif values is not None:
 
             sigma_ip = values["ipsign"]
             sigma_b0 = values["b0sign"]
@@ -177,7 +193,6 @@ class COCOS:
             else:
                 # Should not be here since all cases defined
                 raise ValueError(f"error: COCOS Values not match {val}")
-                return
 
             theta_sign_clockwise = sigma_rphi_z * sigma_rhothetaphi
 
@@ -217,7 +232,7 @@ class COCOS:
 
     @classmethod
     def values_coefficients(
-        self,
+        cls,
         COCOS_in: int,
         COCOS_out: int,
         ip_in: float,
@@ -308,32 +323,32 @@ class COCOS:
         fact_q = sigma_ip_eff * sigma_b0_eff * sigma_rhothetaphi_eff
         fact_dtheta = sigma_rphi_z_eff * sigma_rhothetaphi_eff
 
-        self.sigma_ip_eff = sigma_ip_eff
-        self.sigma_b0_eff = sigma_b0_eff
-        self.sigma_bp_eff = sigma_bp_eff
-        self.sigma_rhothetaphi_eff = sigma_rhothetaphi_eff
-        self.sigma_rphi_z_eff = sigma_rphi_z_eff
-        self.exp_bp_eff = exp_bp_eff
-        self.fact_psi = fact_psi
-        self.fact_q = fact_q
-        self.fact_dpsi = fact_dpsi
-        self.fact_dtheta = fact_dtheta
+        cls.sigma_ip_eff = sigma_ip_eff
+        cls.sigma_b0_eff = sigma_b0_eff
+        cls.sigma_bp_eff = sigma_bp_eff
+        cls.sigma_rhothetaphi_eff = sigma_rhothetaphi_eff
+        cls.sigma_rphi_z_eff = sigma_rphi_z_eff
+        cls.exp_bp_eff = exp_bp_eff
+        cls.fact_psi = fact_psi
+        cls.fact_q = fact_q
+        cls.fact_dpsi = fact_dpsi
+        cls.fact_dtheta = fact_dtheta
 
         return {
-            "sigma_Ip_eff": self.sigma_ip_eff,
-            "sigma_B0_eff": self.sigma_b0_eff,
-            "sigma_Bp_eff": self.sigma_bp_eff,
-            "sigma_rhothetaphi_eff": self.sigma_rhothetaphi_eff,
-            "sigma_RphiZ_eff": self.sigma_rphi_z_eff,
-            "exp_Bp_eff": self.exp_bp_eff,
-            "fact_psi": self.fact_psi,
-            "fact_q": self.fact_q,
-            "fact_dpsi": self.fact_dpsi,
-            "fact_dtheta": self.fact_dtheta,
+            "sigma_Ip_eff": cls.sigma_ip_eff,
+            "sigma_B0_eff": cls.sigma_b0_eff,
+            "sigma_Bp_eff": cls.sigma_bp_eff,
+            "sigma_rhothetaphi_eff": cls.sigma_rhothetaphi_eff,
+            "sigma_RphiZ_eff": cls.sigma_rphi_z_eff,
+            "exp_Bp_eff": cls.exp_bp_eff,
+            "fact_psi": cls.fact_psi,
+            "fact_q": cls.fact_q,
+            "fact_dpsi": cls.fact_dpsi,
+            "fact_dtheta": cls.fact_dtheta,
         }
 
 
-def compute_COCOS(ids, itime: int = None, i1: int = 0) -> dict:
+def compute_COCOS(ids: IDSToplevel, itime: Optional[int] = None, i1: int = 0) -> dict:
     """Compute COCOS values using experimental data in IDS/equilibrium
 
     Parameters
@@ -432,7 +447,9 @@ def compute_COCOS(ids, itime: int = None, i1: int = 0) -> dict:
     return cocos
 
 
-def ids_compute_cocos(ids, itime: int = None, i1: int = 0) -> int:
+def ids_compute_cocos(
+    ids: IDSToplevel, itime: Optional[int] = None, i1: int = 0
+) -> int:
     """Function Interface for computing COCOS
 
     Parameters
