@@ -11,7 +11,7 @@ def validate_cocos(ids):
     Validate that COCOS computed corresponds to the one in DD.
     """
 
-    ver = ids.ids_properties.version_put.data_dictionary.value[0]
+    ver = str(ids.ids_properties.version_put.data_dictionary.value)[0]
     ref = dd_cocos[ver]
 
     # time_slice[:]
