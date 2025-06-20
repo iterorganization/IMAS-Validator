@@ -1,4 +1,4 @@
-""" COCOS module in Python """
+""" IMAS_COCOS module in Python """
 
 import logging
 import traceback
@@ -15,7 +15,7 @@ IDS_COCOS = int(imas.dd_zip.dd_etree().find("cocos").text)
 logger = logging.getLogger(f"module.{__name__}")
 
 
-class COCOS:
+class IMAS_COCOS:
     """
     COCOS module in Python.
 
@@ -453,7 +453,7 @@ def compute_COCOS(ids: IDSToplevel, itime: Optional[int] = None, i1: int = 0) ->
         "sign_pprime_pos": int(sign_pprime_pos),
     }
 
-    cocos = COCOS(values=values).get()
+    cocos = IMAS_COCOS(values=values).get()
 
     return cocos
 
