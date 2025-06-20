@@ -36,7 +36,7 @@ class COCOS:
     sigma_B0 : int
         Sign of vacuum toroidal magnetic field.
     exp_Bp : int
-        Power of 2*pi 
+        Power of 2*pi
     sigma_Bp : int
         Sign of poloidal magnetic field.
     sigma_RphiZ : int
