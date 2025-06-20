@@ -293,10 +293,10 @@ class IMAS_COCOS:
         sigma_b0_in = np.sign(b0_in)
 
         # Get COCOS related parameters
-        c_v_i = COCOS(
+        c_v_i = IMAS_COCOS(
             index={"COCOS": COCOS_in, "ipsign": sigma_ip_in, "b0sign": sigma_b0_in}
         ).get()
-        c_v_o = COCOS(
+        c_v_o = IMAS_COCOS(
             index={"COCOS": COCOS_out, "ipsign": ipsign_out, "b0sign": b0sign_out}
         ).get()
 
