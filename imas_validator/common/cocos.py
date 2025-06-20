@@ -22,23 +22,33 @@ class COCOS:
     This module provides functionality related to coordinate conventions
     in tokamak physics.
 
-    References:
+    References
     [1] O. Sauter and S. Yu. Medvedev, "Tokamak Coordinate Conventions: COCOS",
         Comput. Physics Commun 84 (2013), 293.
     [2] `cocos_module.f90 (CHEASE)`.
 
     Attributes
     ----------
-    COCOS: int
-    sigma_Ip: int
-    sigma_B0: int
-    exp_Bp: int
-    sigma_Bp: int
-    sigma_RphiZ: int
-    sigma_rhothetaphi: int
-    sign_q_pos: int
-    sign_pprime_pos: int
-    theta_sign_clockwise: int
+    COCOS : int
+        Coordinate convention identifier.
+    sigma_Ip : int
+        Sign of plasma current.
+    sigma_B0 : int
+        Sign of vacuum toroidal magnetic field.
+    exp_Bp : int
+        Power of 2*pi 
+    sigma_Bp : int
+        Sign of poloidal magnetic field.
+    sigma_RphiZ : int
+        Sign convention for R-phi-Z coordinates.
+    sigma_rhothetaphi : int
+        Sign convention for rho-theta-phi coordinates.
+    sign_q_pos : int
+        Sign of safety factor (q).
+    sign_pprime_pos : int
+        Sign of pressure gradient.
+    theta_sign_clockwise : int
+        Indicates if theta is clockwise.
     """
 
     # Initial values
