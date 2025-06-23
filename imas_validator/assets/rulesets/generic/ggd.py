@@ -1,8 +1,8 @@
 """Rules applying to all IDSs containing GGDs"""
 
-from imaspy import identifiers
-from imaspy.ids_data_type import IDSDataType
-from imaspy.ids_defs import IDS_TIME_MODE_HOMOGENEOUS
+from imas import identifiers
+from imas.ids_data_type import IDSDataType
+from imas.ids_defs import IDS_TIME_MODE_HOMOGENEOUS
 
 SUPPORTED_IDS_NAMES = (
     "edge_profiles",
@@ -125,7 +125,6 @@ def get_filled_ggd_arrays(ids):
     vector_arrays = []
     for ggd_aos in ggd_list:
         for ggd in ggd_aos:
-
             recursive_ggd_path_search(
                 ggd,
                 scalar_arrays,
