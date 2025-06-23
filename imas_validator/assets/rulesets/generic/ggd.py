@@ -4,7 +4,7 @@ from imas import identifiers
 from imas.ids_data_type import IDSDataType
 from imas.ids_defs import IDS_TIME_MODE_HOMOGENEOUS
 
-SUPPORTED_IDS_NAMES = (
+SUPPORTED_IDS_NAMES = [
     "edge_profiles",
     "edge_sources",
     "edge_transport",
@@ -12,7 +12,10 @@ SUPPORTED_IDS_NAMES = (
     "radiation",
     "runaway_electrons",
     "wall",
-)
+    "plasma_profiles",
+    "plasma_sources",
+    "plasma_transport",
+]
 
 # TODO: Some IDSs do not have the grid structure in a separate `grid_ggd` object, as
 # described by the GGD guidelines. They are currently not covered by the validations.
