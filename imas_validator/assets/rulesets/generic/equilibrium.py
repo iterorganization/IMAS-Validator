@@ -26,9 +26,8 @@ def validate_sign_DD3(ids):
 
         # Set sign of B0
         if ids.vacuum_toroidal_field.b0.has_value:
-            b0sign = np.sign(
-                np.interp(time, ids.time, ids.vacuum_toroidal_field.b0)
-            )
+            b0 = np.interp(time, ids.time, ids.vacuum_toroidal_field.b0)
+            b0sign = np.sign(b0)
         else:
             b0sign = -9
 
@@ -75,9 +74,8 @@ def validate_sign(ids):
 
         # Set sign of B0
         if ids.vacuum_toroidal_field.b0.has_value:
-            b0sign = np.sign(
-                np.interp(time, ids.time, ids.vacuum_toroidal_field.b0)
-            )
+            b0 = np.interp(time, ids.time, ids.vacuum_toroidal_field.b0)
+            b0sign = np.sign(b0)
         else:
             b0sign = -9
 
