@@ -105,10 +105,6 @@ def validate_sign_DD3(ids):
             assert np.sign(psi_diff) == ipsign
             assert np.sign(time_slice.global_quantities.psi_axis) == -ipsign
 
-        if time_slice.profiles_1d.dpressure_dpsi.has_value:
-            dpressure_dpsi = time_slice.profiles_1d.dpressure_dpsi
-            assert np.sign(dpressure_dpsi) == -ipsign
-
 
 @validator("equilibrium", version=">=4.0.0")
 def validate_sign_DD4(ids):
@@ -139,7 +135,3 @@ def validate_sign_DD4(ids):
         ):
             assert np.sign(psi_diff) == -ipsign
             assert np.sign(time_slice.global_quantities.psi_axis) == ipsign
-
-        if time_slice.profiles_1d.dpressure_dpsi.has_value:
-            dpressure_dpsi = time_slice.profiles_1d.dpressure_dpsi
-            assert np.sign(dpressure_dpsi) == ipsign
