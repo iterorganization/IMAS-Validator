@@ -75,11 +75,18 @@ def validate_sign_common(ids):
             assert np.sign(time_slice.profiles_1d.f) == b0sign
 
 
-@validator("equilibrium", version="<4.0.0")
-def validate_sign_DD3(ids):
+@validator("equilibrium")
+def validate_sign(ids):
     """
     Validate that the equilibrium IDS has consistent sign conventions.
     """
+
+    # Set sigma_Bp for the version of the data dictionary
+    ver = str(ids.ids_properties.version_put.data_dictionary.value)[0]
+    if ver == "3":
+        sigma_Bp = 1
+    else:
+        sigma_Bp = -1
 
     # Get the sign of Ip and B0 for each time slice
     ipsigns, _ = ip_b0_sign(ids)
@@ -102,36 +109,4 @@ def validate_sign_DD3(ids):
             # Avoid non-physical cases where psi_boundary == psi_axis
             and np.absolute(psi_diff) > 1e-6
         ):
-            assert np.sign(psi_diff) == ipsign
-            assert np.sign(time_slice.global_quantities.psi_axis) == -ipsign
-
-
-@validator("equilibrium", version=">=4.0.0")
-def validate_sign_DD4(ids):
-    """
-    Validate that the equilibrium IDS has consistent sign conventions.
-    """
-
-    # Get the sign of Ip and B0 for each time slice
-    ipsigns, _ = ip_b0_sign(ids)
-
-    # Loop through each time slice
-    for itime, time_slice in enumerate(ids.time_slice):
-
-        # Set the sign of Ip and B0 for this time slice
-        ipsign = ipsigns[itime]
-
-        #
-        # Validate the sign conventions for EM fields
-        #
-        psi_axis = time_slice.global_quantities.psi_axis
-        psi_boundary = time_slice.global_quantities.psi_boundary
-        psi_diff = psi_boundary - psi_axis
-        if (
-            psi_axis.has_value
-            and psi_boundary.has_value
-            # Avoid non-physical cases where psi_boundary == psi_axis
-            and np.absolute(psi_diff) > 1e-6
-        ):
-            assert np.sign(psi_diff) == -ipsign
-            assert np.sign(time_slice.global_quantities.psi_axis) == ipsign
+            assert np.sign(psi_diff) == ipsign * sigma_Bp
