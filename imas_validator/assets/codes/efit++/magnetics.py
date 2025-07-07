@@ -30,9 +30,11 @@ def validate_required_fields(ids):
         # machine description
         assert flux_loop.name.has_value
         assert flux_loop.identifier.has_value
-        assert flux_loop.position.r.has_value
-        assert flux_loop.position.z.has_value
-        assert flux_loop.position.phi.has_value
+        # position
+        for position in flux_loop.position:
+            assert position.r.has_value
+            assert position.z.has_value
+            assert position.phi.has_value
         # diagnostic data
         assert flux_loop.flux.data.has_value
         assert flux_loop.flux.data_error_upper.has_value
@@ -40,13 +42,15 @@ def validate_required_fields(ids):
             assert flux_loop.flux.time.has_value
 
     # Plasma current (reconstructed data)
-    assert ids.ip.data.has_value
-    assert ids.ip.data_error_upper.has_value
-    if homogeneous_time == 0:
-        assert ids.ip.time.has_value
+    for ip in ids.ip:
+        assert ip.data.has_value
+        assert ip.data_error_upper.has_value
+        if homogeneous_time == 0:
+            assert ip.time.has_value
 
     # Diamagnetic flux (reconstructed data)
-    assert ids.diamagnetic_flux.data.has_value
-    assert ids.diamagnetic_flux.data_error_upper.has_value
-    if homogeneous_time == 0:
-        assert ids.diamagnetic_flux.time.has_value
+    for diamagnetic_flux in ids.diamagnetic_flux:
+        assert diamagnetic_flux.data.has_value
+        assert diamagnetic_flux.data_error_upper.has_value
+        if homogeneous_time == 0:
+            assert diamagnetic_flux.time.has_value
