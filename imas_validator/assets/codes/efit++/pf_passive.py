@@ -10,7 +10,7 @@ def validate_required_fields(ids):
     for loop in ids.loop:
         # machine description
         assert loop.name.has_value
-        for element in loop:
+        for element in loop.element:
             assert element.geometry.geometry_type in [2, 3, 5, 6]
             assert element.turns_with_sign.has_value
         # data
