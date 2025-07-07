@@ -11,7 +11,7 @@ def validate_required_fields(ids):
         # machine description
         assert coil.name.has_value
         assert coil.identifier.has_value
-        for element in coil:
+        for element in coil.element:
             assert element.geometry.geometry_type in [2, 3, 5, 6]
             assert element.turns_with_sign.has_value
 
@@ -27,5 +27,5 @@ def validate_required_fields(ids):
         assert supply.identifier.has_value
 
     # Circuits
-    for circuit in ids.scircuit:
+    for circuit in ids.circuit:
         assert circuit.connections.has_value
