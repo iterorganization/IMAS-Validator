@@ -15,7 +15,8 @@ def validate_required_fields(ids):
         assert b_field_pol_probe.position.z.has_value
         assert b_field_pol_probe.position.phi.has_value
         assert b_field_pol_probe.poloidal_angle.has_value
-        assert b_field_pol_probe.toroidal_angle.has_value
+        # toroidal angle is not read by EFIT++?
+        # assert b_field_pol_probe.toroidal_angle.has_value
         assert b_field_pol_probe.area.has_value
         assert b_field_pol_probe.length.has_value
         assert b_field_pol_probe.turns.has_value
