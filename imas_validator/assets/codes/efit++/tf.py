@@ -1,7 +1,7 @@
 """Required fields of EFIT++ in the tf IDS"""
 
 @validator("tf", version="<3.42.0")
-def validate_required_fields(ids):
+def validate_required_fields_exDD(ids):
     """Validate that the tf IDS has required fields."""
 
     homogeneous_time = ids.ids_properties.homogeneous_time
