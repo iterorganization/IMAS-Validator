@@ -17,9 +17,10 @@ def validate_required_fields(ids):
         assert b_field_pol_probe.poloidal_angle.has_value
         # toroidal angle is not read by EFIT++?
         # assert b_field_pol_probe.toroidal_angle.has_value
-        assert b_field_pol_probe.area.has_value
-        assert b_field_pol_probe.length.has_value
-        assert b_field_pol_probe.turns.has_value
+        if b_field_pol_probe.type.index == 2:  # 'Mirnov probe'
+            assert b_field_pol_probe.area.has_value
+            assert b_field_pol_probe.length.has_value
+            assert b_field_pol_probe.turns.has_value
         # diagnostic data
         assert b_field_pol_probe.field.data.has_value
         assert b_field_pol_probe.field.data_error_upper.has_value
