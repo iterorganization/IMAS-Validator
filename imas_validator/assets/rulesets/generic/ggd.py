@@ -71,6 +71,7 @@ def find_structure_by_index(aos, index):
     for structure in aos:
         if structure.identifier.index == index:
             return structure
+    assert False, f"{aos} does not have an indentifier with the index {index}"
 
 
 def is_index_in_identifier_ref(index, identifier_ref):
@@ -212,7 +213,7 @@ def validate_obj_per_dim_geometry_content(ids):
     for grid_ggd in ids.grid_ggd:
         for space in grid_ggd.space:
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
-                geometry_content = obj_per_dim.geometry_content
+                geometry_content = obj_per_dim.geometry_content.index
                 if geometry_content.has_value and geometry_content != 0:
                     # When the geometry content is filled, they should adhere to
                     # the indices provided in the ggd_geometry_content_identifier.
@@ -220,11 +221,11 @@ def validate_obj_per_dim_geometry_content(ids):
                     # What each of these geometry content indices mean, is described in
                     # more detail in validate_obj_per_dim_geometry_length()
                     if dim == 0:
-                        assert geometry_content in {1, 11}
+                        assert int(geometry_content) in {1, 11}
                     elif dim == 1:
-                        assert geometry_content == 21
+                        assert int(geometry_content) == 21
                     elif dim == 2:
-                        assert geometry_content in {31, 32}
+                        assert int(geometry_content) in {31, 32}
                     else:
                         assert False, (
                             "geometry_content undefined for "
@@ -376,6 +377,8 @@ def validate_grid_subset_dimension_index(ids):
                     dim = object.dimension
                     space_idx = object.space
                     space = find_structure_by_index(grid_ggd.space, space_idx)
+                    if space is None:
+                        continue
                     assert len(space.objects_per_dimension) >= dim
 
 
@@ -393,6 +396,8 @@ def validate_grid_subset_object_index(ids):
                     space_idx = object.space
                     obj_idx = object.index
                     space = find_structure_by_index(grid_ggd.space, space_idx)
+                    if space is None:
+                        continue
                     assert (
                         len(space.objects_per_dimension[dim - 1].object) >= obj_idx > 0
                     )
@@ -454,17 +459,12 @@ def validate_ggd_array_match_element(ids):
             grid_subset_index = sub_array.grid_subset_index
             matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
             if matching_grid_ggd is None:
-                raise ValueError(
-                    f"Could not find a matching grid with index {grid_index}"
-                )
+                continue
             grid_subset = find_structure_by_index(
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
             if grid_subset is None:
-                raise ValueError(
-                    "Could not find a matching grid subset"
-                    f"with index {grid_subset_index}"
-                )
+                continue
             for quantity in sub_array.iter_nonempty_():
                 if (
                     quantity.metadata.name != "grid_index"
@@ -486,6 +486,8 @@ def validate_ggd_array_valid_grid_index(ids):
             assert sub_array.grid_index.has_value
             grid_index = sub_array.grid_index
             matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
+            if matching_grid_ggd is None:
+                continue
             grid_ggd_index = matching_grid_ggd.identifier.index
             assert grid_index == grid_ggd_index
 
@@ -504,6 +506,8 @@ def validate_ggd_array_valid_grid_subset_index(ids):
             grid_index = sub_array.grid_index
             grid_subset_index = sub_array.grid_subset_index
             matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
+            if matching_grid_ggd is None:
+                continue
             assert_index_in_aos_identifier(
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
