@@ -4,8 +4,6 @@
 def validate_required_fields(ids):
     """Validate that the magnetics IDS has required fields."""
 
-    homogeneous_time = ids.ids_properties.homogeneous_time
-
     # Magnetic field probes
     for b_field_pol_probe in ids.b_field_pol_probe:
         # machine description
@@ -24,8 +22,7 @@ def validate_required_fields(ids):
         # diagnostic data
         assert b_field_pol_probe.field.data.has_value
         assert b_field_pol_probe.field.data_error_upper.has_value
-        if homogeneous_time == 0:
-            assert b_field_pol_probe.field.time.has_value
+        assert b_field_pol_probe.field.data.coordinates[0].has_value
 
     # Flux loops
     for flux_loop in ids.flux_loop:
@@ -40,19 +37,17 @@ def validate_required_fields(ids):
         # diagnostic data
         assert flux_loop.flux.data.has_value
         assert flux_loop.flux.data_error_upper.has_value
-        if homogeneous_time == 0:
-            assert flux_loop.flux.time.has_value
+        assert flux_loop.flux.data.coordinates[0].has_value
 
     # Plasma current (reconstructed data)
     for ip in ids.ip:
         assert ip.data.has_value
         assert ip.data_error_upper.has_value
-        if homogeneous_time == 0:
-            assert ip.time.has_value
+        assert ip.data.coordinates[0].has_value
 
     # Diamagnetic flux (reconstructed data)
     for diamagnetic_flux in ids.diamagnetic_flux:
         assert diamagnetic_flux.data.has_value
         assert diamagnetic_flux.data_error_upper.has_value
-        if homogeneous_time == 0:
-            assert diamagnetic_flux.time.has_value
+        assert diamagnetic_flux.data.coordinates[0].has_value
+

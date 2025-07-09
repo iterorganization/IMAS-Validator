@@ -4,8 +4,6 @@
 def validate_required_fields(ids):
     """Validate that the pf_passive IDS has required fields."""
 
-    homogeneous_time = ids.ids_properties.homogeneous_time
-
     # Axisymmetric passive conductors
     for loop in ids.loop:
         # machine description
@@ -16,5 +14,4 @@ def validate_required_fields(ids):
         # data
         assert loop.current.has_value
         assert loop.current_error_upper.has_value
-        if homogeneous_time == 0:
-            assert loop.time.has_value
+        assert loop.current.coordinates[0].has_value

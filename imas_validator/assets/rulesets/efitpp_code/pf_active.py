@@ -4,8 +4,6 @@
 def validate_required_fields(ids):
     """Validate that the pf_active IDS has required fields."""
 
-    homogeneous_time = ids.ids_properties.homogeneous_time
-
     # Axisymmetric poloidal field coils
     for coil in ids.coil:
         # machine description
@@ -18,8 +16,7 @@ def validate_required_fields(ids):
         # data
         assert coil.current.data.has_value
         assert coil.current.data_error_upper.has_value
-        if homogeneous_time == 0:
-            assert coil.current.time.has_value
+        assert coil.current.data.coordinates[0].has_value
 
     # PF power supplies
     for supply in ids.supply:
