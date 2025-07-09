@@ -50,4 +50,3 @@ def validate_required_fields(ids):
         assert diamagnetic_flux.data.has_value
         assert diamagnetic_flux.data_error_upper.has_value
         assert diamagnetic_flux.data.coordinates[0].has_value
-
