@@ -11,7 +11,6 @@ SUPPORTED_IDS_NAMES = [
     "mhd",
     "radiation",
     "runaway_electrons",
-    "wall",
     "plasma_profiles",
     "plasma_sources",
     "plasma_transport",
@@ -21,6 +20,7 @@ SUPPORTED_IDS_NAMES = [
 # described by the GGD guidelines. They are currently not covered by the validations.
 # If the DD for these IDSs stays like this, they will need to be handled separately.
 # GGD grid locations for each IDS:
+# wall (description_ggd/grid_ggd)
 # equilibrium (grids_ggd/grid)
 # distribution_sources (source/ggd/grid)
 # distributions (distribution/ggd/grid)
