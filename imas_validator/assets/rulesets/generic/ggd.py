@@ -200,7 +200,7 @@ def validate_space_coordinates_type_identifier(ids):
         for space in grid_ggd.space:
             for coord_type in space.coordinates_type:
                 assert is_index_in_identifier_ref(
-                    coord_type, identifiers.coordinate_identifier
+                    coord_type.index, identifiers.coordinate_identifier
                 ), "space.coordinates_type not in coordinate identifier reference list"
 
 
