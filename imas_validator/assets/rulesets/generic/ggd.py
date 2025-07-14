@@ -354,12 +354,14 @@ def validate_obj_per_dim_nodes(ids):
 
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_obj_per_dim_measure_empty(ids):
-    """Validate that the measure value of 0D objects is empty."""
+    """Validate that the measure value of 0D objects is empty or zero."""
     for grid_ggd in get_non_referenced_grids(ids):
         for space in grid_ggd.space:
             obj_0D = space.objects_per_dimension[0]
             for obj in obj_0D.object:
-                assert not obj.measure.has_value, "measure of 0D objects must be empty"
+                assert not obj.measure.has_value or obj.measure.value == 0, (
+                    "measure of 0D objects must be empty or zero"
+                )
 
 
 # Grid subset rules
