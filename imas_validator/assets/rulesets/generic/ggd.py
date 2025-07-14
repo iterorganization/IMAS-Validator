@@ -61,7 +61,7 @@ def assert_index_in_aos_identifier(aos, index):
     a structure of an AoS."""
     matches = sum(1 for structure in aos if structure.identifier.index == index)
     assert matches == 1, (
-        f"{aos} should contain exactly one element with "
+        f"{aos.metadata.path} should contain exactly one element with "
         f"`identifier.index` equal to {index}, but found {matches} elements instead."
     )
 
@@ -72,7 +72,7 @@ def find_structure_by_index(aos, index):
     for structure in aos:
         if structure.identifier.index == index:
             return structure
-    assert False, f"{aos} does not have an identifier index of {index}"
+    assert False, f"{aos.metadata.path} does not have an identifier index of {index}"
 
 
 def is_index_in_identifier_ref(index, identifier_ref):
@@ -155,6 +155,9 @@ def validate_grid_ggd_identifier(ids):
     """Validate that the identifiers of all grid_ggds are filled."""
     for grid_ggd in get_non_referenced_grids(ids):
         assert_identifier_filled(grid_ggd.identifier)
+        assert grid_ggd.identifier.index > 0, (
+            "The identifier index of a grid GGD must be larger than 0"
+        )
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
