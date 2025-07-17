@@ -51,15 +51,20 @@ def multi_validator(ggd_mapping):
     return decorator
 
 
+def assert_index_in_identifier_reference(index, identifier_ref):
+    """Asserts that an index exists in the identifier reference."""
+    assert any(index == member.value for member in identifier_ref), (
+        f"Identifier index {index} does not appear in {identifier_ref}"
+    )
+
+
 def assert_valid_identifier(identifier, identifier_ref=None):
     """Asserts that an identifier has its name, index and description fields filled."""
     assert identifier.name.has_value, "Identifier name must be filled"
     assert identifier.index.has_value, "Identifier index must be filled"
     assert identifier.description.has_value, "Identifier description must be filled"
     if identifier_ref:
-        assert any(identifier.index == member.value for member in identifier_ref), (
-            f"Identifier index {identifier.index} does not appear in {identifier_ref}"
-        )
+        assert_index_in_identifier_reference(identifier.index, identifier_ref)
 
 
 def assert_index_in_aos_identifier(aos, index):
@@ -216,10 +221,19 @@ def validate_space_coordinates_type_identifier(ids):
     are in the coordinate identifier reference list."""
     for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
-            for coord_type in space.coordinates_type:
-                assert assert_valid_identifier(
-                    coord_type.index, identifiers.coordinate_identifier
-                )
+            coordinates_type = space.coordinates_type
+            # in DDv3 coordinates_type was a INT_1D, since DDv4 it's an AoS of
+            # coordinate_identifiers
+            if coordinates_type.metadata.data_type == IDSDataType.INT:
+                for coord_type in coordinates_type:
+                    assert_index_in_identifier_reference(
+                        coord_type, identifiers.coordinate_identifier
+                    )
+            else:
+                for coord_type_identifier in space.coordinates_type:
+                    assert_valid_identifier(
+                        coord_type_identifier, identifiers.coordinate_identifier
+                    )
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
