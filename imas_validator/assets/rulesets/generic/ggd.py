@@ -138,8 +138,8 @@ def get_filled_ggd_arrays(ids):
     return scalar_arrays, vector_arrays
 
 
-def get_non_referenced_grids(ids):
-    """Get a list of each grid GGD object that does not have a reference path."""
+def get_defined_grids(ids):
+    """Get a list of each grid GGD that does not have a reference to other IDS."""
     non_referenced_grids = []
     for grid_ggd in ids.grid_ggd:
         # TODO: Referenced grids are currently not checked
@@ -152,30 +152,26 @@ def get_non_referenced_grids(ids):
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_grid_ggd_identifier(ids):
     """Validate that the identifiers of all grid_ggds are filled."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         assert_valid_identifier(grid_ggd.identifier, identifiers.ggd_identifier)
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_grid_ggd_length(ids):
+def validate_grid_ggd_size(ids):
     """Validate that the number of structures in the grid_ggd AoS match
-    the number of time steps."""
-    assert len(ids.grid_ggd) == len(ids.time), (
-        "Number of grid_ggd structures must match the number of time steps"
-    )
+    the number of time steps if the IDS has homogeneous time."""
+    if has_homogeneous_time(ids):
+        assert len(ids.grid_ggd) == len(ids.time), (
+            "Number of grid_ggd structures must match the number of time steps"
+        )
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_grid_ggd_time(ids):
-    """Validate that if the IDS has homogeneous time,
-    the time nodes in the individual grid_ggd structures are not filled."""
-    for grid_ggd in get_non_referenced_grids(ids):
-        if has_homogeneous_time(ids):
-            assert not grid_ggd.time.has_value, (
-                "Time nodes in individual grid_ggd structures should not be filled "
-                "for homogeneous time"
-            )
-        elif has_heterogeneous_time(ids):
+    """Validate that if the IDS has heterogeneous time,
+    the time nodes in the individual grid_ggd structures are filled."""
+    if has_heterogeneous_time(ids):
+        for grid_ggd in get_defined_grids(ids):
             assert grid_ggd.time.has_value, (
                 "Time nodes in individual grid_ggd structures should be filled "
                 "for heterogeneous time"
@@ -186,7 +182,7 @@ def validate_grid_ggd_time(ids):
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_space_identifier(ids):
     """Validate that the identifiers of all grid_ggd spaces are filled"""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             assert_valid_identifier(space.identifier, identifiers.ggd_space_identifier)
 
@@ -195,7 +191,7 @@ def validate_space_identifier(ids):
 def validate_space_coordinates_type_identifier(ids):
     """Validate that the space.coordinate_types match with ones that
     are in the coordinate identifier reference list."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             for coord_type in space.coordinates_type:
                 assert assert_valid_identifier(
@@ -207,7 +203,7 @@ def validate_space_coordinates_type_identifier(ids):
 def validate_space_geometry_type_identifier(ids):
     """Validate that the geometry_type of all spaces is at least 0
     (0 standard, 1 fourier, >1 fourier with periodicity)"""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             assert space.geometry_type.index >= 0, (
                 "space.geometry_type.index must be >= 0"
@@ -219,7 +215,7 @@ def validate_space_geometry_type_identifier(ids):
 def validate_obj_per_dim_geometry_content(ids):
     """Validate that if the geometry_content is filled, its values match
     the reference ggd_geometry_content_identifier."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
                 geometry_content = obj_per_dim.geometry_content.index
@@ -249,10 +245,10 @@ def validate_obj_per_dim_geometry_content(ids):
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_obj_per_dim_geometry_length(ids):
+def validate_obj_per_dim_geometry_size(ids):
     """Validate that the geometry of the objects have the correct length, according to
     its geometry_content."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
                 geometry_content = obj_per_dim.geometry_content
@@ -300,9 +296,9 @@ def validate_obj_per_dim_geometry_length(ids):
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_obj_0D_geometry_length(ids):
+def validate_obj_0D_geometry_size(ids):
     """Validate that the geometry of 0D objects is larger than zero."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             obj_0D = space.objects_per_dimension[0]
             for obj in obj_0D.object:
@@ -312,11 +308,11 @@ def validate_obj_0D_geometry_length(ids):
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_obj_per_dim_nodes_length(ids):
+def validate_obj_per_dim_nodes_size(ids):
     """Validate that the nodes of the objects have the correct length.
     0D objects should be empty or contain themselves, edges should contain 2
     nodes, while n-order should contain at least n+1 nodes."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             for dim, obj_per_dim in enumerate(space.objects_per_dimension):
                 for i, obj in enumerate(obj_per_dim.object):
@@ -339,7 +335,7 @@ def validate_obj_per_dim_nodes_length(ids):
 def validate_obj_per_dim_nodes(ids):
     """Validate that the filled nodes of an object point to
     existing nodes in the grid."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             len_0D_obj = len(space.objects_per_dimension[0].object)
             for obj_per_dim in space.objects_per_dimension:
@@ -354,7 +350,7 @@ def validate_obj_per_dim_nodes(ids):
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_obj_per_dim_measure_empty(ids):
     """Validate that the measure value of 0D objects is empty or zero."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
             obj_0D = space.objects_per_dimension[0]
             for obj in obj_0D.object:
@@ -367,7 +363,7 @@ def validate_obj_per_dim_measure_empty(ids):
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_grid_subset_identifier(ids):
     """Validate that grid subset identifier is filled."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for grid_subset in grid_ggd.grid_subset:
             assert_valid_identifier(
                 grid_subset.identifier, identifiers.ggd_subset_identifier
@@ -375,9 +371,9 @@ def validate_grid_subset_identifier(ids):
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_grid_subset_length(ids):
+def validate_grid_subset_size(ids):
     """Validate that the grid has at least 1 grid subset."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         assert len(grid_ggd.grid_subset) > 0, (
             "GGD grid must have at least 1 grid_subset"
         )
@@ -386,7 +382,7 @@ def validate_grid_subset_length(ids):
 @multi_validator(SUPPORTED_IDS_NAMES)
 def validate_grid_subset_space_index(ids):
     """Validate that the space in the subset points to an existing space in the grid."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for grid_subset in grid_ggd.grid_subset:
             for element in grid_subset.element:
                 for object in element.object:
@@ -398,7 +394,7 @@ def validate_grid_subset_space_index(ids):
 def validate_grid_subset_dimension_index(ids):
     """Validate that the dimension in the grid subset points to
     an existing dimension in the grid."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for grid_subset in grid_ggd.grid_subset:
             for element in grid_subset.element:
                 for object in element.object:
@@ -417,7 +413,7 @@ def validate_grid_subset_dimension_index(ids):
 def validate_grid_subset_object_index(ids):
     """Validate that the object index in the grid subset points to an existing
     object in the grid."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for grid_subset in grid_ggd.grid_subset:
             for element in grid_subset.element:
                 for object in element.object:
@@ -436,7 +432,7 @@ def validate_grid_subset_object_index(ids):
 def validate_grid_subset_obj_dimension(ids):
     """Validate that the dimensions of the objects of which a grid subset is composed
     are not larger than the dimension of the grid subset itself."""
-    for grid_ggd in get_non_referenced_grids(ids):
+    for grid_ggd in get_defined_grids(ids):
         for grid_subset in grid_ggd.grid_subset:
             subset_dim = grid_subset.dimension
             for element in grid_subset.element:
@@ -449,25 +445,14 @@ def validate_grid_subset_obj_dimension(ids):
 
 # GGD rules
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_ggd_length(ids):
-    """Validate that the dimensions of the GGD AoS
-    matches the number of time steps."""
-    ggd_list = get_ggd_aos(ids)
-    for ggd_aos in ggd_list:
-        assert len(ggd_aos) == len(ids.time), (
-            "the length of the array of structures of the GGD must match number of time steps"
-        )
-
-
-@multi_validator(SUPPORTED_IDS_NAMES)
-def validate_ggd_time_homogeneous(ids):
-    """Validate that if the IDS has homogeneous time,
-    the time nodes of the individual GGD structures are not filled."""
-    ggd_list = get_ggd_aos(ids)
-    for ggd_aos in ggd_list:
-        for ggd in ggd_aos:
-            assert not ggd.time.has_value, (
-                "time nodes of individual GGD structures should not be filled for homogeneous time"
+def validate_ggd_size(ids):
+    """Validate that the dimensions of the GGD AoS matches the number of time steps."""
+    if has_homogeneous_time(ids):
+        ggd_list = get_ggd_aos(ids)
+        for ggd_aos in ggd_list:
+            assert len(ggd_aos) == len(ids.time), (
+                "the length of the array of structures of the GGD must "
+                "match number of time steps"
             )
 
 
