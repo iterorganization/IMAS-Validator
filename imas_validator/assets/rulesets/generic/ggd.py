@@ -230,7 +230,7 @@ def validate_space_coordinates_type_identifier(ids):
                         coord_type, identifiers.coordinate_identifier
                     )
             else:
-                for coord_type_identifier in space.coordinates_type:
+                for coord_type_identifier in coordinates_type:
                     assert_valid_identifier(
                         coord_type_identifier, identifiers.coordinate_identifier
                     )
