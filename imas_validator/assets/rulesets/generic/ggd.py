@@ -49,11 +49,15 @@ def multi_validator(ids_names):
     return decorator
 
 
-def assert_identifier_filled(identifier):
+def assert_valid_identifier(identifier, identifier_ref=None):
     """Asserts that an identifier has its name, index and description fields filled."""
     assert identifier.name.has_value, "Identifier name must be filled"
     assert identifier.index.has_value, "Identifier index must be filled"
     assert identifier.description.has_value, "Identifier description must be filled"
+    if identifier_ref:
+        assert any(identifier.index == member.value for member in identifier_ref), (
+            f"Identifier index {identifier.index} does not appear in {identifier_ref}"
+        )
 
 
 def assert_index_in_aos_identifier(aos, index):
@@ -73,11 +77,6 @@ def find_structure_by_index(aos, index):
         if structure.identifier.index == index:
             return structure
     assert False, f"{aos.metadata.path} does not have an identifier index of {index}"
-
-
-def is_index_in_identifier_ref(index, identifier_ref):
-    """Checks if a given index appears in an identifier reference."""
-    return any(index == member.value for member in identifier_ref)
 
 
 def recursive_ggd_path_search(quantity, scalar_list, vector_list):
@@ -154,10 +153,7 @@ def get_non_referenced_grids(ids):
 def validate_grid_ggd_identifier(ids):
     """Validate that the identifiers of all grid_ggds are filled."""
     for grid_ggd in get_non_referenced_grids(ids):
-        assert_identifier_filled(grid_ggd.identifier)
-        assert grid_ggd.identifier.index > 0, (
-            "The identifier index of a grid GGD must be larger than 0"
-        )
+        assert_valid_identifier(grid_ggd.identifier, identifiers.ggd_identifier)
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
@@ -192,7 +188,7 @@ def validate_space_identifier(ids):
     """Validate that the identifiers of all grid_ggd spaces are filled"""
     for grid_ggd in get_non_referenced_grids(ids):
         for space in grid_ggd.space:
-            assert_identifier_filled(space.identifier)
+            assert_valid_identifier(space.identifier, identifiers.ggd_space_identifier)
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
@@ -202,9 +198,9 @@ def validate_space_coordinates_type_identifier(ids):
     for grid_ggd in get_non_referenced_grids(ids):
         for space in grid_ggd.space:
             for coord_type in space.coordinates_type:
-                assert is_index_in_identifier_ref(
+                assert assert_valid_identifier(
                     coord_type.index, identifiers.coordinate_identifier
-                ), "space.coordinates_type not in coordinate identifier reference list"
+                )
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
@@ -373,7 +369,9 @@ def validate_grid_subset_identifier(ids):
     """Validate that grid subset identifier is filled."""
     for grid_ggd in get_non_referenced_grids(ids):
         for grid_subset in grid_ggd.grid_subset:
-            assert_identifier_filled(grid_subset.identifier)
+            assert_valid_identifier(
+                grid_subset.identifier, identifiers.ggd_subset_identifier
+            )
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
