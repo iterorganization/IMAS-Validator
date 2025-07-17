@@ -113,37 +113,58 @@ def recursive_ggd_path_search(quantity, scalar_list, vector_list):
             )
 
 
-def get_ggd_aos(ids):
-    """Get a list containing all GGD AoS nodes in the IDS"""
-    ggd_list = []
-    for node in Select(ids, "(^|/)ggd$", leaf_only=False):
-        parent_node = Parent(node)
-        # Do not include structures of GGD, i.e. ggd[0]
-        if parent_node.metadata.name != "ggd":
-            ggd_list.append(node)
-    return ggd_list
-
-
 def get_filled_ggd_arrays(ids):
     """Get a list of each filled scalar and vector GGD array in the IDS."""
-    ggd_list = get_ggd_aos(ids)
     scalar_arrays = []
     vector_arrays = []
-    for ggd_aos in ggd_list:
-        for ggd in ggd_aos:
-            recursive_ggd_path_search(
-                ggd,
-                scalar_arrays,
-                vector_arrays,
-            )
+    for ggd in get_ggds(ids):
+        recursive_ggd_path_search(
+            ggd,
+            scalar_arrays,
+            vector_arrays,
+        )
 
     return scalar_arrays, vector_arrays
+
+
+def get_objects_from_path(ids, path, descend_final):
+    """Returns IDS objects found by traversing an IDSPath. If descend_final is True,
+    returns elements of the final AoS; otherwise, returns the AoS itself.
+    """
+    parts = path.split("/")
+
+    current = [ids]
+    for i, part in enumerate(parts):
+        next_level = []
+        for obj in current:
+            attr = obj[part]
+            if i == len(parts) - 1 and not descend_final:
+                next_level.append(attr)
+            else:
+                next_level.extend(attr)
+        current = next_level
+
+    return current
+
+
+def get_ggds(ids, descend_final=True):
+    """Get a list of all GGD nodes in the IDS"""
+    _, ggd_map = GGD_PATHS_PER_IDS[str(ids.metadata.name)]
+    if not ggd_map:
+        return []
+    return get_objects_from_path(ids, ggd_map, descend_final)
+
+
+def get_grid_ggds(ids, descend_final=True):
+    """Get a list of all grid GGD nodes in the IDS"""
+    grid_ggd_map, _ = GGD_PATHS_PER_IDS[str(ids.metadata.name)]
+    return get_objects_from_path(ids, grid_ggd_map, descend_final)
 
 
 def get_defined_grids(ids):
     """Get a list of each grid GGD that does not have a reference to other IDS."""
     non_referenced_grids = []
-    for grid_ggd in ids.grid_ggd:
+    for grid_ggd in get_grid_ggds(ids):
         # TODO: Referenced grids are currently not checked
         if not grid_ggd.path:
             non_referenced_grids.append(grid_ggd)
@@ -449,8 +470,9 @@ def validate_grid_subset_obj_dimension(ids):
 @multi_validator(GGD_PATHS_PER_IDS)
 def validate_ggd_size(ids):
     """Validate that the dimensions of the GGD AoS matches the number of time steps."""
+
     if has_homogeneous_time(ids):
-        ggd_list = get_ggd_aos(ids)
+        ggd_list = get_ggds(ids, descend_final=False)
         for ggd_aos in ggd_list:
             assert len(ggd_aos) == len(ids.time), (
                 "the length of the array of structures of the GGD must "
@@ -468,6 +490,7 @@ def validate_ggd_arrays(ids):
     'volumes' in the reference identifier, the elements can be left empty.
     """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
+
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
             assert sub_array.grid_index.has_value, (
