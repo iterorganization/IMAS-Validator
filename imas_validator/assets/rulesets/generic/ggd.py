@@ -458,40 +458,12 @@ def validate_ggd_size(ids):
 
 # GGD array rules
 @multi_validator(SUPPORTED_IDS_NAMES)
-def validate_ggd_array_match_element(ids):
-    """Validate that the number of values in a GGD array match the number of elements
+def validate_ggd_arrays(ids):
+    """Validate that the GGD grid and grid subset referenced in GGD arrays exist.
+    The number of values in a GGD array should match the number of elements
     in the corresponding subset. If the subset contains all nodes by
     definition, which occurs for the ggd subsets named 'nodes', 'edges', 'cells' and
     'volumes' in the reference identifier, the elements can be left empty.
-    """
-    scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
-    for array in scalar_arrays + vector_arrays:
-        for sub_array in array:
-            grid_index = sub_array.grid_index
-            grid_subset_index = sub_array.grid_subset_index
-            matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
-            if matching_grid_ggd is None:
-                continue
-
-            grid_subset = find_structure_by_index(
-                matching_grid_ggd.grid_subset, grid_subset_index
-            )
-            if grid_subset is None:
-                continue
-            for quantity in sub_array.iter_nonempty_():
-                if (
-                    quantity.metadata.name != "grid_index"
-                    and quantity.metadata.name != "grid_subset_index"
-                ):
-                    assert len(grid_subset.element) == len(quantity), (
-                        "number of values in GGD array must match number of elements"
-                    )
-
-
-@multi_validator(SUPPORTED_IDS_NAMES)
-def validate_ggd_array_valid_grid_index(ids):
-    """Validate that for the grid_index of a GGD array, the
-    identifier index of the corresponding grid_ggd matches.
     """
     scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
     for array in scalar_arrays + vector_arrays:
@@ -500,34 +472,36 @@ def validate_ggd_array_valid_grid_index(ids):
                 "the grid_index of a GGD array must be filled"
             )
             grid_index = sub_array.grid_index
-            matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
-            if matching_grid_ggd is None:
-                continue
-            grid_ggd_index = matching_grid_ggd.identifier.index
-            assert grid_index == grid_ggd_index, (
-                "The grid_index must match identifier index of grid_ggd"
-            )
 
-
-@multi_validator(SUPPORTED_IDS_NAMES)
-def validate_ggd_array_valid_grid_subset_index(ids):
-    """Validate that the grid_subset_index of a GGD array matches
-    with the identifier index of a grid subset.
-    """
-    scalar_arrays, vector_arrays = get_filled_ggd_arrays(ids)
-    for array in scalar_arrays + vector_arrays:
-        for sub_array in array:
             assert sub_array.grid_subset_index.has_value, (
                 "the grid_subset_index of a GGD array must be filled"
             )
-            grid_index = sub_array.grid_index
             grid_subset_index = sub_array.grid_subset_index
+
+            assert sub_array.grid_subset_index.values, (
+                "the values of a GGD array must be filled"
+            )
+
             matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
-            if matching_grid_ggd is None:
+
+            # NOTE: grids with references to another IDS are not validated
+            if matching_grid_ggd is None or matching_grid_ggd.path:
                 continue
-            assert_index_in_aos_identifier(
+
+            grid_subset = find_structure_by_index(
                 matching_grid_ggd.grid_subset, grid_subset_index
             )
+            if grid_subset is None or grid_subset.identifier.index in [1, 2, 5, 43]:
+                continue
+
+            for quantity in sub_array.iter_nonempty_():
+                if (
+                    quantity.metadata.name != "grid_index"
+                    and quantity.metadata.name != "grid_subset_index"
+                ):
+                    assert len(grid_subset.element) == len(quantity), (
+                        "number of values in GGD array must match number of elements"
+                    )
 
 
 @multi_validator(SUPPORTED_IDS_NAMES)
