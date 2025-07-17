@@ -4,29 +4,31 @@ from imas import identifiers
 from imas.ids_data_type import IDSDataType
 from imas.ids_defs import IDS_TIME_MODE_HETEROGENEOUS, IDS_TIME_MODE_HOMOGENEOUS
 
-SUPPORTED_IDS_NAMES = [
-    "edge_profiles",
-    "edge_sources",
-    "edge_transport",
-    "mhd",
-    "radiation",
-    "runaway_electrons",
-    "plasma_profiles",
-    "plasma_sources",
-    "plasma_transport",
-]
-
-# TODO: Some IDSs do not have the grid structure in a separate `grid_ggd` object, as
-# described by the GGD guidelines. They are currently not covered by the validations.
-# If the DD for these IDSs stays like this, they will need to be handled separately.
-# GGD grid locations for each IDS:
-# wall (description_ggd/grid_ggd)
-# equilibrium (grids_ggd/grid)
-# distribution_sources (source/ggd/grid)
-# distributions (distribution/ggd/grid)
-# tf (field_map/grid)
-# transport_solver_numerics (boundary_conditions_ggd/grid)
-# waves (coherent_wave/full_wave/grid)
+# As IDSs store their GGD grid and GGD AoS in different locations, they are explicitly
+# mapped here. If you want to enable GGD validation for a new IDS, amend it to this
+# mapping. This takes the following form:
+# "<IDS name>": ("<GGD grid IDS path>", "<GGD IDS path>")
+GGD_PATHS_PER_IDS = {
+    "edge_profiles": ("grid_ggd", "ggd"),
+    "edge_sources": ("grid_ggd", "source/ggd"),
+    "edge_transport": ("grid_ggd", "model/ggd"),
+    "mhd": ("grid_ggd", "ggd"),
+    "radiation": ("grid_ggd", "process/ggd"),
+    "runaway_electrons": ("grid_ggd", "ggd_fluid"),
+    "plasma_profiles": ("grid_ggd", "ggd"),
+    "plasma_sources": ("grid_ggd", "source/ggd"),
+    "plasma_transport": ("grid_ggd", "model/ggd"),
+    "wall": ("description_ggd", "description_ggd/ggd"),
+    "equilibrium": ("grids_ggd/grid", "time_slice/ggd"),
+    "distribution_sources": ("source/ggd/grid", "source/ggd"),
+    "distributions": ("distribution/ggd/grid", "distribution/ggd"),
+    "tf": ("field_map/grid", ""),  # doesn't have GGD?
+    "transport_solver_numerics": (
+        "boundary_conditions_ggd/grid",
+        "boundary_conditions_ggd",
+    ),
+    "waves": ("coherent_wave/full_wave/grid", "coherent_wave/full_wave"),
+}
 
 
 # Helper functions
@@ -38,11 +40,11 @@ def has_heterogeneous_time(ids):
     return ids.ids_properties.homogeneous_time == IDS_TIME_MODE_HETEROGENEOUS
 
 
-def multi_validator(ids_names):
+def multi_validator(ggd_mapping):
     """Decorator to apply the @validator decorator for multiple IDSs."""
 
     def decorator(func):
-        for name in ids_names:
+        for name in list(ggd_mapping):
             func = validator(name)(func)
         return func
 
@@ -149,14 +151,14 @@ def get_defined_grids(ids):
 
 
 # Grid rules
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_ggd_identifier(ids):
     """Validate that the identifiers of all grid_ggds are filled."""
     for grid_ggd in get_defined_grids(ids):
         assert_valid_identifier(grid_ggd.identifier, identifiers.ggd_identifier)
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_ggd_size(ids):
     """Validate that the number of structures in the grid_ggd AoS match
     the number of time steps if the IDS has homogeneous time."""
@@ -166,7 +168,7 @@ def validate_grid_ggd_size(ids):
         )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_ggd_time(ids):
     """Validate that if the IDS has heterogeneous time,
     the time nodes in the individual grid_ggd structures are filled."""
@@ -179,7 +181,7 @@ def validate_grid_ggd_time(ids):
 
 
 # Space rules
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_space_identifier(ids):
     """Validate that the identifiers of all grid_ggd spaces are filled"""
     for grid_ggd in get_defined_grids(ids):
@@ -187,7 +189,7 @@ def validate_space_identifier(ids):
             assert_valid_identifier(space.identifier, identifiers.ggd_space_identifier)
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_space_coordinates_type_identifier(ids):
     """Validate that the space.coordinate_types match with ones that
     are in the coordinate identifier reference list."""
@@ -199,7 +201,7 @@ def validate_space_coordinates_type_identifier(ids):
                 )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_space_geometry_type_identifier(ids):
     """Validate that the geometry_type of all spaces is at least 0
     (0 standard, 1 fourier, >1 fourier with periodicity)"""
@@ -211,7 +213,7 @@ def validate_space_geometry_type_identifier(ids):
 
 
 # Objects_per_dimension rules
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_obj_per_dim_geometry_content(ids):
     """Validate that if the geometry_content is filled, its values match
     the reference ggd_geometry_content_identifier."""
@@ -244,7 +246,7 @@ def validate_obj_per_dim_geometry_content(ids):
                         )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_obj_per_dim_geometry_size(ids):
     """Validate that the geometry of the objects have the correct length, according to
     its geometry_content."""
@@ -295,7 +297,7 @@ def validate_obj_per_dim_geometry_size(ids):
                             )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_obj_0D_geometry_size(ids):
     """Validate that the geometry of 0D objects is larger than zero."""
     for grid_ggd in get_defined_grids(ids):
@@ -307,7 +309,7 @@ def validate_obj_0D_geometry_size(ids):
                 )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_obj_per_dim_nodes_size(ids):
     """Validate that the nodes of the objects have the correct length.
     0D objects should be empty or contain themselves, edges should contain 2
@@ -331,7 +333,7 @@ def validate_obj_per_dim_nodes_size(ids):
                         )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_obj_per_dim_nodes(ids):
     """Validate that the filled nodes of an object point to
     existing nodes in the grid."""
@@ -347,7 +349,7 @@ def validate_obj_per_dim_nodes(ids):
                         )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_obj_per_dim_measure_empty(ids):
     """Validate that the measure value of 0D objects is empty or zero."""
     for grid_ggd in get_defined_grids(ids):
@@ -360,7 +362,7 @@ def validate_obj_per_dim_measure_empty(ids):
 
 
 # Grid subset rules
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_subset_identifier(ids):
     """Validate that grid subset identifier is filled."""
     for grid_ggd in get_defined_grids(ids):
@@ -370,7 +372,7 @@ def validate_grid_subset_identifier(ids):
             )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_subset_size(ids):
     """Validate that the grid has at least 1 grid subset."""
     for grid_ggd in get_defined_grids(ids):
@@ -379,7 +381,7 @@ def validate_grid_subset_size(ids):
         )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_subset_space_index(ids):
     """Validate that the space in the subset points to an existing space in the grid."""
     for grid_ggd in get_defined_grids(ids):
@@ -390,7 +392,7 @@ def validate_grid_subset_space_index(ids):
                     assert_index_in_aos_identifier(grid_ggd.space, space_idx)
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_subset_dimension_index(ids):
     """Validate that the dimension in the grid subset points to
     an existing dimension in the grid."""
@@ -409,7 +411,7 @@ def validate_grid_subset_dimension_index(ids):
                     )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_subset_object_index(ids):
     """Validate that the object index in the grid subset points to an existing
     object in the grid."""
@@ -428,7 +430,7 @@ def validate_grid_subset_object_index(ids):
                     ), "object index must point to an existing object in the grid"
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_grid_subset_obj_dimension(ids):
     """Validate that the dimensions of the objects of which a grid subset is composed
     are not larger than the dimension of the grid subset itself."""
@@ -444,7 +446,7 @@ def validate_grid_subset_obj_dimension(ids):
 
 
 # GGD rules
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_ggd_size(ids):
     """Validate that the dimensions of the GGD AoS matches the number of time steps."""
     if has_homogeneous_time(ids):
@@ -457,7 +459,7 @@ def validate_ggd_size(ids):
 
 
 # GGD array rules
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_ggd_arrays(ids):
     """Validate that the GGD grid and grid subset referenced in GGD arrays exist.
     The number of values in a GGD array should match the number of elements
@@ -504,7 +506,7 @@ def validate_ggd_arrays(ids):
                     )
 
 
-@multi_validator(SUPPORTED_IDS_NAMES)
+@multi_validator(GGD_PATHS_PER_IDS)
 def validate_ggd_array_labels_filled(ids):
     """Validate that the labels of ions/neutrals are filled."""
     for label in Select(ids, "/label$"):
