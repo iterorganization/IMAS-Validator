@@ -143,6 +143,9 @@ def get_objects_from_path(ids, path, descend_final):
     for i, part in enumerate(parts):
         next_level = []
         for obj in current:
+            # If IDS path cannot be found, skip it
+            if not hasattr(obj, part):
+                continue
             attr = obj[part]
             if i == len(parts) - 1 and not descend_final:
                 next_level.append(attr)
