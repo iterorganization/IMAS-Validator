@@ -22,7 +22,7 @@ GGD_PATHS_PER_IDS = {
     "equilibrium": ("grids_ggd/grid", "time_slice/ggd"),
     "distribution_sources": ("source/ggd/grid", "source/ggd"),
     "distributions": ("distribution/ggd/grid", "distribution/ggd"),
-    "tf": ("field_map/grid", ""),  # doesn't have GGD?
+    "tf": ("field_map/grid", "field_map"),
     "transport_solver_numerics": (
         "boundary_conditions_ggd/grid",
         "boundary_conditions_ggd",
@@ -63,7 +63,7 @@ def assert_valid_identifier(identifier, identifier_ref=None):
     assert identifier.name.has_value, "Identifier name must be filled"
     assert identifier.index.has_value, "Identifier index must be filled"
     assert identifier.description.has_value, "Identifier description must be filled"
-    if identifier_ref:
+    if identifier_ref is not None:
         assert_index_in_identifier_reference(identifier.index, identifier_ref)
 
 
@@ -77,13 +77,14 @@ def assert_index_in_aos_identifier(aos, index):
     )
 
 
-def find_structure_by_index(aos, index):
-    """Return the first object in an AoS whose identifier.index matches the
+def find_structure_by_index(list_of_aos, index):
+    """Return the first object in a list of AoSs whose identifier.index matches the
     given index, or None if no match is found."""
-    for structure in aos:
-        if structure.identifier.index == index:
-            return structure
-    assert False, f"{aos.metadata.path} does not have an identifier index of {index}"
+    for aos in list_of_aos:
+        for structure in aos:
+            if structure.identifier.index == index:
+                return structure
+    assert False, f"{list_of_aos} does not have an AoS with identifier index of {index}"
 
 
 def recursive_ggd_path_search(quantity, scalar_list, vector_list):
@@ -189,9 +190,12 @@ def validate_grid_ggd_size(ids):
     """Validate that the number of structures in the grid_ggd AoS match
     the number of time steps if the IDS has homogeneous time."""
     if has_homogeneous_time(ids):
-        assert len(ids.grid_ggd) == len(ids.time), (
-            "Number of grid_ggd structures must match the number of time steps"
-        )
+        grid_ggds = get_grid_ggds(ids, descend_final=False)
+        for grid_ggd in grid_ggds:
+            if grid_ggd.metadata.structure_reference == "generic_grid_aos3_root":
+                assert len(grid_ggd) == len(ids.time), (
+                    "Number of grid_ggd structures must match the number of time steps"
+                )
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
@@ -437,7 +441,7 @@ def validate_grid_subset_dimension_index(ids):
                 for object in element.object:
                     dim = object.dimension
                     space_idx = object.space
-                    space = find_structure_by_index(grid_ggd.space, space_idx)
+                    space = find_structure_by_index([grid_ggd.space], space_idx)
                     if space is None:
                         continue
                     assert len(space.objects_per_dimension) >= dim, (
@@ -457,7 +461,7 @@ def validate_grid_subset_object_index(ids):
                     dim = object.dimension
                     space_idx = object.space
                     obj_idx = object.index
-                    space = find_structure_by_index(grid_ggd.space, space_idx)
+                    space = find_structure_by_index([grid_ggd.space], space_idx)
                     if space is None:
                         continue
                     assert (
@@ -517,19 +521,23 @@ def validate_ggd_arrays(ids):
             )
             grid_subset_index = sub_array.grid_subset_index
 
-            assert sub_array.grid_subset_index.values, (
-                "the values of a GGD array must be filled"
+            assert sub_array.has_value, (
+                "at least one quantity of a GGD array must be filled"
             )
 
-            matching_grid_ggd = find_structure_by_index(ids.grid_ggd, grid_index)
+            matching_grid_ggd = find_structure_by_index(
+                get_grid_ggds(ids, descend_final=False), grid_index
+            )
 
             # NOTE: grids with references to another IDS are not validated
             if matching_grid_ggd is None or matching_grid_ggd.path:
                 continue
 
             grid_subset = find_structure_by_index(
-                matching_grid_ggd.grid_subset, grid_subset_index
+                [matching_grid_ggd.grid_subset], grid_subset_index
             )
+            # For the grid subsets 'nodes', 'edges', 'cells' and 'volumes' which have
+            # indices 1, 2, 5, 43 respectively, elements may be empty
             if grid_subset is None or grid_subset.identifier.index in [1, 2, 5, 43]:
                 continue
 
