@@ -7,27 +7,27 @@ from imas.ids_defs import IDS_TIME_MODE_HETEROGENEOUS, IDS_TIME_MODE_HOMOGENEOUS
 # As IDSs store their GGD grid and GGD AoS in different locations, they are explicitly
 # mapped here. If you want to enable GGD validation for a new IDS, amend it to this
 # mapping. This takes the following form:
-# "<IDS name>": ("<GGD grid IDS path>", "<GGD IDS path>")
+# "<IDS name>": ("<GGD grid IDS path>", ["<GGD IDS path1>", "<GGD IDS path2>", ...])
 GGD_PATHS_PER_IDS = {
-    "edge_profiles": ("grid_ggd", "ggd"),
-    "edge_sources": ("grid_ggd", "source/ggd"),
-    "edge_transport": ("grid_ggd", "model/ggd"),
-    "mhd": ("grid_ggd", "ggd"),
-    "radiation": ("grid_ggd", "process/ggd"),
-    "runaway_electrons": ("grid_ggd", "ggd_fluid"),
-    "plasma_profiles": ("grid_ggd", "ggd"),
-    "plasma_sources": ("grid_ggd", "source/ggd"),
-    "plasma_transport": ("grid_ggd", "model/ggd"),
-    "wall": ("description_ggd", "description_ggd/ggd"),
-    "equilibrium": ("grids_ggd/grid", "time_slice/ggd"),
-    "distribution_sources": ("source/ggd/grid", "source/ggd"),
-    "distributions": ("distribution/ggd/grid", "distribution/ggd"),
-    "tf": ("field_map/grid", "field_map"),
+    "edge_profiles": ("grid_ggd", ["ggd", "ggd_fast"]),
+    "edge_sources": ("grid_ggd", ["source/ggd", "source/ggd_fast"]),
+    "edge_transport": ("grid_ggd", ["model/ggd", "model/ggd_fast"]),
+    "mhd": ("grid_ggd", ["ggd"]),
+    "radiation": ("grid_ggd", ["process/ggd"]),
+    "runaway_electrons": ("grid_ggd", ["ggd_fluid"]),
+    "plasma_profiles": ("grid_ggd", ["ggd", "ggd_fast"]),
+    "plasma_sources": ("grid_ggd", ["source/ggd", "source/ggd_fast"]),
+    "plasma_transport": ("grid_ggd", ["model/ggd", "model/ggd_fast"]),
+    "wall": ("description_ggd/grid_ggd", ["description_ggd/ggd"]),
+    "equilibrium": ("grids_ggd/grid", ["time_slice/ggd"]),
+    "distribution_sources": ("source/ggd/grid", ["source/ggd"]),
+    "distributions": ("distribution/ggd/grid", ["distribution/ggd"]),
+    "tf": ("field_map/grid", ["field_map"]),
     "transport_solver_numerics": (
         "boundary_conditions_ggd/grid",
-        "boundary_conditions_ggd",
+        ["boundary_conditions_ggd"],
     ),
-    "waves": ("coherent_wave/full_wave/grid", "coherent_wave/full_wave"),
+    "waves": ("coherent_wave/full_wave/grid", ["coherent_wave/full_wave"]),
 }
 
 
@@ -158,12 +158,18 @@ def get_ggds(ids, descend_final=True):
     _, ggd_map = GGD_PATHS_PER_IDS[str(ids.metadata.name)]
     if not ggd_map:
         return []
-    return get_objects_from_path(ids, ggd_map, descend_final)
+    ggds = []
+    for ggd_path in ggd_map:
+        current_ggds = get_objects_from_path(ids, ggd_path, descend_final)
+        ggds.extend(current_ggds)
+    return ggds
 
 
 def get_grid_ggds(ids, descend_final=True):
     """Get a list of all grid GGD nodes in the IDS"""
     grid_ggd_map, _ = GGD_PATHS_PER_IDS[str(ids.metadata.name)]
+    if not grid_ggd_map:
+        return []
     return get_objects_from_path(ids, grid_ggd_map, descend_final)
 
 
