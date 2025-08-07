@@ -77,14 +77,21 @@ def assert_index_in_aos_identifier(aos, index):
     )
 
 
-def find_structure_by_index(list_of_aos, index):
-    """Return the first object in a list of AoSs whose identifier.index matches the
-    given index, or None if no match is found."""
-    for aos in list_of_aos:
-        for structure in aos:
-            if structure.identifier.index == index:
-                return structure
-    assert False, f"{list_of_aos} does not have an AoS with identifier index of {index}"
+def find_structure_by_index(list_of_objs, index):
+    """Return the first object in a list of AoSs or list of structures whose
+    identifier.index matches the given index, or None if no match is found."""
+    for obj in list_of_objs:
+        if obj.metadata.data_type == IDSDataType.STRUCT_ARRAY:
+            for structure in obj:
+                if structure.identifier.index == index:
+                    return structure
+        elif obj.metadata.data_type == IDSDataType.STRUCTURE:
+            if obj.identifier.index == index:
+                return obj
+
+    assert False, (
+        f"{list_of_objs} does not have a structure with an identifier index of {index}"
+    )
 
 
 def recursive_ggd_path_search(quantity, scalar_list, vector_list):
@@ -173,7 +180,20 @@ def get_grid_ggds(ids, descend_final=True):
     grid_ggd_map, _ = GGD_PATHS_PER_IDS[str(ids.metadata.name)]
     if not grid_ggd_map:
         return []
-    return get_objects_from_path(ids, grid_ggd_map, descend_final)
+
+    objs = get_objects_from_path(ids, grid_ggd_map, descend_final=False)
+
+    if not descend_final:
+        return objs
+
+    list_of_grid_ggds = []
+    for obj in objs:
+        if obj.metadata.data_type == IDSDataType.STRUCT_ARRAY:
+            list_of_grid_ggds.extend(obj)
+        elif obj.metadata.data_type == IDSDataType.STRUCTURE:
+            list_of_grid_ggds.append(obj)
+
+    return list_of_grid_ggds
 
 
 def get_defined_grids(ids):
