@@ -1,8 +1,12 @@
 """Rules applying to all IDSs containing GGDs"""
 
+import logging
+
 from imas import identifiers
 from imas.ids_data_type import IDSDataType
 from imas.ids_defs import IDS_TIME_MODE_HETEROGENEOUS, IDS_TIME_MODE_HOMOGENEOUS
+
+logger = logging.getLogger(__name__)
 
 # As IDSs store their GGD grid and GGD AoS in different locations, they are explicitly
 # mapped here. If you want to enable GGD validation for a new IDS, amend it to this
@@ -180,8 +184,12 @@ def get_defined_grids(ids):
     """Get a list of each grid GGD that does not have a reference to other IDS."""
     non_referenced_grids = []
     for grid_ggd in get_grid_ggds(ids):
-        # TODO: Referenced grids are currently not checked
-        if not grid_ggd.path:
+        # NOTE: Referenced grids are currently not checked
+        if grid_ggd.path:
+            logger.warning(
+                f"{grid_ggd} contains a referenced grid so it will not be validated."
+            )
+        else:
             non_referenced_grids.append(grid_ggd)
     return non_referenced_grids
 
@@ -540,6 +548,10 @@ def validate_ggd_arrays(ids):
 
             # NOTE: grids with references to another IDS are not validated
             if matching_grid_ggd is None or matching_grid_ggd.path:
+                logger.warning(
+                    f"{sub_array} is defined on a referenced grid, so cannot validate "
+                    "if the grid_index and grid_subset_index are valid."
+                )
                 continue
 
             grid_subset = find_structure_by_index(
