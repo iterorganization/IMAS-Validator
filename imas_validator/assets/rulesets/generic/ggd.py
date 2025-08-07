@@ -57,9 +57,9 @@ def multi_validator(ggd_mapping):
 
 def assert_index_in_identifier_reference(index, identifier_ref):
     """Asserts that an index exists in the identifier reference."""
-    assert any(index == member.value for member in identifier_ref), (
-        f"Identifier index {index} does not appear in {identifier_ref}"
-    )
+    assert any(
+        index == member.value for member in identifier_ref
+    ), f"Identifier index {index} does not appear in {identifier_ref}"
 
 
 def assert_valid_identifier(identifier, identifier_ref=None):
@@ -210,9 +210,9 @@ def validate_grid_ggd_size(ids):
         grid_ggds = get_grid_ggds(ids, descend_final=False)
         for grid_ggd in grid_ggds:
             if grid_ggd.metadata.structure_reference == "generic_grid_aos3_root":
-                assert len(grid_ggd) == len(ids.time), (
-                    "Number of grid_ggd structures must match the number of time steps"
-                )
+                assert len(grid_ggd) == len(
+                    ids.time
+                ), "Number of grid_ggd structures must match the number of time steps"
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
@@ -263,9 +263,9 @@ def validate_space_geometry_type_identifier(ids):
     (0 standard, 1 fourier, >1 fourier with periodicity)"""
     for grid_ggd in get_defined_grids(ids):
         for space in grid_ggd.space:
-            assert space.geometry_type.index >= 0, (
-                "space.geometry_type.index must be >= 0"
-            )
+            assert (
+                space.geometry_type.index >= 0
+            ), "space.geometry_type.index must be >= 0"
 
 
 # Objects_per_dimension rules
@@ -284,17 +284,19 @@ def validate_obj_per_dim_geometry_content(ids):
                     # What each of these geometry content indices mean, is described in
                     # more detail in validate_obj_per_dim_geometry_length()
                     if dim == 0:
-                        assert int(geometry_content) in {1, 11}, (
-                            "0D geometry_content must be either 1, or 11"
-                        )
+                        assert int(geometry_content) in {
+                            1,
+                            11,
+                        }, "0D geometry_content must be either 1, or 11"
                     elif dim == 1:
-                        assert int(geometry_content) == 21, (
-                            "1D geometry_content must be 21"
-                        )
+                        assert (
+                            int(geometry_content) == 21
+                        ), "1D geometry_content must be 21"
                     elif dim == 2:
-                        assert int(geometry_content) in {31, 32}, (
-                            "2D geometry_content must be either 31, or 32"
-                        )
+                        assert int(geometry_content) in {
+                            31,
+                            32,
+                        }, "2D geometry_content must be either 31, or 32"
                     else:
                         assert False, (
                             "geometry_content undefined for "
@@ -328,15 +330,15 @@ def validate_obj_per_dim_geometry_size(ids):
                             )
                         elif geometry_content == 21:
                             # contains 3 surface areas
-                            assert len(geometry) == 3, (
-                                "geometry length must be 3 for edge_areas"
-                            )
+                            assert (
+                                len(geometry) == 3
+                            ), "geometry length must be 3 for edge_areas"
                         elif geometry_content == 31:
                             # contains coordinate indices (ix, iy) and volume
                             # after extension
-                            assert len(geometry) == 3, (
-                                "geometry length must be 3 for face_indices_volume"
-                            )
+                            assert (
+                                len(geometry) == 3
+                            ), "geometry length must be 3 for face_indices_volume"
                         elif geometry_content == 32:
                             # contains coordinate indices (ix, iy), volume after
                             # extension, connection length, and distance
@@ -360,9 +362,9 @@ def validate_obj_0D_geometry_size(ids):
         for space in grid_ggd.space:
             obj_0D = space.objects_per_dimension[0]
             for obj in obj_0D.object:
-                assert len(obj.geometry) > 0, (
-                    "length of geometry of 0D objects must be > 0"
-                )
+                assert (
+                    len(obj.geometry) > 0
+                ), "length of geometry of 0D objects must be > 0"
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
@@ -384,9 +386,9 @@ def validate_obj_per_dim_nodes_size(ids):
                     elif dim == 1:
                         assert len(nodes) == 2, "edges must contain 2 nodes"
                     else:
-                        assert len(nodes) >= dim + 1, (
-                            "n-order objects must contain at least n+1 nodes"
-                        )
+                        assert (
+                            len(nodes) >= dim + 1
+                        ), "n-order objects must contain at least n+1 nodes"
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
@@ -400,9 +402,9 @@ def validate_obj_per_dim_nodes(ids):
                 for obj in obj_per_dim.object:
                     if obj.nodes.has_value:
                         assert (0 < obj.nodes).all(), "object nodes must be positive"
-                        assert (obj.nodes <= len_0D_obj).all(), (
-                            "object nodes must point to existing nodes"
-                        )
+                        assert (
+                            obj.nodes <= len_0D_obj
+                        ).all(), "object nodes must point to existing nodes"
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
@@ -412,9 +414,9 @@ def validate_obj_per_dim_measure_empty(ids):
         for space in grid_ggd.space:
             obj_0D = space.objects_per_dimension[0]
             for obj in obj_0D.object:
-                assert not obj.measure.has_value or obj.measure.value == 0, (
-                    "measure of 0D objects must be empty or zero"
-                )
+                assert (
+                    not obj.measure.has_value or obj.measure.value == 0
+                ), "measure of 0D objects must be empty or zero"
 
 
 # Grid subset rules
@@ -432,9 +434,9 @@ def validate_grid_subset_identifier(ids):
 def validate_grid_subset_size(ids):
     """Validate that the grid has at least 1 grid subset."""
     for grid_ggd in get_defined_grids(ids):
-        assert len(grid_ggd.grid_subset) > 0, (
-            "GGD grid must have at least 1 grid_subset"
-        )
+        assert (
+            len(grid_ggd.grid_subset) > 0
+        ), "GGD grid must have at least 1 grid_subset"
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
@@ -496,9 +498,9 @@ def validate_grid_subset_obj_dimension(ids):
             for element in grid_subset.element:
                 for object in element.object:
                     obj_dim = object.dimension
-                    assert subset_dim >= obj_dim, (
-                        "object dimension must be smaller or equal to the dimension of the grid subset"
-                    )
+                    assert (
+                        subset_dim >= obj_dim
+                    ), "object dimension must be smaller or equal to the dimension of the grid subset"
 
 
 # GGD rules
@@ -528,19 +530,19 @@ def validate_ggd_arrays(ids):
 
     for array in scalar_arrays + vector_arrays:
         for sub_array in array:
-            assert sub_array.grid_index.has_value, (
-                "the grid_index of a GGD array must be filled"
-            )
+            assert (
+                sub_array.grid_index.has_value
+            ), "the grid_index of a GGD array must be filled"
             grid_index = sub_array.grid_index
 
-            assert sub_array.grid_subset_index.has_value, (
-                "the grid_subset_index of a GGD array must be filled"
-            )
+            assert (
+                sub_array.grid_subset_index.has_value
+            ), "the grid_subset_index of a GGD array must be filled"
             grid_subset_index = sub_array.grid_subset_index
 
-            assert sub_array.has_value, (
-                "at least one quantity of a GGD array must be filled"
-            )
+            assert (
+                sub_array.has_value
+            ), "at least one quantity of a GGD array must be filled"
 
             matching_grid_ggd = find_structure_by_index(
                 get_grid_ggds(ids, descend_final=False), grid_index
@@ -567,9 +569,9 @@ def validate_ggd_arrays(ids):
                     quantity.metadata.name != "grid_index"
                     and quantity.metadata.name != "grid_subset_index"
                 ):
-                    assert len(grid_subset.element) == len(quantity), (
-                        "number of values in GGD array must match number of elements"
-                    )
+                    assert len(grid_subset.element) == len(
+                        quantity
+                    ), "number of values in GGD array must match number of elements"
 
 
 @multi_validator(GGD_PATHS_PER_IDS)
