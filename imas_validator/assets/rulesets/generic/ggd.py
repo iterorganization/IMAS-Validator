@@ -233,10 +233,12 @@ def validate_grid_ggd_time(ids):
     the time nodes in the individual grid_ggd structures are filled."""
     if has_heterogeneous_time(ids):
         for grid_ggd in get_defined_grids(ids):
-            assert grid_ggd.time.has_value, (
-                "Time nodes in individual grid_ggd structures should be filled "
-                "for heterogeneous time"
-            )
+            # tf/field_map/grid does not have a time attribute
+            if hasattr(grid_ggd, "time"):
+                assert grid_ggd.time.has_value, (
+                    "Time nodes in individual grid_ggd structures should be filled "
+                    "for heterogeneous time"
+                )
 
 
 # Space rules
