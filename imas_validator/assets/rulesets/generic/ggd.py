@@ -1,8 +1,12 @@
 """Rules applying to all IDSs containing GGDs"""
 
+import logging
+
 from imas import identifiers
 from imas.ids_data_type import IDSDataType
 from imas.ids_defs import IDS_TIME_MODE_HETEROGENEOUS, IDS_TIME_MODE_HOMOGENEOUS
+
+logger = logging.getLogger(__name__)
 
 # As IDSs store their GGD grid and GGD AoS in different locations, they are explicitly
 # mapped here. If you want to enable GGD validation for a new IDS, amend it to this
@@ -180,8 +184,12 @@ def get_defined_grids(ids):
     """Get a list of each grid GGD that does not have a reference to other IDS."""
     non_referenced_grids = []
     for grid_ggd in get_grid_ggds(ids):
-        # TODO: Referenced grids are currently not checked
-        if not grid_ggd.path:
+        # NOTE: Referenced grids are currently not checked
+        if grid_ggd.path:
+            logger.warning(
+                f"{grid_ggd} contains a referenced grid so it will not be validated."
+            )
+        else:
             non_referenced_grids.append(grid_ggd)
     return non_referenced_grids
 
@@ -276,17 +284,19 @@ def validate_obj_per_dim_geometry_content(ids):
                     # What each of these geometry content indices mean, is described in
                     # more detail in validate_obj_per_dim_geometry_length()
                     if dim == 0:
-                        assert int(geometry_content) in {1, 11}, (
-                            "0D geometry_content must be either 1, or 11"
-                        )
+                        assert int(geometry_content) in {
+                            1,
+                            11,
+                        }, "0D geometry_content must be either 1, or 11"
                     elif dim == 1:
                         assert int(geometry_content) == 21, (
                             "1D geometry_content must be 21"
                         )
                     elif dim == 2:
-                        assert int(geometry_content) in {31, 32}, (
-                            "2D geometry_content must be either 31, or 32"
-                        )
+                        assert int(geometry_content) in {
+                            31,
+                            32,
+                        }, "2D geometry_content must be either 31, or 32"
                     else:
                         assert False, (
                             "geometry_content undefined for "
@@ -489,7 +499,8 @@ def validate_grid_subset_obj_dimension(ids):
                 for object in element.object:
                     obj_dim = object.dimension
                     assert subset_dim >= obj_dim, (
-                        "object dimension must be smaller or equal to the dimension of the grid subset"
+                        "object dimension must be smaller or equal to the dimension of "
+                        "the grid subset"
                     )
 
 
@@ -540,6 +551,10 @@ def validate_ggd_arrays(ids):
 
             # NOTE: grids with references to another IDS are not validated
             if matching_grid_ggd is None or matching_grid_ggd.path:
+                logger.warning(
+                    f"{sub_array} is defined on a referenced grid, so cannot validate "
+                    "if the grid_index and grid_subset_index are valid."
+                )
                 continue
 
             grid_subset = find_structure_by_index(
