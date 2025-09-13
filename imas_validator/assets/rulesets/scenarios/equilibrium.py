@@ -8,7 +8,7 @@ def validate_mandatory_values(ids):
     assert ids.time_slice.has_value
     for time_slice in ids.time_slice:
 
-        # time_slice[:].global_quantities.ip
+        # time_slice[:].global_quantities
         assert time_slice.global_quantities.ip.has_value
 
         # time_slice[:].profiles_2d
