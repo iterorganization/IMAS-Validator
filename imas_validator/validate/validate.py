@@ -6,7 +6,6 @@ import logging
 import sys
 
 import imas  # type: ignore
-from packaging.version import Version
 
 # from imas_validator.exceptions import IMASVersionError
 from imas_validator.rules.loading import load_rules
