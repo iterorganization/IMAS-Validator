@@ -62,16 +62,8 @@ def validate(
 def _check_imas_version() -> None:
     """Check if the installed IMAS version is sufficient."""
     # TODO: check if this is the best level to test for the IMAS version
-    if not imas.backends.imas_core.imas_interface.has_imas:
-        version_found = imas.backends.imas_core.imas_interface.ll_interface._al_version
-        if version_found is None:
-            logger.info(
-                "No IMAS install could be found."
-                "IDS Validation will work with limited functionality."
-            )
-            return
-        else:
-            logger.info(f"Found IMAS install with version {version_found}.")
+    version_found = imas.backends.imas_core.imas_interface.ll_interface._al_version
+    logger.info(f"Found IMAS install with version {version_found}.")
 
     if imas.backends.imas_core.imas_interface.ll_interface._al_version < Version("5.1"):
         logger.info(
