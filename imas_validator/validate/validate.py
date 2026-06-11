@@ -62,18 +62,25 @@ def validate(
 def _check_imas_version() -> None:
     """Check if the installed IMAS version is sufficient."""
     # TODO: check if this is the best level to test for the IMAS version
-    if not imas.backends.imas_core.imas_interface.has_imas:
-        version_found = imas.backends.imas_core.imas_interface.ll_interface._al_version
-        if version_found is None:
-            logger.info(
-                "No IMAS install could be found."
-                "IDS Validation will work with limited functionality."
-            )
-            return
-        else:
-            logger.info(f"Found IMAS install with version {version_found}.")
+    try:
+        # On imas-python >= 2.2 this import raises ImportError when imas_core
+        # is not installed. On older versions the import always succeeds and
+        # _al_version is None when the access layer is missing.
+        from imas.backends.imas_core.imas_interface import ll_interface
+    except ImportError:
+        version_found = None
+    else:
+        version_found = ll_interface._al_version
 
-    if imas.backends.imas_core.imas_interface.ll_interface._al_version < Version("5.1"):
+    if version_found is None:
+        logger.info(
+            "No IMAS install could be found."
+            "IDS Validation will work with limited functionality."
+        )
+        return
+
+    logger.info(f"Found IMAS install with version {version_found}.")
+    if version_found < Version("5.1"):
         logger.info(
             "IDS Validation requires an IMAS installation of version 5.1 or newer."
             "See the README for more details."
