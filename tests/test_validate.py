@@ -35,7 +35,6 @@ def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
 
 def test_validate(caplog):
     module = "imas_validator.validate.validate"
-    # patch _check_imas_version for now
     with patch(
         f"{module}.imas.DBEntry",
         spec=True,
@@ -43,7 +42,7 @@ def test_validate(caplog):
         get=get,
         uri="",
         factory=imas.IDSFactory("3.40.1"),
-    ), patch(f"{module}._check_imas_version"):
+    ):
         validate_options = ValidateOptions(
             rulesets=["test-ruleset"],
             extra_rule_dirs=[Path("tests/rulesets/validate-test")],
