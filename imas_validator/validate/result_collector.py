@@ -5,7 +5,7 @@ validation tool
 
 import logging
 import traceback
-from typing import Any, List, Tuple
+from typing import Any, Iterator, List, Tuple
 
 import imas  # type: ignore
 
@@ -22,6 +22,27 @@ from imas_validator.validate.result import (
 from imas_validator.validate_options import ValidateOptions
 
 logger = logging.getLogger(__name__)
+
+
+def _iter_filled_paths(
+    node: imas.ids_structure.IDSStructure, prefix: str = ""
+) -> Iterator[str]:
+    """Yield filled leaf paths relative to the IDS root.
+
+    Carry the path down the tree so AoS indices are obtained once by enumeration,
+    rather than repeatedly searching parent arrays through ``node._path``.
+    ``iter_nonempty_`` retains the rejection of lazy-loaded IDSs: their unloaded
+    nodes must not be silently omitted from coverage.
+    """
+    for child in node.iter_nonempty_():
+        path = prefix + child.metadata.name
+        if isinstance(child, imas.ids_primitive.IDSPrimitive):
+            yield path
+        elif isinstance(child, imas.ids_struct_array.IDSStructArray):
+            for index, item in enumerate(child):
+                yield from _iter_filled_paths(item, f"{path}[{index}]/")
+        else:
+            yield from _iter_filled_paths(child, path + "/")
 
 
 class ResultCollector:
@@ -158,13 +179,9 @@ class ResultCollector:
         for ids_instance, name, occ in idss:
             key = (name, occ)
             if key not in self.filled_nodes_dict.keys():
-                self.filled_nodes_dict[key] = set()
-                imas.util.visit_children(
-                    lambda node: self.filled_nodes_dict[key].add(node._path),
-                    ids_instance,
-                    leaf_only=True,
-                    visit_empty=False,
-                )
+                # Only cache a complete traversal, so a failure cannot leave partial
+                # coverage that would prevent a later attempt from collecting it.
+                self.filled_nodes_dict[key] = set(_iter_filled_paths(ids_instance))
 
     def coverage_dict(self) -> CoverageDict:
         """
