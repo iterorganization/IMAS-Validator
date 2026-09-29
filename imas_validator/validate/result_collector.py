@@ -4,8 +4,10 @@ validation tool
 """
 
 import logging
+import sys
 import traceback
-from typing import Any, Iterator, List, Tuple
+from types import FrameType
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 import imas  # type: ignore
 
@@ -45,6 +47,81 @@ def _iter_filled_paths(
             yield from _iter_filled_paths(child, path + "/")
 
 
+def _extract_stack(frame: Optional[FrameType]) -> traceback.StackSummary:
+    """Cheap equivalent of ``traceback.extract_stack(frame)``.
+
+    ``traceback.extract_stack`` calls ``linecache.checkcache`` (an ``os.stat``) for
+    every file in the stack and reads the source line of every frame. That work is
+    wasted for the vast majority of asserts, whose traceback is never displayed.
+    The frame summaries created here look up their source line lazily, on first
+    access of ``FrameSummary.line``.
+    """
+    frames = []
+    while frame is not None:
+        code = frame.f_code
+        frames.append(
+            traceback.FrameSummary(
+                code.co_filename, frame.f_lineno, code.co_name, lookup_line=False
+            )
+        )
+        frame = frame.f_back
+    frames.reverse()
+    return traceback.StackSummary.from_list(frames)
+
+
+class _NodePathCache:
+    """Memoized equivalent of ``IDSBase._path``.
+
+    ``IDSBase._path`` recomputes the path from the root for every call, and finds
+    the index of each AoS element with a linear search through its parent array.
+    For large AoS (e.g. GGD objects) this makes path computation quadratic. This
+    cache memoizes the path of every node it has seen and builds an index map once
+    per AoS, so that computing the paths of all nodes of an IDS is linear.
+
+    Entries are keyed by ``id()`` and keep a reference to the node, so that ids
+    cannot be recycled while the cache is alive. The IDS data must not be modified
+    while the cache is in use: call :meth:`clear` when switching IDSs.
+    """
+
+    def __init__(self) -> None:
+        self._paths: Dict[int, Tuple[Any, str]] = {}
+        self._aos_indices: Dict[int, Tuple[Any, Dict[int, int]]] = {}
+
+    def clear(self) -> None:
+        self._paths.clear()
+        self._aos_indices.clear()
+
+    def path(self, node: Any) -> str:
+        entry = self._paths.get(id(node))
+        if entry is not None:
+            return entry[1]
+        if isinstance(node, imas.ids_toplevel.IDSToplevel):
+            path = ""
+        else:
+            parent = node._parent
+            parent_path = self.path(parent)
+            if isinstance(parent, imas.ids_struct_array.IDSStructArray):
+                index = self._aos_index(parent).get(id(node))
+                if index is None:
+                    # Broken link to parent: let imas handle (and log) this case
+                    path = node._path
+                else:
+                    path = f"{parent_path}[{index}]"
+            elif parent_path:
+                path = f"{parent_path}/{node.metadata.name}"
+            else:
+                path = node.metadata.name
+        self._paths[id(node)] = (node, path)
+        return path
+
+    def _aos_index(self, aos: Any) -> Dict[int, int]:
+        entry = self._aos_indices.get(id(aos))
+        if entry is None:
+            entry = (aos, {id(item): index for index, item in enumerate(aos)})
+            self._aos_indices[id(aos)] = entry
+        return entry[1]
+
+
 class ResultCollector:
     """Class for storing IDSValidationResult objects"""
 
@@ -64,6 +141,8 @@ class ResultCollector:
         self.imas_uri = imas_uri
         self.visited_nodes_dict: NodesDict = {}
         self.filled_nodes_dict: NodesDict = {}
+        self._path_cache = _NodePathCache()
+        self._current_idss: List[Tuple[imas.ids_toplevel.IDSToplevel, str, int]] = []
 
     def set_context(
         self,
@@ -81,6 +160,9 @@ class ResultCollector:
             raise NotImplementedError(
                 "Two occurrence of one IDS in a single validation rule is not supported"
             )
+        # Paths remain valid as long as the same IDS instances are validated
+        if [id(ids[0]) for ids in idss] != [id(ids[0]) for ids in self._current_idss]:
+            self._path_cache.clear()
         self._current_rule = rule
         self._current_idss = idss
 
@@ -117,9 +199,8 @@ class ResultCollector:
             test: Expression to evaluate in test
             msg: Given message for failed assertion
         """
-        tb = traceback.extract_stack()
-        # pop last stack frame so that new last frame is inside validation test
-        tb.pop()
+        # start at the caller, so that the last frame is inside the validation test
+        tb = _extract_stack(sys._getframe(1))
         if isinstance(test, IDSWrapper):
             nodes_dict = self.create_nodes_dict(test._ids_nodes)
         else:
@@ -157,7 +238,7 @@ class ResultCollector:
         for node in ids_nodes:
             ids_name = node._toplevel.metadata.name
             ids_result = nodes_dict[occ_dict[ids_name]]
-            ids_result.add(node._path)
+            ids_result.add(self._path_cache.path(node))
         return nodes_dict
 
     def append_nodes_dict(
