@@ -18,6 +18,11 @@ ids
 
 The filter returns only the rules that adhere to all supplied conditions.
 
+IDS data is loaded only when its name and occurrence match a selected rule,
+or when it is an additional input to a selected cross-IDS rule. Wildcard rules
+can still require all IDSs. Version constraints are checked after loading,
+using the stored IDS's Data Dictionary version.
+
 Examples
 --------
 
