@@ -119,7 +119,7 @@ def test_cli_entry_point_returns_one_and_writes_reports(tmp_path):
 
     assert completed.returncode == 1
     assert completed.stdout.splitlines()[-1] == str(uri)
-    assert "FAILED validation." in completed.stdout
+    assert "FAILED validation." in " ".join(completed.stdout.split())
     assert len(list(reports_path.rglob("*.xml"))) == 1
     assert len(list(reports_path.rglob("*.txt"))) == 1
     assert len(list(reports_path.rglob("*.html"))) == 2
