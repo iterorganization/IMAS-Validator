@@ -106,7 +106,8 @@ class ResultCollector:
             exc=exc,
         )
         self.results.append(result)
-        self.append_nodes_dict({}, self._current_idss)
+        if self.validate_options.track_node_dict:
+            self.append_nodes_dict({}, self._current_idss)
 
     def assert_(self, test: Any, msg: str = "") -> None:
         """
