@@ -183,7 +183,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: List) -> None:
+def main(argv: List) -> int:
 
     parser = configure_argument_parser()
     args = parser.parse_args(args=argv if argv else ["--help"])
@@ -253,7 +253,7 @@ def main(argv: List) -> None:
                     cli_logger.info(f"{color_red}{'-'*50}")  # noqa: E226
 
         if not common_result_list:
-            return
+            return 0
 
         if isinstance(command_objects[0], ValidateCommand):
             # generate summary report
@@ -271,15 +271,22 @@ def main(argv: List) -> None:
             if failed_test_uris:
                 sys.stdout.write(" ".join(failed_test_uris) + "\n")
 
+        all_validations_passed = all(
+            result.success
+            for result_collection in common_result_list
+            for result in result_collection.results
+        )
+        return 0 if all_validations_passed else 1
+
     except CommandNotRecognisedException:
         parser.print_help()
+        return 2
 
 
 def execute_cli() -> None:
     argv: List = sys.argv[1:]
-    main(argv)
+    sys.exit(main(argv))
 
 
 if __name__ == "__main__":
-    argv: List = sys.argv[1:]
-    main(argv)
+    execute_cli()
