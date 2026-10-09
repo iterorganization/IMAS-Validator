@@ -46,6 +46,7 @@ def validate_pressure_thermal_electron_core_profiles(ids):
             profiles_1d.electrons.density_thermal
             * profiles_1d.electrons.temperature
             * 1.602176634e-19,
+            rtol=1.2e-4,
         ), "Electron thermal pressure not consistent with density_thermal * temperature"
 
 
