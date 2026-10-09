@@ -527,10 +527,10 @@ def validate_ggd_size(ids):
         ggd_list = get_ggds(ids, descend_final=False)
         for ggd_aos in ggd_list:
             if len(ggd_aos) > 0:
-                   assert len(ggd_aos) == len(ids.time), (
-                       "the length of the array of structures of the GGD must "
-                       "match number of time steps"
-                   )
+                assert len(ggd_aos) == len(ids.time), (
+                    "the length of the array of structures of the GGD must "
+                    "match number of time steps"
+                )
 
 
 # GGD array rules
