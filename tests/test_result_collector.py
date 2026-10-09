@@ -212,3 +212,43 @@ def test_nodes_dicts(res_collector, rule, test_data_core_profiles, test_data_wav
         for i in range(2)
     }
     assert res_collector.coverage_dict() == expected_dict
+
+
+def test_node_path_cache_matches_imas_path():
+    import imas
+
+    from imas_validator.validate.result_collector import _NodePathCache
+
+    ids = imas.IDSFactory("3.40.1").core_profiles()
+    ids.profiles_1d.resize(5)
+    for profile in ids.profiles_1d:
+        profile.ion.resize(3)
+        for ion in profile.ion:
+            ion.temperature = [1.0]
+    cache = _NodePathCache()
+    nodes = []
+    imas.util.visit_children(nodes.append, ids, leaf_only=False, visit_empty=True)
+    assert len(nodes) > 100
+    for node in nodes:
+        assert cache.path(node) == node._path
+    # Cached lookups return the same result
+    for node in nodes:
+        assert cache.path(node) == node._path
+
+
+def test_extract_stack_matches_traceback():
+    import sys
+    import traceback
+
+    from imas_validator.validate.result_collector import _extract_stack
+
+    def inner():
+        return _extract_stack(sys._getframe(0)), traceback.extract_stack()
+
+    fast, reference = inner()
+    assert [(f.filename, f.lineno, f.name) for f in fast] == [
+        (f.filename, f.lineno, f.name) for f in reference
+    ]
+    assert fast[-1].name == "inner"
+    # Source lines are looked up lazily, but give the same result
+    assert fast[-1].line == reference[-1].line
