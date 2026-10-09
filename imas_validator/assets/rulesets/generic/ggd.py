@@ -526,10 +526,11 @@ def validate_ggd_size(ids):
     if has_homogeneous_time(ids):
         ggd_list = get_ggds(ids, descend_final=False)
         for ggd_aos in ggd_list:
-            assert len(ggd_aos) == len(ids.time), (
-                "the length of the array of structures of the GGD must "
-                "match number of time steps"
-            )
+            if len(ggd_aos) > 0:
+                   assert len(ggd_aos) == len(ids.time), (
+                       "the length of the array of structures of the GGD must "
+                       "match number of time steps"
+                   )
 
 
 # GGD array rules
