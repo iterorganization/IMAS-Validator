@@ -97,12 +97,12 @@ def validate_errorbars(ids):
     """
     for error_upper in Select(ids, "_error_upper$", has_value=True):
         assert (
-            error_upper >= 0
+            np.nanmin(error_upper) >= 0
         ), "Negative value found for errorbar, while their values must be positive."
 
     for error_lower in Select(ids, "_error_lower$", has_value=True):
         assert (
-            error_lower >= 0
+            np.nanmin(error_lower) >= 0
         ), "Negative value found for errorbar, while their values must be positive."
         error_lower_name = str(error_lower.metadata.name)
         error_upper_name = error_lower_name.replace("_error_lower", "_error_upper")
