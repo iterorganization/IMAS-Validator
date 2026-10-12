@@ -1,5 +1,8 @@
 """Generic rules applying to all IDSs"""
+
 import numpy as np
+
+
 @validator("*")
 def validate_homogeneous_time(ids):
     """Validation function for the time mode (ids_properties.homogeneous_time).
