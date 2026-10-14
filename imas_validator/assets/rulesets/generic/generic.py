@@ -99,14 +99,10 @@ def validate_errorbars(ids):
     that error_upper is also filled whenever ``error_lower`` is non empty
     """
     for error_upper in Select(ids, "_error_upper$", has_value=True):
-        assert np.isnan(error_upper) | (
-            error_upper >= 0
-        ), "Negative value found for errorbar, while their values must be positive."
+        assert (np.logical_or(np.isnan(error_upper), error_upper >= 0)), "Negative value found for errorbar, while their values must be positive."
 
     for error_lower in Select(ids, "_error_lower$", has_value=True):
-        assert np.isnan(error_lower) | (
-            error_lower >= 0
-        ), "Negative value found for errorbar, while their values must be positive."
+        assert (np.logical_or(np.isnan(error_lower), error_lower >= 0)), "Negative value found for errorbar, while their values must be positive."
         error_lower_name = str(error_lower.metadata.name)
         error_upper_name = error_lower_name.replace("_error_lower", "_error_upper")
         error_upper = getattr(Parent(error_lower), error_upper_name, None)
