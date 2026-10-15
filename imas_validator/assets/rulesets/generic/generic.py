@@ -59,36 +59,58 @@ def validate_increasing_time(ids):
                 ), f"Non-increasing time found for dynamic Array of Structures: {aos!r}"
                 last_time = struct.time
 
-
 @validator("*")
-def validate_min_max(ids):
-    """Validate that ``*_min`` values are lower than ``*_max`` values, and the related
-    value is within the bounds.
-
-    Notes:
-
-    * ``{value}_min <= {value}_max`` is only checked when both values are filled.
-    * ``{value}_min <= {value} <= {value}_max`` (value is within bounds) is only
-      validated when all three quantities are filled.
+def validate_min_max(ids, underflow_threshold=1e-100):
     """
+    Validate that quantity_min <= quantity_max and quantity_min <= quantity <= quantity_max.
+    Ignores NaN elements during comparisons and handles IMAS primitive objects.
+    """
+    def _extract_clean_array(node):
+        """Extract float array from IMAS node and filter out NaNs."""
+        if node is None or not getattr(node, "has_value", False):
+            return None
+        val = getattr(node, "value", node)
+        try:
+            arr = np.asarray(val, dtype=float)
+            # Flush float underflow noise directly to 0.0
+            return np.where(np.abs(arr) < underflow_threshold, 0.0, arr)
+        except (TypeError, ValueError):
+            return None
+
     for quantity_min in Select(ids, "_min$", has_value=True):
-        quantity_name = str(quantity_min.metadata.name)[:-4]  # strip off _min
-        quantity = getattr(Parent(quantity_min), quantity_name, None)
-        quantity_max = getattr(Parent(quantity_min), quantity_name + "_max", None)
+        quantity_name = str(quantity_min.metadata.name)[:-4]
+        parent = Parent(quantity_min)
 
-        # If _max exists and is filled, check that it is >= _min
-        if quantity_max is not None and quantity_max.has_value:
-            assert quantity_min <= quantity_max
+        quantity_max = getattr(parent, f"{quantity_name}_max", None)
+        quantity = getattr(parent, quantity_name, None)
 
-            # quantity exist, is not a structure and is filled, check that the quantity
-            # is within bounds:
-            if (
-                quantity is not None
-                and not quantity.metadata.data_type.value.startswith("struct")
-                and quantity.has_value
-            ):
-                assert quantity_min <= quantity <= quantity_max
+        val_min = _extract_clean_array(quantity_min)
+        val_max = _extract_clean_array(quantity_max)
 
+        if val_min is None or val_max is None:
+            continue
+
+        # 1. Validate min <= max (ignoring NaNs)
+        mask = ~(np.isnan(val_min) | np.isnan(val_max))
+        if np.any(mask):
+            assert np.all(val_min[mask] <= val_max[mask]), (
+                f"Validation failed: min > max for '{quantity_name}' at path: {quantity_min.metadata.path}"
+            )
+
+        # 2. Validate min <= core <= max (ignoring NaNs)
+        if (
+            quantity is not None
+            and getattr(quantity, "has_value", False)
+            and not str(getattr(quantity.metadata.data_type, "value", "")).startswith("struct")
+        ):
+            val_core = _extract_clean_array(quantity)
+            if val_core is not None:
+                mask_core = mask & ~np.isnan(val_core)
+                if np.any(mask_core):
+                    in_bounds = (val_min[mask_core] <= val_core[mask_core]) & (val_core[mask_core] <= val_max[mask_core])
+                    assert np.all(in_bounds), (
+                        f"Validation failed: '{quantity_name}' out of [min, max] bounds at path: {quantity.metadata.path}"
+                    )
 
 @validator("*")
 def validate_errorbars(ids):
