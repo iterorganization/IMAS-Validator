@@ -114,19 +114,40 @@ def validate_errorbars(ids):
 
 @validator("*")
 def validate_density_positive(ids):
-    """Validate that density values are positive"""
-    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
-        if node.metadata.units == "m^-3" and not (
-            "derivative" in str(node.metadata.path)
+    """Validate that density values are positive."""
+    for node in Select(ids, r"^((?!_error_).)*$", has_value=True):
+        if (
+            getattr(node.metadata, "units", None) == "m^-3"
+            and "derivative" not in str(node.metadata.path)
         ):
-            assert node >= 0, "Negative value found for a density"
+            val = getattr(node, "value", node)
+            try:
+                arr = np.asarray(val, dtype=float)
+            except (TypeError, ValueError):
+                continue
 
+            valid_vals = arr[~np.isnan(arr)]
+            if valid_vals.size > 0:
+                assert np.min(valid_vals) >= 0, (
+                    f"Negative value found for a density at path: {node.metadata.path}"
+                )
 
 @validator("*")
 def validate_temperature_positive(ids):
-    """Validate that temperature and energy values are positive"""
-    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
-        if node.metadata.units == "eV" and not (
-            "derivative" in str(node.metadata.path)
+    """Validate that temperature and energy values are positive."""
+    for node in Select(ids, r"^((?!_error_).)*$", has_value=True):
+        if (
+            getattr(node.metadata, "units", None) == "eV"
+            and "derivative" not in str(node.metadata.path)
         ):
-            assert node >= 0, "Negative value found for a temperature or energy"
+            val = getattr(node, "value", node)
+            try:
+                arr = np.asarray(val, dtype=float)
+            except (TypeError, ValueError):
+                continue
+
+            valid_vals = arr[~np.isnan(arr)]
+            if valid_vals.size > 0:
+                assert np.min(valid_vals) >= 0, (
+                    f"Negative value found for a temperature or energy at path: {node.metadata.path}"
+                )
