@@ -66,7 +66,8 @@ def validate_increasing_time(ids):
 @validator("*")
 def validate_min_max(ids, underflow_threshold=1e-100):
     """
-    Validate that quantity_min <= quantity_max and quantity_min <= quantity <= quantity_max.
+    Validate that quantity_min <= quantity_max and
+    quantity_min <= quantity <= quantity_max.
     Ignores NaN elements during comparisons and handles IMAS primitive objects.
     """
 
@@ -98,9 +99,10 @@ def validate_min_max(ids, underflow_threshold=1e-100):
         # 1. Validate min <= max (ignoring NaNs)
         mask = ~(np.isnan(val_min) | np.isnan(val_max))
         if np.any(mask):
-            assert np.all(
-                val_min[mask] <= val_max[mask]
-            ), f"Validation failed: min > max for '{quantity_name}' at path: {quantity_min.metadata.path}"
+            assert np.all(val_min[mask] <= val_max[mask]), (
+                f"Validation failed: min > max for '{quantity_name}' "
+                f"at path: {quantity_min.metadata.path}"
+            )
 
         # 2. Validate min <= core <= max (ignoring NaNs)
         if (
@@ -117,9 +119,10 @@ def validate_min_max(ids, underflow_threshold=1e-100):
                     in_bounds = (val_min[mask_core] <= val_core[mask_core]) & (
                         val_core[mask_core] <= val_max[mask_core]
                     )
-                    assert np.all(
-                        in_bounds
-                    ), f"Validation failed: '{quantity_name}' out of [min, max] bounds at path: {quantity.metadata.path}"
+                    assert np.all(in_bounds), (
+                        f"Validation failed: '{quantity_name}' out of [min, max] "
+                        f"bounds at path: {quantity.metadata.path}"
+                    )
 
 
 @validator("*")
