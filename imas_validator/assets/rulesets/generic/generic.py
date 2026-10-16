@@ -164,14 +164,7 @@ def validate_temperature_positive(ids):
             node.metadata.units == "eV
             and "derivative" not in str(node.metadata.path)
         ):
-            val = getattr(node, "value", node)
-            try:
-                arr = np.asarray(val, dtype=float)
-            except (TypeError, ValueError):
-                continue
-
-            valid_vals = arr[~np.isnan(arr)]
-            if valid_vals.size > 0:
-                assert np.min(valid_vals) >= 0, (
-                    f"Negative value found for a temperature or energy at path: {node.metadata.path}"
-                )
+           assert np.all(np.logical_or(np.isnan(node), node >= 0)), (
+                "Negative value found for a temperature or energy "
+                f"at path: {node.metadata.path}"
+            )
