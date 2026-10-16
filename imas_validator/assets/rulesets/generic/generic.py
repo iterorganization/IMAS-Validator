@@ -161,7 +161,7 @@ def validate_temperature_positive(ids):
     """Validate that temperature and energy values are positive."""
     for node in Select(ids, r"^((?!_error_).)*$", has_value=True):
         if (
-            getattr(node.metadata, "units", None) == "eV"
+            node.metadata.units == "eV
             and "derivative" not in str(node.metadata.path)
         ):
             val = getattr(node, "value", node)
