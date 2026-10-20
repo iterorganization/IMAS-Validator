@@ -34,6 +34,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     validate_parser = subparsers.add_parser(
         "validate",
         help="validate IDS",
+        usage="%(prog)s [-h] URI [URI ...] [options]",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Options taking several values (-r, -e, -f, --filter_name,"
         " --filter_ids) must come after the URIs, or be followed by '--'.",
     )
@@ -45,7 +47,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         type=str,
         nargs="+",
         action="append",
-        help="URI for database entry",
+        help="One or more URIs of database entries (place them before options"
+        " taking multiple values, or after '--')",
     )
 
     validate_group.add_argument(

@@ -58,6 +58,16 @@ You can find custom rule folders and rulesets with the flags:
 
     $ imas_validator validate 'imas:hdf5?path=imas-validator-course/good' -e path/to/my_rule_folder -r my_ruleset
 
+.. note::
+
+    The options ``-r``, ``-e``, ``-f``, ``--filter_name`` and ``--filter_ids`` accept
+    multiple values. Therefore, give the URI(s) before these options, or separate them
+    with ``--``:
+
+    .. code-block:: console
+
+        $ imas_validator validate -r my_ruleset -- 'imas:hdf5?path=imas-validator-course/good'
+
 Exercise 2
 ----------
 
