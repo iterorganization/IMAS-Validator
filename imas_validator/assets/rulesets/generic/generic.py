@@ -63,6 +63,14 @@ def validate_increasing_time(ids):
                 last_time = struct.time
 
 
+def _less_equal_ignore_nan(lhs, rhs):
+    """Element-wise ``lhs <= rhs``, where comparisons involving NaN are True."""
+    return np.logical_or(
+        np.logical_or(np.isnan(lhs), np.isnan(rhs)),
+        lhs <= rhs,
+    )
+
+
 @validator("*")
 def validate_min_max(ids):
     """Validate that ``*_min`` values are lower than ``*_max`` values, and the related
@@ -73,6 +81,7 @@ def validate_min_max(ids):
     * ``{value}_min <= {value}_max`` is only checked when both values are filled.
     * ``{value}_min <= {value} <= {value}_max`` (value is within bounds) is only
       validated when all three quantities are filled.
+    * NaN elements are ignored: a comparison involving a NaN is considered valid.
     """
     for quantity_min in Select(ids, "_min$", has_value=True):
         quantity_name = str(quantity_min.metadata.name)[:-4]  # strip off _min
@@ -81,7 +90,7 @@ def validate_min_max(ids):
 
         # If _max exists and is filled, check that it is >= _min
         if quantity_max is not None and quantity_max.has_value:
-            assert quantity_min <= quantity_max
+            assert _less_equal_ignore_nan(quantity_min, quantity_max)
 
             # quantity exist, is not a structure and is filled, check that the quantity
             # is within bounds:
@@ -90,7 +99,10 @@ def validate_min_max(ids):
                 and not quantity.metadata.data_type.value.startswith("struct")
                 and quantity.has_value
             ):
-                assert quantity_min <= quantity <= quantity_max
+                assert np.logical_and(
+                    _less_equal_ignore_nan(quantity_min, quantity),
+                    _less_equal_ignore_nan(quantity, quantity_max),
+                )
 
 
 @validator("*")
@@ -117,19 +129,25 @@ def validate_errorbars(ids):
 
 @validator("*")
 def validate_density_positive(ids):
-    """Validate that density values are positive"""
+    """Validate that density values are positive, ignoring NaN values"""
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "m^-3" and not (
             "derivative" in str(node.metadata.path)
         ):
-            assert node >= 0, "Negative value found for a density"
+            assert np.logical_or(
+                np.isnan(node), node >= 0
+            ), "Negative value found for a density"
 
 
 @validator("*")
 def validate_temperature_positive(ids):
-    """Validate that temperature and energy values are positive"""
+    """Validate that temperature and energy values are positive, ignoring NaN
+    values
+    """
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "eV" and not (
             "derivative" in str(node.metadata.path)
         ):
-            assert node >= 0, "Negative value found for a temperature or energy"
+            assert np.logical_or(
+                np.isnan(node), node >= 0
+            ), "Negative value found for a temperature or energy"
