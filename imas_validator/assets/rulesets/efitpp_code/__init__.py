@@ -1,1 +1,1 @@
-"""Folder for bundled code-specific IMAS-Validator tests"""
+"""Rules checking that the IDS fields required as input by EFIT++ are filled"""
