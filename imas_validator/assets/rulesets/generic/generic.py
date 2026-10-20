@@ -84,14 +84,9 @@ def validate_min_max(ids):
     * NaN elements are ignored: a comparison involving a NaN is considered valid.
     """
     for quantity_min in Select(ids, "_min$", has_value=True):
-        quantity_name = str(quantity_min.metadata.name)[:-4]
-        parent = Parent(quantity_min)
-
-        quantity_max = getattr(parent, f"{quantity_name}_max", None)
-        quantity = getattr(parent, quantity_name, None)
-
-        val_min = _extract_clean_array(quantity_min)
-        val_max = _extract_clean_array(quantity_max)
+        quantity_name = str(quantity_min.metadata.name)[:-4]  # strip off _min
+        quantity = getattr(Parent(quantity_min), quantity_name, None)
+        quantity_max = getattr(Parent(quantity_min), quantity_name + "_max", None)
 
         # If _max exists and is filled, check that it is >= _min
         if quantity_max is not None and quantity_max.has_value:
