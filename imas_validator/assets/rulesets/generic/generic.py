@@ -63,26 +63,26 @@ def validate_increasing_time(ids):
                 last_time = struct.time
 
 
+def _less_equal_ignore_nan(lhs, rhs):
+    """Element-wise ``lhs <= rhs``, where comparisons involving NaN are True."""
+    return np.logical_or(
+        np.logical_or(np.isnan(lhs), np.isnan(rhs)),
+        lhs <= rhs,
+    )
+
+
 @validator("*")
-def validate_min_max(ids, underflow_threshold=1e-100):
-    """
-    Validate that quantity_min <= quantity_max and
-    quantity_min <= quantity <= quantity_max.
-    Ignores NaN elements during comparisons and handles IMAS primitive objects.
-    """
+def validate_min_max(ids):
+    """Validate that ``*_min`` values are lower than ``*_max`` values, and the related
+    value is within the bounds.
 
-    def _extract_clean_array(node):
-        """Extract float array from IMAS node and filter out NaNs."""
-        if node is None or not getattr(node, "has_value", False):
-            return None
-        val = getattr(node, "value", node)
-        try:
-            arr = np.asarray(val, dtype=float)
-            # Flush float underflow noise directly to 0.0
-            return np.where(np.abs(arr) < underflow_threshold, 0.0, arr)
-        except (TypeError, ValueError):
-            return None
+    Notes:
 
+    * ``{value}_min <= {value}_max`` is only checked when both values are filled.
+    * ``{value}_min <= {value} <= {value}_max`` (value is within bounds) is only
+      validated when all three quantities are filled.
+    * NaN elements are ignored: a comparison involving a NaN is considered valid.
+    """
     for quantity_min in Select(ids, "_min$", has_value=True):
         quantity_name = str(quantity_min.metadata.name)[:-4]
         parent = Parent(quantity_min)
@@ -93,36 +93,21 @@ def validate_min_max(ids, underflow_threshold=1e-100):
         val_min = _extract_clean_array(quantity_min)
         val_max = _extract_clean_array(quantity_max)
 
-        if val_min is None or val_max is None:
-            continue
+        # If _max exists and is filled, check that it is >= _min
+        if quantity_max is not None and quantity_max.has_value:
+            assert _less_equal_ignore_nan(quantity_min, quantity_max)
 
-        # 1. Validate min <= max (ignoring NaNs)
-        mask = ~(np.isnan(val_min) | np.isnan(val_max))
-        if np.any(mask):
-            assert np.all(val_min[mask] <= val_max[mask]), (
-                f"Validation failed: min > max for '{quantity_name}' "
-                f"at path: {quantity_min.metadata.path}"
-            )
-
-        # 2. Validate min <= core <= max (ignoring NaNs)
-        if (
-            quantity is not None
-            and getattr(quantity, "has_value", False)
-            and not str(getattr(quantity.metadata.data_type, "value", "")).startswith(
-                "struct"
-            )
-        ):
-            val_core = _extract_clean_array(quantity)
-            if val_core is not None:
-                mask_core = mask & ~np.isnan(val_core)
-                if np.any(mask_core):
-                    in_bounds = (val_min[mask_core] <= val_core[mask_core]) & (
-                        val_core[mask_core] <= val_max[mask_core]
-                    )
-                    assert np.all(in_bounds), (
-                        f"Validation failed: '{quantity_name}' out of [min, max] "
-                        f"bounds at path: {quantity.metadata.path}"
-                    )
+            # quantity exist, is not a structure and is filled, check that the quantity
+            # is within bounds:
+            if (
+                quantity is not None
+                and not quantity.metadata.data_type.value.startswith("struct")
+                and quantity.has_value
+            ):
+                assert np.logical_and(
+                    _less_equal_ignore_nan(quantity_min, quantity),
+                    _less_equal_ignore_nan(quantity, quantity_max),
+                )
 
 
 @validator("*")
@@ -131,13 +116,13 @@ def validate_errorbars(ids):
     that error_upper is also filled whenever ``error_lower`` is non empty
     """
     for error_upper in Select(ids, "_error_upper$", has_value=True):
-        assert (
-            error_upper >= 0
+        assert np.logical_or(
+            np.isnan(error_upper), error_upper >= 0
         ), "Negative value found for errorbar, while their values must be positive."
 
     for error_lower in Select(ids, "_error_lower$", has_value=True):
-        assert (
-            error_lower >= 0
+        assert np.logical_or(
+            np.isnan(error_lower), error_lower >= 0
         ), "Negative value found for errorbar, while their values must be positive."
         error_lower_name = str(error_lower.metadata.name)
         error_upper_name = error_lower_name.replace("_error_lower", "_error_upper")
@@ -149,30 +134,25 @@ def validate_errorbars(ids):
 
 @validator("*")
 def validate_density_positive(ids):
-    """Validate that density values are positive."""
-    for node in Select(ids, r"^((?!_error_).)*$", has_value=True):
-        if getattr(node.metadata, "units", None) == "m^-3" and "derivative" not in str(
-            node.metadata.path
+    """Validate that density values are positive, ignoring NaN values"""
+    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
+        if node.metadata.units == "m^-3" and not (
+            "derivative" in str(node.metadata.path)
         ):
-            val = getattr(node, "value", node)
-            try:
-                arr = np.asarray(val, dtype=float)
-            except (TypeError, ValueError):
-                continue
-
-            valid_vals = arr[~np.isnan(arr)]
-            if valid_vals.size > 0:
-                assert (
-                    np.min(valid_vals) >= 0
-                ), f"Negative value found for a density at path: {node.metadata.path}"
+            assert np.logical_or(
+                np.isnan(node), node >= 0
+            ), "Negative value found for a density"
 
 
 @validator("*")
 def validate_temperature_positive(ids):
-    """Validate that temperature and energy values are positive."""
-    for node in Select(ids, r"^((?!_error_).)*$", has_value=True):
-        if node.metadata.units == "eV" and "derivative" not in str(node.metadata.path):
-            assert np.all(np.logical_or(np.isnan(node), node >= 0)), (
-                "Negative value found for a temperature or energy "
-                f"at path: {node.metadata.path}"
-            )
+    """Validate that temperature and energy values are positive, ignoring NaN
+    values
+    """
+    for node in Select(ids, "^((?!_error_).)*$", has_value=True):
+        if node.metadata.units == "eV" and not (
+            "derivative" in str(node.metadata.path)
+        ):
+            assert np.logical_or(
+                np.isnan(node), node >= 0
+            ), "Negative value found for a temperature or energy"
