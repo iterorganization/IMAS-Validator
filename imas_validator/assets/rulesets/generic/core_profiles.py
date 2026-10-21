@@ -1,17 +1,38 @@
 """Generic rules applying to the core_profiles IDS"""
 
+import numpy as np
+
 @validator("core_profiles")
 def validate_electroneutrality(ids):
-    """Validate that electroneutrality is verified in the CORE_PROFILES IDS"""
+    """Validate that electroneutrality is verified in the CORE_PROFILES IDS."""
     for profiles_1d in ids.profiles_1d:
-        if len(profiles_1d.ion) == 0 or not profiles_1d.ion[0].density.has_value:
+        # 1. Baseline checks (existence of global structures)
+        if (
+            len(profiles_1d.ion) == 0
+            or not profiles_1d.electrons.density.has_value
+        ):
             continue
-        ni_zi = sum(ion.density * ion.z_ion for ion in profiles_1d.ion)
-        assert Approx(
-            profiles_1d.electrons.density,
-            ni_zi,
-        ), "Electroneutrality is not verified"
 
+        # 2. Ensure EACH ion species contains all required profiles
+        if any(
+            not ion.density.has_value 
+            or not ion.z_ion_1d.has_value 
+            for ion in profiles_1d.ion
+        ):
+            continue
+
+        # 3. Initialize arrays for accumulation (radial grid size)
+        n_points = len(profiles_1d.electrons.density)
+        sum_ni_z = np.zeros(n_points)
+        
+        # 4. Point-by-point summation over the radial grid for all species
+        for ion in profiles_1d.ion:
+            sum_ni_z += ion.density * ion.z_ion_1d
+
+        # 5. Assertions (1D profile comparisons)
+        assert Approx(
+            profiles_1d.electrons.density, sum_ni_z
+        ), "Electron density profile not consistent with ion average charge profiles (quasi-neutrality violation)"
 
 @validator("core_profiles")
 def validate_z_ion(ids):
