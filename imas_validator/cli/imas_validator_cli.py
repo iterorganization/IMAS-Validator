@@ -31,7 +31,12 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(
         dest="command", description="subparsers for command"
     )
-    validate_parser = subparsers.add_parser("validate", help="validate IDS")
+    validate_parser = subparsers.add_parser(
+        "validate",
+        help="validate IDS",
+        epilog="Options taking several values (-r, -e, -f, --filter_name,"
+        " --filter_ids) must come after the URIs, or be followed by '--'.",
+    )
 
     validate_group = validate_parser.add_argument_group("Validator arguments")
 
@@ -158,8 +163,10 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             action="append",
             nargs="+",
             default=[],
-            help="Specify combined list of rule names and ids names"
-            " that should be present in rule",
+            help="Strings that must all be present in the rule: IDS names are"
+            " matched against the rule's IDSs, other strings against the rule name"
+            " 'ruleset/file.py:function'. A string equal to a ruleset name also"
+            " selects that ruleset",
         )
 
         group.add_argument(
@@ -168,7 +175,10 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             action="append",
             nargs="+",
             default=[],
-            help="Specify list of strings that should be present in rule name",
+            help="Strings that must all be present in the rule name"
+            " 'ruleset/file.py:function'. A string equal to a ruleset name (e.g."
+            " 'iter'), optionally followed by '/...', also selects that ruleset,"
+            " so -r is not needed",
         )
 
         group.add_argument(
@@ -177,7 +187,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             action="append",
             nargs="+",
             default=[],
-            help="Specify list of strings that should be present in rule ids names",
+            help="IDS names that must all be among the IDSs the rule applies to"
+            " (exact match)",
         )
 
     return parser
