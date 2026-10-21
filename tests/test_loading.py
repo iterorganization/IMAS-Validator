@@ -21,6 +21,7 @@ from imas_validator.rules.loading import (
     filter_rules,
     filter_rulesets,
     load_docs,
+    load_rules,
     load_rules_from_path,
 )
 from imas_validator.validate_options import RuleFilter, ValidateOptions
@@ -152,6 +153,34 @@ def test_filter_rulesets_none(caplog):
     assert caplog.record_tuples == [
         ("imas_validator.rules.loading", logging.INFO, log_test)
     ]
+
+
+@pytest.mark.parametrize(
+    "name_filter, expected",
+    [
+        (["test-ruleset"], ["generic", "test-ruleset"]),
+        (["test-ruleset/common_ids.py"], ["generic", "test-ruleset"]),
+        (["test-rule"], ["generic"]),
+        (["common_ids"], ["generic"]),
+    ],
+)
+def test_filter_rulesets_by_name_filter(name_filter, expected):
+    base = "tests/rulesets/base"
+    unfiltered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/test-ruleset")]
+    validate_options = ValidateOptions(rule_filter=RuleFilter(name=name_filter))
+    filtered = filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
+    assert sorted(p.name for p in filtered) == expected
+
+
+def test_load_rules_with_ruleset_name_filter(res_collector):
+    validate_options = ValidateOptions(
+        use_bundled_rulesets=False,
+        extra_rule_dirs=[Path("tests/rulesets/base")],
+        rule_filter=RuleFilter(name=["test-ruleset"]),
+    )
+    rules = load_rules(res_collector, validate_options)
+    assert rules
+    assert all(rule.name.startswith("test-ruleset/") for rule in rules)
 
 
 def test_filter_rulesets_apply_generic(caplog):

@@ -231,6 +231,10 @@ def filter_rulesets(
         List of directories corresponding to given rule sets
     """
     filtered_rulesets: List[Path] = []
+    # Name filter tokens like "iter" or "iter/..." also select the "iter" ruleset
+    filter_ruleset_names = {
+        token.split("/")[0] for token in validate_options.rule_filter.name
+    }
     for ruleset_dir in ruleset_dirs:
         name = ruleset_dir.name
         if name == "generic":
@@ -238,8 +242,10 @@ def filter_rulesets(
                 filtered_rulesets.append(ruleset_dir)
         else:
             if (
-                validate_options.explore and len(validate_options.rulesets) == 0
-            ) or name in validate_options.rulesets:
+                (validate_options.explore and len(validate_options.rulesets) == 0)
+                or name in validate_options.rulesets
+                or name in filter_ruleset_names
+            ):
                 filtered_rulesets.append(ruleset_dir)
     filtered_ruleset_names = [p.name for p in filtered_rulesets]
     for ruleset in validate_options.rulesets:
