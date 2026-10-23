@@ -37,7 +37,9 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         usage="%(prog)s [-h] URI [URI ...] [options]",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Options taking several values (-r, -e, -f, --filter_name,"
-        " --filter_ids) must come after the URIs, or be followed by '--'.",
+        " --filter_ids) must come\nafter the URIs, or be followed by '--', eg.:\n"
+        "  imas_validator validate <URI> -f core_profiles\n"
+        "  imas_validator validate -f core_profiles -- <URI>",
     )
 
     validate_group = validate_parser.add_argument_group("Validator arguments")
