@@ -75,6 +75,38 @@ def test_cli_wrong_command():
     assert pytest_wrapped_e.value.code == 2
 
 
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["validate", "URI", "-f", "core_profiles"],
+        ["validate", "-f", "core_profiles", "--", "URI"],
+    ],
+)
+def test_cli_uri_and_multi_value_option_order(argv):
+    args = imas_validator_cli.configure_argument_parser().parse_args(argv)
+
+    assert args.URI == [["URI"]]
+    assert args.filter == [["core_profiles"]]
+
+
+def test_cli_uri_after_multi_value_option_without_separator():
+    parser = imas_validator_cli.configure_argument_parser()
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        parser.parse_args(["validate", "-f", "core_profiles", "URI"])
+
+    assert pytest_wrapped_e.value.code == 2
+
+
+def test_cli_validate_help_shows_uri_first(capsys):
+    with pytest.raises(SystemExit):
+        imas_validator_cli.main(["validate", "--help"])
+
+    help_text = capsys.readouterr().out
+    assert "validate [-h] URI [URI ...] [options]" in help_text
+    assert "imas_validator validate -f core_profiles -- <URI>" in help_text
+
+
 def test_cli_returns_zero_when_all_datasets_pass(monkeypatch, tmp_path):
     exit_status, _, _ = _run_cli_with_results(monkeypatch, tmp_path, {"valid.nc": True})
 
