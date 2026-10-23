@@ -186,3 +186,87 @@ def test_plural_identifier_netcdf(tmp_path):
     assert results[-1].nodes_dict == {
         ("wall", 0): {node.indices._path, node.names._path}
     }
+
+
+@pytest.mark.parametrize("version", ["3.40.1", "4.1.1"])
+@pytest.mark.parametrize(
+    "ids_name, path, valid_index, valid_name",
+    [
+        (
+            "equilibrium",
+            "time_slice[0]/convergence/grad_shafranov_deviation_expression",
+            1,
+            "absolute_gs_difference",
+        ),
+        (
+            "transport_solver_numerics",
+            "solver_1d[0]/equation[0]/computation_mode",
+            1,
+            "interpretative",
+        ),
+        (
+            "transport_solver_numerics",
+            "solver_1d[0]/equation[0]/boundary_condition[0]/type",
+            1,
+            "value",
+        ),
+    ],
+)
+def test_legacy_identifier_references(version, ids_name, path, valid_index, valid_name):
+    ids = imas.IDSFactory(version).new(ids_name)
+    if ids_name == "equilibrium":
+        ids.time_slice.resize(1)
+    else:
+        ids.solver_1d.resize(1)
+        ids.solver_1d[0].equation.resize(1)
+    if "boundary_condition" in path:
+        ids.solver_1d[0].equation[0].boundary_condition.resize(1)
+    node = ids[path]
+    node.index = valid_index
+    node.name = valid_name
+    results = _run_identifier_rules(ids, "generic/identifiers.py")
+    assert [r.success for r in results] == [True, True]
+    node.name = "invalid"
+    results = _run_identifier_rules(ids, "generic/identifiers.py")
+    assert [r.success for r in results] == [True, False]
+    assert results[-1].nodes_dict == {
+        (ids_name, 0): {node.index._path, node.name._path}
+    }
+    node.index = 999999
+    results = _run_identifier_rules(ids, "generic/identifiers.py")
+    assert [r.success for r in results] == [False]
+
+
+def test_legacy_identifier_reference_without_suffix():
+    # DD 3.41.0 to 4.0.0 refer to equilibrium_convergence_status.xml, while the
+    # enumeration is registered as equilibrium_convergence_status_identifier
+    ids = imas.IDSFactory("3.42.0").equilibrium()
+    ids.time_slice.resize(1)
+    node = ids.time_slice[0].convergence.result
+    node.index = 1
+    node.name = "converged"
+    results = _run_identifier_rules(ids, "generic/identifiers.py")
+    assert [r.success for r in results] == [True, True]
+    node.index = 999999
+    results = _run_identifier_rules(ids, "generic/identifiers.py")
+    assert [r.success for r in results] == [False]
+
+
+@pytest.mark.parametrize(
+    "version, ids_name, path",
+    [
+        ("3.30.0", "spectrometer_x_ray_crystal", "crystal/geometry_type"),
+        (
+            "3.35.0",
+            "spectrometer_visible",
+            "channel[0]/geometry_matrix/emission_grid/grid_type",
+        ),
+    ],
+)
+def test_unresolvable_identifier_reference_is_skipped(version, ids_name, path):
+    # These DDs refer to identifier files for which no enumeration is registered
+    ids = imas.IDSFactory(version).new(ids_name)
+    if ids_name == "spectrometer_visible":
+        ids.channel.resize(1)
+    ids[path].index = 999999
+    assert _run_identifier_rules(ids, "generic/identifiers.py") == []

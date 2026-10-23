@@ -5,13 +5,29 @@ enumeration of the Data Dictionary, see
 https://imas-data-dictionary.readthedocs.io/en/latest/reference_identifier.html
 """
 
+from pathlib import Path
+
+import imas
 import numpy as np
+
+
+def _metadata_identifier_enum(metadata):
+    """Resolve an identifier enumeration. Some older DDs (3.22.0 to 4.0.0) refer to
+    identifier files without their "_identifier" suffix; identifiers that still
+    cannot be resolved are skipped."""
+    try:
+        return metadata.identifier_enum
+    except KeyError:
+        name = f"{Path(metadata.doc_identifier).stem}_identifier"
+        if name in imas.identifiers.identifiers:
+            return imas.identifiers[name]
+        return None
 
 
 def _identifier_enum(index):
     """Return the identifier enumeration of the structure containing ``index``, or
     None when that structure is not an identifier with an enumeration."""
-    return Parent(index)._obj.metadata.identifier_enum
+    return _metadata_identifier_enum(Parent(index)._obj.metadata)
 
 
 @validator("*")
@@ -61,11 +77,11 @@ def _plural_identifier_enum(indices):
     metadata = Parent(indices)._obj.metadata
     if not getattr(metadata, "structure_reference", "").startswith("identifier_"):
         return None
-    identifier_enum = metadata.identifier_enum
+    identifier_enum = _metadata_identifier_enum(metadata)
     if identifier_enum is None:
         parent = Parent(indices, 2)._obj.metadata
         if getattr(parent, "structure_reference", "") == "generic_grid_identifier":
-            identifier_enum = parent.identifier_enum
+            identifier_enum = _metadata_identifier_enum(parent)
     return identifier_enum
 
 
