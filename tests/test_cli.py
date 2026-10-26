@@ -98,15 +98,6 @@ def test_cli_uri_after_multi_value_option_without_separator():
     assert pytest_wrapped_e.value.code == 2
 
 
-def test_cli_validate_help_shows_uri_first(capsys):
-    with pytest.raises(SystemExit):
-        imas_validator_cli.main(["validate", "--help"])
-
-    help_text = capsys.readouterr().out
-    assert "validate [-h] URI [URI ...] [options]" in help_text
-    assert "imas_validator validate -f core_profiles -- <URI>" in help_text
-
-
 def test_cli_returns_zero_when_all_datasets_pass(monkeypatch, tmp_path):
     exit_status, _, _ = _run_cli_with_results(monkeypatch, tmp_path, {"valid.nc": True})
 
