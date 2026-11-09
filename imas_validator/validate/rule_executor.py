@@ -120,7 +120,11 @@ class RuleExecutor:
             if not candidate_rules:
                 self.progress.update(t1, advance=1)
                 continue
-            ids_instance = self._load_ids_instance(ids_name, occurrence)
+            # Lazy load when all candidate rules only read a few nodes: a full get()
+            # of a large IDS (e.g. with GGD data) can take a lot of time and memory.
+            # Node coverage needs all filled nodes, so it requires a full load.
+            lazy = self._use_lazy(candidate_rules)
+            ids_instance = self._load_ids_instance(ids_name, occurrence, lazy)
             if ids_instance is None:
                 continue
             # With autoconvert=False, use the stored IDS's DD version, not the
@@ -138,7 +142,9 @@ class RuleExecutor:
                 # unoptimized algorithm, change if performance ever becomes problem.
                 for name, occ in zip(rule.ids_names[1:], rule.ids_occs[1:]):
                     assert occ is not None
-                    instance = self._load_ids_instance(name, occ)
+                    instance = self._load_ids_instance(
+                        name, occ, self._use_lazy([rule])
+                    )
                     if instance is None:
                         continue
                     idss.append(instance)
@@ -150,13 +156,21 @@ class RuleExecutor:
                 yield idss, rule
         self.progress_stop()
 
+    def _use_lazy(self, rules: List[IDSValidationRule]) -> bool:
+        """Whether IDSs for these rules can be lazy loaded"""
+        return not self.validate_options.track_node_dict and all(
+            rule.lazy for rule in rules
+        )
+
     def _load_ids_instance(
-        self, ids_name: str, occurrence: int
+        self, ids_name: str, occurrence: int, lazy: bool = False
     ) -> Optional[IDSInstance]:
-        logger.debug(f"Processing IDS: {ids_name}, occurrence = {occurrence}")
+        logger.debug(
+            f"Processing IDS: {ids_name}, occurrence = {occurrence}, lazy = {lazy}"
+        )
         try:
             ids_instance = (
-                self.db_entry.get(ids_name, occurrence, autoconvert=False),
+                self.db_entry.get(ids_name, occurrence, autoconvert=False, lazy=lazy),
                 ids_name,
                 occurrence,
             )
