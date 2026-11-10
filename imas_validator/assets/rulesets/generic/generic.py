@@ -1,7 +1,7 @@
 """Generic rules applying to all IDSs"""
 
 import numpy as np
-from imas.ids_struct_array import IDSStructArray
+from imas.ids_data_type import IDSDataType
 
 
 @validator("*")
@@ -164,10 +164,9 @@ def _unique_name_nodes(ids, has_value=True):
     for name in Select(ids, "(^|/)name$", has_value=has_value):
         if not str(name.metadata.documentation).startswith(UNIQUE_NAME_DOC):
             continue
-        aos = Parent(name, 2)
         # name of a structure or of the IDS toplevel has no siblings to compare with
-        if isinstance(aos._obj, IDSStructArray):
-            yield name, aos
+        if Parent(name).metadata.data_type == IDSDataType.STRUCT_ARRAY:
+            yield name, Parent(name, 2)
 
 
 @validator("*")
@@ -192,7 +191,3 @@ def validate_unique_names(ids):
             assert np.all(
                 name != np.delete(values, i)
             ), f"Duplicate name {str(name)!r} in {aos._obj!r}"
-
-    # Uncomment to also require a non-empty name in every array of structures element:
-    # for name, _ in _unique_name_nodes(ids, has_value=False):
-    #     assert name.has_value, "name must be filled"
