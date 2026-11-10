@@ -16,8 +16,9 @@ def new_pf_active():
     return ids
 
 
-def run_rule(ids):
-    """Run the bundled generic validate_aos_name_not_empty rule on ids."""
+def run_rule(ids, **options):
+    """Run the bundled pedantic validate_aos_name_not_empty rule on ids."""
+    options.setdefault("rulesets", ["pedantic"])
 
     def list_all_occurrences(ids_name):
         return numpy.array([0]) if ids_name == ids.metadata.name else []
@@ -33,9 +34,9 @@ def run_rule(ids):
         uri="",
         factory=imas.IDSFactory("3.40.1"),
     ):
-        options = ValidateOptions(rule_filter=RuleFilter(name=[RULE_NAME]))
+        options = ValidateOptions(rule_filter=RuleFilter(name=[RULE_NAME]), **options)
         results = validate(imas_uri="", validate_options=options).results
-    assert all(res.rule.name.endswith(f"generic.py:{RULE_NAME}") for res in results)
+    assert all(res.rule.name == f"pedantic/generic.py:{RULE_NAME}" for res in results)
     assert all(res.exc is None for res in results)
     return results
 
@@ -92,3 +93,9 @@ def test_plain_structure_name_ignored():
     ids.code.name = ""  # name of a plain structure, not checked
     results = run_rule(ids)
     assert results == []
+
+
+def test_not_applied_by_default():
+    ids = new_pf_active()
+    ids.coil.resize(1)  # coil[0].name is empty
+    assert run_rule(ids, rulesets=[]) == []
