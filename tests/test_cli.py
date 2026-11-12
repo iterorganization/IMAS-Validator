@@ -10,7 +10,7 @@ import numpy
 import pytest
 
 from imas_validator.cli import imas_validator_cli
-from imas_validator.cli.commands import validate_command
+from imas_validator.cli.commands import explore_command, validate_command
 
 
 def _run_cli_with_results(monkeypatch, output_path, validation_results):
@@ -250,3 +250,11 @@ def test_explore_command():
     argv = ["explore"]
 
     imas_validator_cli.main(argv)
+
+
+@pytest.mark.parametrize("argv, apply_generic", [([], True), (["-g"], False)])
+def test_explore_command_no_generic(argv, apply_generic):
+    parser = imas_validator_cli.configure_argument_parser()
+    args = parser.parse_args(["explore", *argv])
+    command_object = explore_command.ExploreCommand(args)
+    assert command_object.validate_options.apply_generic is apply_generic
