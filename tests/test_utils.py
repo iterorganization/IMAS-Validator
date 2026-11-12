@@ -56,3 +56,19 @@ def test_prepare_rule_filter_object():
         returned_rule_filter.ids.sort()
         == ["core_sources", "edge_profiles:3", "rulename3", "core_profiles"].sort()
     )
+
+
+def test_prepare_rule_filter_object_exclude():
+    args = argparse.Namespace(
+        filter=[],
+        filter_name=[["validate"]],
+        filter_ids=[],
+        exclude=[["ggd", "equilibrium"]],
+        exclude_name=[["iter/"]],
+        exclude_ids=[["summary"]],
+    )
+    rule_filter = prepare_rule_filter_object(args)
+    assert rule_filter.name == ["validate"]
+    assert rule_filter.ids == []
+    assert sorted(rule_filter.exclude_name) == ["ggd", "iter/"]
+    assert sorted(rule_filter.exclude_ids) == ["equilibrium", "summary"]

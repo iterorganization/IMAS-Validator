@@ -24,6 +24,8 @@ class ExploreCommand(GenericCommand):
                 Path(element)
                 for element in flatten_2d_list_or_return_empty(args.extra_rule_dirs)
             ],
+            # store_false option: True unless -g/--no-generic is given
+            apply_generic=getattr(args, "no_generic", True),
             use_bundled_rulesets=not args.no_bundled,  # invert logic
             rule_filter=prepare_rule_filter_object(args),
             explore=True,
