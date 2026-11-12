@@ -30,6 +30,8 @@ Docs: `make -C docs html` (Sphinx). Benchmarks: `asv` with `asv.conf.json`, benc
 
 The version comes from git tags via setuptools_scm and is written to `imas_validator/_version.py`. That file is generated; don't edit it. PRs target the `develop` branch.
 
+Record user-visible changes (new rules or features, behaviour changes, breaking changes such as removed or renamed rules, notable fixes) under *Unreleased* in `docs/source/changelog.rst`, in the same PR. At release time that section is renamed to the version and reused for the release notes.
+
 ## Architecture
 
 The pipeline (`validate/validate.py:validate`): open an `imas.DBEntry` → `ResultCollector` → `load_rules` → `RuleExecutor.apply_rules_to_data` → `IDSValidationResultCollection` → report generators in `report/`.

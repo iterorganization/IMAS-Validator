@@ -3,6 +3,7 @@
 import imas  # type: ignore
 import numpy as np
 import pytest
+from imas.ids_defs import EMPTY_FLOAT  # type: ignore
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
@@ -54,7 +55,7 @@ def make_equilibrium(dd_version, prof, ip=IP, b0=B0):
     ts.profiles_1d.q = prof["q"]
     ts.profiles_1d.f = prof["f"]
     ts.profiles_1d.phi = prof["phi"]
-    ts.profiles_1d.pressure = [1e5, 5e4, 0.0]
+    ts.profiles_1d.pressure = np.linspace(1e5, 0.0, len(prof["psi"]))
     setattr(ts.profiles_1d, current_density_name(dd_version), prof["j"])
     return eq
 
@@ -103,12 +104,12 @@ def make_idss(dd_version, prof):
     return idss
 
 
-def run_cocos_rules(tmp_path, dd_version, idss):
+def run_cocos_rules(tmp_path, dd_version, idss, name="cocos"):
     uri = f"{tmp_path}/cocos.nc"
     with imas.DBEntry(uri, "w", dd_version=dd_version) as dbentry:
         for ids in idss.values():
             dbentry.put(ids)
-    options = ValidateOptions(rule_filter=RuleFilter(name=["cocos"]))
+    options = ValidateOptions(rule_filter=RuleFilter(name=[name]))
     # validate() only lists the IDSs of the default DD version: match the entry's
     # version so that DD4-only IDSs (plasma_profiles) are validated as well
     with pytest.MonkeyPatch.context() as mp:
@@ -170,6 +171,7 @@ def test_plasma_profiles_dd4(tmp_path):
         ("core_profiles", "q"),
         ("core_profiles", "j"),
         ("edge_profiles", "psi"),
+        ("edge_profiles", "j"),
         ("summary", "q"),
     ],
 )
@@ -205,6 +207,72 @@ def test_unknown_reference_signs_are_skipped(tmp_path):
     prof = consistent_profiles(DD3)
     prof["psi"] = prof["psi"][::-1]  # wrong, but no Ip to compare with
     eq = make_equilibrium(DD3, prof, ip=0.0, b0=B0)
+    results = run_cocos_rules(tmp_path, DD3, {"equilibrium": eq})
+    assert failed_rules(results) == set()
+
+
+def failure_messages(results):
+    return {result.msg for result in results if not result.success}
+
+
+@pytest.mark.parametrize("dd_version", [DD3, DD4])
+def test_psi_messages_differ(tmp_path, dd_version):
+    prof = consistent_profiles(dd_version)
+    eq = make_equilibrium(dd_version, prof)
+    ts = eq.time_slice[0]
+    ts.global_quantities.psi_axis, ts.global_quantities.psi_boundary = (
+        prof["psi"][-1],
+        prof["psi"][0],
+    )
+    msgs_global = failure_messages(
+        run_cocos_rules(tmp_path, dd_version, {"equilibrium": eq})
+    )
+
+    eq = make_equilibrium(dd_version, prof)
+    eq.time_slice[0].profiles_1d.psi = prof["psi"][::-1]
+    msgs_profile = failure_messages(
+        run_cocos_rules(tmp_path, dd_version, {"equilibrium": eq})
+    )
+
+    assert len(msgs_global) == 1 and len(msgs_profile) == 1
+    assert msgs_global != msgs_profile
+
+
+@pytest.mark.parametrize("dd_version", [DD3, DD4])
+def test_edge_profiles_messages_mention_inferred_ip(tmp_path, dd_version):
+    prof = consistent_profiles(dd_version)
+    prof["psi"] = prof["psi"][::-1]
+    idss = {"edge_profiles": make_profiles(dd_version, "edge_profiles", prof)}
+    msgs = failure_messages(run_cocos_rules(tmp_path, dd_version, idss))
+    assert msgs and all("inferred from q*B0" in msg for msg in msgs)
+
+
+@pytest.mark.parametrize("dd_version", [DD3, DD4])
+def test_fill_values_are_ignored(tmp_path, dd_version):
+    prof = consistent_profiles(dd_version)
+    for name in ["q", "f", "phi", "j"]:
+        prof[name] = np.append(prof[name], EMPTY_FLOAT)
+    prof["psi"] = np.append(prof["psi"], prof["psi"][-1] + np.diff(prof["psi"])[-1])
+    prof["rho"] = np.array([0.0, 0.3, 0.6, 1.0])
+    idss = make_idss(dd_version, prof)
+    # A wrong sign of the fill value would make the q and j checks fail
+    for ids in idss.values():
+        if ids.metadata.name == "summary":
+            ids.global_quantities.q_95.value = [EMPTY_FLOAT]
+    results = run_cocos_rules(tmp_path, dd_version, idss)
+    assert failed_rules(results) == set()
+
+
+def test_phi_on_axis_without_b0(tmp_path):
+    prof = consistent_profiles(DD3)
+    prof["phi"] = prof["phi"] + 1.0
+    eq = make_equilibrium(DD3, prof)
+    eq.vacuum_toroidal_field.b0 = []
+    results = run_cocos_rules(
+        tmp_path, DD3, {"equilibrium": eq}, name="validate_phi_on_axis"
+    )
+    assert failed_rules(results) == {"validate_phi_on_axis"}
+    # phi on axis is not a COCOS check
     results = run_cocos_rules(tmp_path, DD3, {"equilibrium": eq})
     assert failed_rules(results) == set()
 

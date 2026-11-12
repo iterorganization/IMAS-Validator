@@ -30,6 +30,7 @@ Manual
    usage
    filter_rules
    tips_and_tricks
+   changelog
 
 .. toctree::
    :caption: API docs
