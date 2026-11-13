@@ -30,6 +30,8 @@ Docs: `make -C docs html` (Sphinx). Benchmarks: `asv` with `asv.conf.json`, benc
 
 The version comes from git tags via setuptools_scm and is written to `imas_validator/_version.py`. That file is generated; don't edit it. PRs target the `develop` branch.
 
+Record user-visible changes (new rules or features, behaviour changes, breaking changes such as removed or renamed rules, notable fixes) under *Unreleased* in `docs/source/changelog.rst`, in the same PR. At release time that section is renamed to the version and reused for the release notes.
+
 ## Architecture
 
 The pipeline (`validate/validate.py:validate`): open an `imas.DBEntry` → `ResultCollector` → `load_rules` → `RuleExecutor.apply_rules_to_data` → `IDSValidationResultCollection` → report generators in `report/`.
@@ -38,7 +40,7 @@ The pipeline (`validate/validate.py:validate`): open an `imas.DBEntry` → `Resu
 
 **Rule files are not imported as modules.** `rules/ast_rewrite.py:run_path` reads the source, uses an AST transformer to rewrite every `assert x, msg` statement into a call `assert(x, msg)`, and then `exec`s it with injected globals: `validator` (a per-file `ValidatorRegistry.validator` decorator), `assert` (bound to `ResultCollector.assert_`), and the helpers from `rules/helpers.py` (`Select`, `Increasing`, `Decreasing`, `Approx`, `Parent`, exported through `__all__`/`HELPER_DICT`). This is why rule files use undefined names (flake8 F821 is ignored for `imas_validator/assets/*`) and why mypy ignores assets. To add a new helper for rule authors, add it to `__all__` in `helpers.py`.
 
-**`@validator(*ids_names, version="")`** (`rules/data.py`) creates `IDSValidationRule`s. IDS names can be `"*"` or `"name:occurrence"`. Multi-IDS rules must give an occurrence for every name. `version` is a `packaging` SpecifierSet that is matched against the IDS's DD version. A rule's name is `ruleset/file.py:func`.
+**`@validator(*ids_names, version="")`** (`rules/data.py`) creates `IDSValidationRule`s. IDS names can be `"*"` or `"name:occurrence"`. Multi-IDS rules must give an occurrence for every name. `version` is a `packaging` SpecifierSet that is matched against the IDS's DD version. A rule's name is `ruleset/file.py:func`. `lazy=True` marks a rule that reads only a few nodes: the executor then lazy loads the IDS (`DBEntry.get(..., lazy=True)`) when every candidate rule for that IDS is lazy and node coverage is off. A full `get()` of a large IDS (GGD, many time slices) can take many minutes and GBs, so set it on rules that only probe a few fields, and don't use `iter_nonempty_` in them.
 
 **Execution** (`validate/rule_executor.py`): for each IDS occurrence in the entry, the executor loads it with `autoconvert=False`, matches rules on the *first* IDS name and occurrence, and for multi-IDS rules also loads the additional IDSs. An exception inside a rule becomes an error result, not a crash. With `use_pdb`, a failed assert raises `InternalValidateDebugException` and the executor drops into `pdb.post_mortem` at the rule's own frame.
 

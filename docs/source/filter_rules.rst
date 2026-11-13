@@ -33,6 +33,13 @@ or when it is an additional input to a selected cross-IDS rule. Wildcard rules
 can still require all IDSs. Version constraints are checked after loading,
 using the stored IDS's Data Dictionary version.
 
+Rules that read only a few nodes can be declared with ``lazy=True``. An IDS is
+lazy loaded only when *all* selected rules that apply to it are lazy (and node
+coverage is not tracked). The default ``generic`` ruleset contains non-lazy
+rules for every IDS, so lazy loading only takes effect when a filter selects
+lazy rules alone, for example ``--filter cocos`` for the COCOS sign checks of
+large IDSs.
+
 Examples
 --------
 
