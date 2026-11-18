@@ -1,5 +1,5 @@
 import argparse
-from typing import Any, List
+from typing import Any, List, Tuple
 
 import imas  # type: ignore
 
@@ -24,28 +24,35 @@ def flatten_2d_list_or_return_empty(list_2d: List[List[Any]]) -> List[Any]:
     ]
 
 
+def _split_names_and_ids(
+    mixed: List[str], names: List[str], ids: List[str]
+) -> Tuple[List[str], List[str]]:
+    """Return (names, ids), adding the IDS names of ``mixed`` to ``ids`` and its
+    other strings to ``names``"""
+    mixed_ids = set(mixed).intersection(get_all_ids_names())
+    return names + list(set(mixed) - mixed_ids), ids + list(mixed_ids)
+
+
 def prepare_rule_filter_object(args: argparse.Namespace) -> RuleFilter:
     """
     Returns RuleFilter object filled with data from CLI arguments
-    Uses args.filter, args.filter_name and args.filter_ids
+    Uses args.filter, args.filter_name, args.filter_ids, and the matching
+    args.exclude, args.exclude_name and args.exclude_ids
     """
-    name_filter = []
-    ids_filter = []
 
-    # parse --filter_name and --filter_ids
-    name_filter.extend(flatten_2d_list_or_return_empty(args.filter_name))
-    ids_filter.extend(flatten_2d_list_or_return_empty(args.filter_ids))
+    def get(option: str) -> List[str]:
+        return flatten_2d_list_or_return_empty(getattr(args, option, None) or [])
 
-    # parse --filter and split it into names and ids_names
-    ids_filter.extend(
-        list(
-            set(flatten_2d_list_or_return_empty(args.filter)).intersection(
-                get_all_ids_names()
-            )
-        )
+    # --filter and --exclude are split into rule names and IDS names
+    name_filter, ids_filter = _split_names_and_ids(
+        get("filter"), get("filter_name"), get("filter_ids")
     )
-    name_filter.extend(
-        list(set(flatten_2d_list_or_return_empty(args.filter)) - set(ids_filter))
+    exclude_name, exclude_ids = _split_names_and_ids(
+        get("exclude"), get("exclude_name"), get("exclude_ids")
     )
-
-    return RuleFilter(name=name_filter, ids=ids_filter)
+    return RuleFilter(
+        name=name_filter,
+        ids=ids_filter,
+        exclude_name=exclude_name,
+        exclude_ids=exclude_ids,
+    )

@@ -16,6 +16,19 @@ class RuleFilter:
     """List of strings that should be present in rule name"""
     ids: List[str] = field(default_factory=list)
     """List of strings that should be present in rule ids_names"""
+    exclude_name: List[str] = field(default_factory=list)
+    """Rules whose name contains any of these strings are discarded"""
+    exclude_ids: List[str] = field(default_factory=list)
+    """Rules applying to any of these IDS names (exact match) are discarded"""
+
+    @property
+    def selects_rules(self) -> bool:
+        """Whether name or IDS selection criteria are given (exclusions not counted).
+
+        When they are, all rulesets are searched for matching rules, unless rulesets
+        are named explicitly.
+        """
+        return bool(self.name or self.ids)
 
     def is_selected(self, rule: IDSValidationRule) -> bool:
         """Check whether rule should be applied or not
@@ -29,6 +42,10 @@ class RuleFilter:
         if not all(x in rule.name for x in self.name):
             return False
         if not all(x in rule.ids_names for x in self.ids):
+            return False
+        if any(x in rule.name for x in self.exclude_name):
+            return False
+        if any(x in rule.ids_names for x in self.exclude_ids):
             return False
         return True
 

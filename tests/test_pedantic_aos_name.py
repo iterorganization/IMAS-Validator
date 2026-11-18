@@ -20,6 +20,7 @@ def run_rule(ids, **options):
     """Run the bundled pedantic validate_aos_name_not_empty rule on ids."""
     options.setdefault("rulesets", ["pedantic"])
     options.setdefault("stop_at_load_error", True)
+    options.setdefault("rule_filter", RuleFilter(name=[RULE_NAME]))
 
     def list_all_occurrences(ids_name):
         return numpy.array([0]) if ids_name == ids.metadata.name else []
@@ -35,7 +36,7 @@ def run_rule(ids, **options):
         uri="",
         factory=imas.IDSFactory("3.40.1"),
     ):
-        options = ValidateOptions(rule_filter=RuleFilter(name=[RULE_NAME]), **options)
+        options = ValidateOptions(**options)
         results = validate(imas_uri="", validate_options=options).results
     assert all(res.rule.name == f"pedantic/generic.py:{RULE_NAME}" for res in results)
     assert all(res.exc is None for res in results)
@@ -99,4 +100,15 @@ def test_plain_structure_name_ignored():
 def test_not_applied_by_default():
     ids = new_pf_active()
     ids.coil.resize(1)  # coil[0].name is empty
-    assert run_rule(ids, rulesets=[]) == []
+    # No ruleset named and no rule filter: only generic is applied by default, and it
+    # is disabled here, so no rule must run
+    results = run_rule(ids, rulesets=[], apply_generic=False, rule_filter=RuleFilter())
+    assert results == []
+
+
+def test_applied_by_name_filter_without_ruleset():
+    ids = new_pf_active()
+    ids.coil.resize(1)  # coil[0].name is empty
+    # A name filter without a named ruleset searches all rulesets, pedantic included
+    results = run_rule(ids, rulesets=[])
+    assert failed_paths(results) == {"coil[0]/name"}
