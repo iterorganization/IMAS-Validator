@@ -36,8 +36,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         help="validate IDS",
         usage="%(prog)s [-h] URI [URI ...] [options]",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="Options taking several values (-r, -e, -f, --filter_name,"
-        " --filter_ids) must come after the URIs, or be followed by '--'.",
+        epilog="Options taking several values (-r, -e, -f, -x, --filter_*,"
+        " --exclude_*) must come after the URIs, or be followed by '--'.",
     )
 
     validate_group = validate_parser.add_argument_group("Validator arguments")
@@ -71,13 +71,6 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         default=[],
         help="""Specify path to your custom ruleset. Subsequent usage of following
                 argument will overwrite previous occurrences of the argument""",
-    )
-
-    validate_group.add_argument(
-        "-g",
-        "--no-generic",
-        action="store_false",
-        help="Disable usage of generic ruleset",
     )
 
     validate_group.add_argument(
@@ -153,6 +146,13 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             help="Disable rulesets bundled with imas_validator.",
         )
         group.add_argument(
+            "-g",
+            "--no-generic",
+            action="store_false",
+            help="Disable usage of generic ruleset",
+        )
+
+        group.add_argument(
             "--verbose",
             action="store_true",
             default=False,
@@ -168,8 +168,9 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             default=[],
             help="Strings that must all be present in the rule: IDS names are"
             " matched against the rule's IDSs, other strings against the rule name"
-            " 'ruleset/file.py:function'. A string equal to a ruleset name also"
-            " selects that ruleset",
+            " 'ruleset/file.py:function'. Without -r, all rulesets are searched."
+            " A string equal to an IDS name (in the default DD version) is always"
+            " an IDS filter: use --filter_name to match it in rule names",
         )
 
         group.add_argument(
@@ -179,9 +180,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             nargs="+",
             default=[],
             help="Strings that must all be present in the rule name"
-            " 'ruleset/file.py:function'. A string equal to a ruleset name (e.g."
-            " 'iter'), optionally followed by '/...', also selects that ruleset,"
-            " so -r is not needed",
+            " 'ruleset/file.py:function'. Without -r, all rulesets are searched",
         )
 
         group.add_argument(
@@ -191,7 +190,40 @@ def configure_argument_parser() -> argparse.ArgumentParser:
             nargs="+",
             default=[],
             help="IDS names that must all be among the IDSs the rule applies to"
-            " (exact match)",
+            " (exact match). Without -r, all rulesets are searched",
+        )
+
+        group.add_argument(
+            "-x",
+            "--exclude",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Discard rules containing any of these strings: IDS names are"
+            " matched against the rule's IDSs, other strings against the rule name"
+            " 'ruleset/file.py:function' (e.g. 'ggd', or 'iter/' for a ruleset)."
+            " A string equal to an IDS name (in the default DD version) is always"
+            " an IDS exclusion: use --exclude_name to match it in rule names",
+        )
+
+        group.add_argument(
+            "--exclude_name",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Discard rules whose name 'ruleset/file.py:function' contains any"
+            " of these strings",
+        )
+
+        group.add_argument(
+            "--exclude_ids",
+            type=str,
+            action="append",
+            nargs="+",
+            default=[],
+            help="Discard rules applying to any of these IDS names (exact match)",
         )
 
     return parser
