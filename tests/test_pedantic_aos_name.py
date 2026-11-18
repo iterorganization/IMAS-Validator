@@ -19,11 +19,12 @@ def new_pf_active():
 def run_rule(ids, **options):
     """Run the bundled pedantic validate_aos_name_not_empty rule on ids."""
     options.setdefault("rulesets", ["pedantic"])
+    options.setdefault("stop_at_load_error", True)
 
     def list_all_occurrences(ids_name):
         return numpy.array([0]) if ids_name == ids.metadata.name else []
 
-    def get(ids_name, occurrence=0, autoconvert=False):
+    def get(ids_name, occurrence=0, autoconvert=False, lazy=False):
         return ids
 
     with patch(
