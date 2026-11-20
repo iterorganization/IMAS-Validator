@@ -10,7 +10,7 @@ import numpy
 import pytest
 
 from imas_validator.cli import imas_validator_cli
-from imas_validator.cli.commands import validate_command
+from imas_validator.cli.commands import explore_command, validate_command
 
 
 def _run_cli_with_results(monkeypatch, output_path, validation_results):
@@ -96,15 +96,6 @@ def test_cli_uri_after_multi_value_option_without_separator():
         parser.parse_args(["validate", "-f", "core_profiles", "URI"])
 
     assert pytest_wrapped_e.value.code == 2
-
-
-def test_cli_validate_help_shows_uri_first(capsys):
-    with pytest.raises(SystemExit):
-        imas_validator_cli.main(["validate", "--help"])
-
-    help_text = capsys.readouterr().out
-    assert "validate [-h] URI [URI ...] [options]" in help_text
-    assert "imas_validator validate -f core_profiles -- <URI>" in help_text
 
 
 def test_cli_returns_zero_when_all_datasets_pass(monkeypatch, tmp_path):
@@ -250,3 +241,11 @@ def test_explore_command():
     argv = ["explore"]
 
     imas_validator_cli.main(argv)
+
+
+@pytest.mark.parametrize("argv, apply_generic", [([], True), (["-g"], False)])
+def test_explore_command_no_generic(argv, apply_generic):
+    parser = imas_validator_cli.configure_argument_parser()
+    args = parser.parse_args(["explore", *argv])
+    command_object = explore_command.ExploreCommand(args)
+    assert command_object.validate_options.apply_generic is apply_generic

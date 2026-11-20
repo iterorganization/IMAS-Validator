@@ -156,20 +156,63 @@ def test_filter_rulesets_none(caplog):
 
 
 @pytest.mark.parametrize(
-    "name_filter, expected",
+    "rule_filter, rulesets, expected",
     [
-        (["test-ruleset"], ["generic", "test-ruleset"]),
-        (["test-ruleset/common_ids.py"], ["generic", "test-ruleset"]),
-        (["test-rule"], ["generic"]),
-        (["common_ids"], ["generic"]),
+        # Any name or IDS filter searches all rulesets, as explore does
+        (RuleFilter(name=["test-ruleset"]), [], ["generic", "test-ruleset"]),
+        (RuleFilter(name=["test-rule"]), [], ["generic", "test-ruleset"]),
+        (RuleFilter(name=["common_ids"]), [], ["generic", "test-ruleset"]),
+        (RuleFilter(ids=["core_profiles"]), [], ["generic", "test-ruleset"]),
+        # Exclusions alone don't extend the default selection
+        (RuleFilter(exclude_name=["ggd"]), [], ["generic"]),
+        # Explicitly named rulesets restrict the search
+        (RuleFilter(name=["common_ids"]), ["generic"], ["generic"]),
     ],
 )
-def test_filter_rulesets_by_name_filter(name_filter, expected):
+def test_filter_rulesets_by_rule_filter(rule_filter, rulesets, expected):
     base = "tests/rulesets/base"
     unfiltered_rulesets = [Path(f"{base}/generic"), Path(f"{base}/test-ruleset")]
-    validate_options = ValidateOptions(rule_filter=RuleFilter(name=name_filter))
+    validate_options = ValidateOptions(rule_filter=rule_filter, rulesets=rulesets)
     filtered = filter_rulesets(unfiltered_rulesets, validate_options=validate_options)
     assert sorted(p.name for p in filtered) == expected
+
+
+@pytest.mark.parametrize("explore", [False, True])
+@pytest.mark.parametrize(
+    "rule_filter, rulesets",
+    [
+        (RuleFilter(name=["common_ids"]), []),
+        (RuleFilter(name=["test-ruleset"]), []),
+        (RuleFilter(ids=["core_profiles"]), []),
+        (RuleFilter(name=["common_ids"]), ["generic"]),
+        (RuleFilter(name=["common_ids"], exclude_name=["generic/"]), []),
+    ],
+)
+def test_validate_and_explore_select_same_rules(
+    res_collector, rule_filter, rulesets, explore
+):
+    def rule_names(explore):
+        validate_options = ValidateOptions(
+            use_bundled_rulesets=False,
+            extra_rule_dirs=[Path("tests/rulesets/base")],
+            rule_filter=rule_filter,
+            rulesets=rulesets,
+            explore=explore,
+        )
+        return sorted(rule.name for rule in load_rules(res_collector, validate_options))
+
+    assert rule_names(explore=False) == rule_names(explore=True)
+
+
+def test_load_rules_excluding_ruleset(res_collector):
+    validate_options = ValidateOptions(
+        use_bundled_rulesets=False,
+        extra_rule_dirs=[Path("tests/rulesets/base")],
+        rule_filter=RuleFilter(ids=["core_profiles"], exclude_name=["test-ruleset/"]),
+    )
+    rules = load_rules(res_collector, validate_options)
+    assert rules
+    assert not any(rule.name.startswith("test-ruleset/") for rule in rules)
 
 
 def test_load_rules_with_ruleset_name_filter(res_collector):
@@ -350,6 +393,12 @@ def test_filter_rules(res_collector):
     assert_filter_rules(rules, 4, RuleFilter(ids=["core_profiles"]))
     assert_filter_rules(rules, 4, RuleFilter(name=["test"], ids=["core_profiles"]))
     assert_filter_rules(rules, 2, RuleFilter(name=["test", "4"]))
+    assert_filter_rules(rules, 6, RuleFilter(exclude_name=["val_core_profiles"]))
+    assert_filter_rules(rules, 4, RuleFilter(exclude_name=["val_core", "val_eq"]))
+    assert_filter_rules(rules, 4, RuleFilter(exclude_ids=["equilibrium"]))
+    assert_filter_rules(
+        rules, 2, RuleFilter(name=["core_profiles"], exclude_name=["val_"])
+    )
 
 
 def assert_filter_rules(rules, res, rule_filter):
@@ -404,6 +453,7 @@ def test_load_docs_no_docs(res_collector):
         use_bundled_rulesets=False,
         apply_generic=True,
         extra_rule_dirs=rule_dirs,
+        rulesets=["generic"],
         rule_filter=RuleFilter(name=["common_ids"], ids=[]),
     )
     docs = load_docs(res_collector, val_options)

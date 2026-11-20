@@ -60,7 +60,7 @@ You can find custom rule folders and rulesets with the flags:
 
 .. note::
 
-    The options ``-r``, ``-e``, ``-f``, ``--filter_name`` and ``--filter_ids`` accept
+    The options ``-r``, ``-e``, ``-f``, ``-x``, ``--filter_*`` and ``--exclude_*`` accept
     multiple values. Therefore, give the URI(s) before these options, or separate them
     with ``--``:
 

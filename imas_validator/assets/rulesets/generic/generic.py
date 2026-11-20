@@ -1,6 +1,7 @@
 """Generic rules applying to all IDSs"""
 
 import numpy as np
+from imas.ids_data_type import IDSDataType
 
 
 @validator("*")
@@ -151,3 +152,42 @@ def validate_temperature_positive(ids):
             assert np.logical_or(
                 np.isnan(node), node >= 0
             ), "Negative value found for a temperature or energy"
+
+
+UNIQUE_NAME_DOC = "Short string identifier (unique for a given device)"
+
+
+def _unique_name_nodes(ids, has_value=True):
+    """Yield (name, aos) for all ``name`` nodes documented as unique identifiers
+    that are part of an array of structures ``aos``.
+    """
+    for name in Select(ids, "(^|/)name$", has_value=has_value):
+        if not str(name.metadata.documentation).startswith(UNIQUE_NAME_DOC):
+            continue
+        # name of a structure or of the IDS toplevel has no siblings to compare with
+        if Parent(name).metadata.data_type == IDSDataType.STRUCT_ARRAY:
+            yield name, Parent(name, 2)
+
+
+@validator("*")
+def validate_unique_names(ids):
+    """Validate that ``name`` nodes documented as "Short string identifier (unique
+    for a given device)" are unique among the elements of their array of structures,
+    e.g. ``pf_active/coil(:)/name`` or ``divertors/divertor(i)/target(:)/name``.
+
+    Notes:
+
+    * Uniqueness is checked separately for each instance of the array of structures
+      (e.g. the targets of each divertor, or the gaps of each time slice).
+    * Empty names are ignored.
+    """
+    groups = {}
+    for name, aos in _unique_name_nodes(ids):
+        groups.setdefault(id(aos._obj), (aos, []))[1].append(name)
+
+    for aos, names in groups.values():
+        values = np.array([str(name) for name in names])
+        for i, name in enumerate(names):
+            assert np.all(
+                name != np.delete(values, i)
+            ), f"Duplicate name {str(name)!r} in {aos._obj!r}"

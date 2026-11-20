@@ -33,8 +33,14 @@ def check_expected_calls(func, expected_call_list):
     assert expected_idss == actual_idss
 
 
+def get(
+    ids_name: str, occurrence: int = 0, autoconvert: bool = False, lazy: bool = False
+):
+    return _get(ids_name, occurrence)
+
+
 @lru_cache
-def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
+def _get(ids_name: str, occurrence: int):
     # Trying to get an IDS that isn't filled is an error:
     if occurrence not in list_all_occurrences(ids_name):
         raise imas.exception.DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
@@ -134,7 +140,7 @@ def test_apply_rules_to_data(rule_executor):
 
     # Also expect that get() was called exactly once per IDS/occurrence
     get_calls = [
-        call(ids_name, occurrence, autoconvert=False)
+        call(ids_name, occurrence, autoconvert=False, lazy=False)
         for ids_name in _occurrence_dict
         for occurrence in _occurrence_dict[ids_name]
     ]
@@ -229,3 +235,37 @@ def test_parse_ids_names(dbentry):
     for ids_names in inputs:
         with pytest.raises(ValueError):
             rule = IDSValidationRule(Path("/my_path.py"), mock, *ids_names)
+
+
+@pytest.mark.parametrize(
+    "lazy_flags, track_node_dict, expected_lazy",
+    [
+        ([True], False, True),
+        ([True, True], False, True),
+        ([True, False], False, False),
+        ([False], False, False),
+        ([True], True, False),  # node coverage needs fully loaded IDSs
+    ],
+)
+def test_lazy_loading(dbentry, lazy_flags, track_node_dict, expected_lazy):
+    rules = []
+    for i, lazy in enumerate(lazy_flags):
+        mock = Mock()
+        mock.__name__ = f"Mock func {i}"
+        rules.append(IDSValidationRule(Path("t/eq.py"), mock, "equilibrium", lazy=lazy))
+    validate_options = ValidateOptions(track_node_dict=track_node_dict)
+    result_collector = ResultCollector(
+        validate_options=validate_options, imas_uri=dbentry.uri
+    )
+    executor = RuleExecutor(dbentry, rules, result_collector, validate_options)
+    executor.apply_rules_to_data()
+
+    for rule in rules:
+        assert rule.func.call_count == 2
+    dbentry.get.assert_has_calls(
+        [
+            call("equilibrium", occurrence, autoconvert=False, lazy=expected_lazy)
+            for occurrence in [0, 1]
+        ]
+    )
+    assert dbentry.get.call_count == 2

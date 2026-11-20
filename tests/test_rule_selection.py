@@ -33,7 +33,7 @@ def executor():
         ]
     }
     db = Mock()
-    # The entry's DD can differ from a stored IDS's DD (autoconvert=False).
+    # The entry's DD can differ from a stored IDS's DD (autoconvert=False, lazy=False).
     db.factory = imas.IDSFactory("4.0.0")
     db.dd_version = "4.0.0"
     db.list_all_occurrences.side_effect = lambda name: [
@@ -70,7 +70,7 @@ def test_reads_only_candidates(executor, spec, expected):
     assert sorted((idss[0][1], idss[0][2]) for idss, _ in matches) == sorted(expected)
     assert executor.db_entry.get.call_count == len(expected)
     executor.db_entry.get.assert_has_calls(
-        [call(name, occ, autoconvert=False) for name, occ in expected], any_order=True
+        [call(name, occ, autoconvert=False, lazy=False) for name, occ in expected], any_order=True
     )
 
 
@@ -78,7 +78,7 @@ def test_reads_only_candidates(executor, spec, expected):
 def test_version_filter_uses_loaded_ids(executor, version, count):
     executor.rules = [make_rule("core_profiles:3", version=version)]
     assert len(list(executor.find_matching_rules())) == count
-    executor.db_entry.get.assert_called_once_with("core_profiles", 3, autoconvert=False)
+    executor.db_entry.get.assert_called_once_with("core_profiles", 3, autoconvert=False, lazy=False)
 
 
 def test_cross_ids_dependency_without_standalone_rule(executor):
@@ -90,8 +90,8 @@ def test_cross_ids_dependency_without_standalone_rule(executor):
         ("equilibrium", 1),
     ]
     assert executor.db_entry.get.call_args_list == [
-        call("core_profiles", 3, autoconvert=False),
-        call("equilibrium", 1, autoconvert=False),
+        call("core_profiles", 3, autoconvert=False, lazy=False),
+        call("equilibrium", 1, autoconvert=False, lazy=False),
     ]
 
 
@@ -108,7 +108,7 @@ def test_unmatched_unreadable_ids_do_not_affect_selected_rule(executor, stop, ca
 
     executor.db_entry.get.side_effect = get
     assert len(list(executor.find_matching_rules())) == 1
-    executor.db_entry.get.assert_called_once_with("core_profiles", 3, autoconvert=False)
+    executor.db_entry.get.assert_called_once_with("core_profiles", 3, autoconvert=False, lazy=False)
     assert "Unable to load IDS" not in caplog.text
 
 
