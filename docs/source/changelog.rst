@@ -29,6 +29,18 @@ New rules
   toroidal current density against the signs of Ip and B0.
 - ``generic/equilibrium.py``: non-negative pressure, and toroidal flux phi zero
   on the magnetic axis.
+- ``generic/pf_active.py``: PF coil and power supply limits, when the limits
+  are filled in the IDS: coil current within ``coil(:)/current_limit_max``
+  (interpolated at ``b_field_max_timed`` when available, from DD 3.32.1 when the
+  coil current became the current per turn, and extrapolated linearly beyond the
+  tabulated fields), supply current and voltage within
+  ``supply(:)/*_limit_min/max``, and coil force combinations within
+  ``force_limits`` (from DD 3.40.0).
+- ``iter/pf_active.py``: ITER CS and PF coil current limits (conductor and power
+  supply), PF2-PF5 imbalance current (VS1 converter) and vertical force limits on
+  the PF coils and the CS stack, from ITER_D_2ACJT3, ITER_D_3LDS93 and the ITER
+  machine description (``ITER_MD`` 111001/204), for scenario entries that do not
+  carry the limits.
 - ``generic/ggd.py``: consistency of GGD grids and quantities (grid and subset
   identifiers and indices, coordinate types, number of elements per subset,
   time modes) for the IDSs that use GGD.
