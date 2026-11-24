@@ -1,9 +1,5 @@
-"""Generic rules applying to all identifier structures.
-
-Identifier structures (``name``, ``index``, ``description``) refer to an identifier
-enumeration of the Data Dictionary, see
-https://imas-data-dictionary.readthedocs.io/en/latest/reference_identifier.html
-"""
+"""Identifier index/name checks against imas-python's bundled DD enumerations.
+Negative (private) indices and names unknown to the bundled enumeration are skipped."""
 
 from pathlib import Path
 
@@ -12,9 +8,8 @@ import numpy as np
 
 
 def _metadata_identifier_enum(metadata):
-    """Resolve an identifier enumeration. Some older DDs (3.22.0 to 4.0.0) refer to
-    identifier files without their "_identifier" suffix; identifiers that still
-    cannot be resolved are skipped."""
+    """Resolve the identifier enumeration, also for older DDs whose reference lacks
+    the "_identifier" suffix; None if it cannot be resolved."""
     try:
         return metadata.identifier_enum
     except KeyError:
@@ -24,19 +19,25 @@ def _metadata_identifier_enum(metadata):
         return None
 
 
+def _unknown_name(identifier_enum, name):
+    """Whether ``name`` is no name or alias of the enumeration, ignoring case
+    (it may be valid in the data's own DD version)."""
+    value = str(getattr(name, "value", name)).casefold()
+    return all(
+        value not in (n.casefold() for n in (m.name, *m.aliases))
+        for m in identifier_enum
+    )
+
+
 def _identifier_enum(index):
-    """Return the identifier enumeration of the structure containing ``index``, or
-    None when that structure is not an identifier with an enumeration."""
+    """Identifier enumeration of the structure containing ``index``, or None."""
     return _metadata_identifier_enum(Parent(index)._obj.metadata)
 
 
 @validator("*")
 def validate_identifier_index(ids):
-    """Validate that identifier indices are defined in their identifier enumeration.
-
-    Negative indices are not checked: the Data Dictionary specifies that "private
-    identifier values must be indicated by a negative index".
-    """
+    """Validate that identifier indices are defined in their enumeration.
+    Negative (private) indices are skipped."""
     for index in Select(ids, "(^|/)index$", has_value=True):
         identifier_enum = _identifier_enum(index)
         if identifier_enum is None or index < 0:
@@ -48,21 +49,19 @@ def validate_identifier_index(ids):
 
 @validator("*")
 def validate_identifier_name(ids):
-    """Validate that identifier names match the name (or an alias) of the
-    identifier enumeration value with the same index.
-
-    Only checked when both ``name`` and ``index`` are filled and the index is
-    defined in the identifier enumeration.
-    """
+    """Validate that identifier names match the name or an alias of their index.
+    Names unknown to the bundled enumeration are skipped."""
     for index in Select(ids, "(^|/)index$", has_value=True):
         identifier_enum = _identifier_enum(index)
         if identifier_enum is None:
             continue
         name = Parent(index).name
-        if not name.has_value:
+        if not name.has_value or index < 0:
             continue
         member = next((m for m in identifier_enum if index == m.index), None)
         if member is None:  # Reported by validate_identifier_index
+            continue
+        if _unknown_name(identifier_enum, name._obj):
             continue
         assert np.logical_and(
             index == member.index, np.isin(name, [member.name, *member.aliases])
@@ -87,10 +86,8 @@ def _plural_identifier_enum(indices):
 
 @validator("*")
 def validate_identifier_indices(ids):
-    """Check plural identifier indices against their DD enumeration.
-
-    Negative (private) values and structures without an enumeration are skipped.
-    """
+    """Validate that plural identifier indices are defined in their enumeration.
+    Negative (private) indices are skipped."""
     for indices in Select(ids, "(^|/)indices$", has_value=True):
         identifier_enum = _plural_identifier_enum(indices)
         if identifier_enum is None:
@@ -107,12 +104,8 @@ def validate_identifier_indices(ids):
 
 @validator("*")
 def validate_identifier_names(ids):
-    """Check plural names against the canonical names or aliases of their indices.
-
-    A single name or index applies to every element of the subset. Otherwise,
-    filled arrays must have equal lengths. Empty names and private or unknown
-    indices are skipped; unknown indices are checked by validate_identifier_indices.
-    """
+    """Validate that plural names match the name or an alias of their indices.
+    A length-1 array applies to all elements; unknown names are skipped."""
     for indices in Select(ids, "(^|/)indices$", has_value=True):
         identifier_enum = _plural_identifier_enum(indices)
         if identifier_enum is None:
@@ -133,6 +126,8 @@ def validate_identifier_names(ids):
                 continue
             member = next((m for m in identifier_enum if index == m.index), None)
             if member is None:
+                continue
+            if _unknown_name(identifier_enum, getattr(name, "_obj", name)):
                 continue
             assert np.logical_and(
                 index == member.index, np.isin(name, [member.name, *member.aliases])

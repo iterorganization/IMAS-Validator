@@ -2,13 +2,18 @@
 
 import imas
 import pytest
+from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 from imas_validator.validate.validate import validate
 from imas_validator.validate_options import RuleFilter, ValidateOptions
 
+# DD version of the identifier enumerations bundled with imas-python
+LATEST = imas.dd_zip.latest_dd_version()
 
-def _validate_sources(tmp_path, rule_name, identifiers):
-    ids = imas.IDSFactory().new("core_sources")
+
+def _validate_sources(tmp_path, rule_name, identifiers, version=None):
+    ids = imas.IDSFactory(version).new("core_sources")
     ids.ids_properties.homogeneous_time = imas.ids_defs.IDS_TIME_MODE_HOMOGENEOUS
     ids.time = [0.0]
     ids.source.resize(len(identifiers))
@@ -18,7 +23,7 @@ def _validate_sources(tmp_path, rule_name, identifiers):
         if name is not None:
             source.identifier.name = name
     uri = str(tmp_path / "identifiers.nc")
-    with imas.DBEntry(uri, "w") as entry:
+    with imas.DBEntry(uri, "w", dd_version=version) as entry:
         entry.put(ids)
 
     result = validate(uri, ValidateOptions(rule_filter=RuleFilter(name=[rule_name])))
@@ -49,6 +54,7 @@ def test_identifier_index(tmp_path, identifiers, expected):
         ([(2, "nbi")], [True]),
         ([(1, "nbi")], [False]),  # name of another index
         ([(1, "Total")], [False]),  # names are case sensitive
+        ([(1, "invalid")], []),  # unknown name: may be valid in another DD version
         ([(1, None)], []),  # no name: nothing to check
         ([(99, "total")], []),  # unknown index: reported by the index rule
         ([(-1, "total")], []),  # private value: not checked
@@ -57,7 +63,55 @@ def test_identifier_index(tmp_path, identifiers, expected):
 )
 def test_identifier_name(tmp_path, identifiers, expected):
     rule = "validate_identifier_name"
-    assert _validate_sources(tmp_path, rule, identifiers) == expected
+    assert _validate_sources(tmp_path, rule, identifiers, LATEST) == expected
+
+
+def test_identifier_name_older_dd(tmp_path):
+    rule = "validate_identifier_name"
+    # Names are checked for every DD version against the bundled enumeration
+    assert _validate_sources(tmp_path, rule, [(1, "total")], "3.40.1") == [True]
+    # "nbi" is the bundled name of another index: reported for every DD version
+    assert _validate_sources(tmp_path, rule, [(1, "nbi")], "3.40.1") == [False]
+    assert _validate_sources(tmp_path, rule, [(1, "nbi")], LATEST) == [False]
+    # A name unknown to the bundled enumeration may be valid in the data's own DD
+    # version (e.g. coordinate_identifier 500 "n_tor" became "n_phi"): not checked
+    assert _validate_sources(tmp_path, rule, [(1, "unknown")], "3.40.1") == []
+    assert _validate_sources(tmp_path, rule, [(1, "unknown")], LATEST) == []
+
+
+@pytest.mark.parametrize(
+    "version, ids_name, path, index, name",
+    [
+        # Index 1 was a toroidal flux loop up to DD 3.42, "poloidal_flux" since 4.0
+        ("3.42.0", "magnetics", "flux_loop[0]/type", 1, "toroidal"),
+        # Index 200 was "nodes_combining_spaces" in DD 3.39, now "4d_hypervolumes"
+        (
+            "3.39.0",
+            "edge_profiles",
+            "grid_ggd[0]/grid_subset[0]/identifier",
+            200,
+            "nodes_combining_spaces",
+        ),
+    ],
+)
+def test_identifier_name_of_older_dd_not_reported(version, ids_name, path, index, name):
+    # Valid names of the data's own DD version that the bundled enumeration renamed
+    # without an alias must not be reported
+    ids = imas.IDSFactory(version).new(ids_name)
+    if ids_name == "magnetics":
+        ids.flux_loop.resize(1)
+    else:
+        ids.grid_ggd.resize(1)
+        ids.grid_ggd[0].grid_subset.resize(1)
+    ids[path].index = index
+    ids[path].name = name
+    results = _run_identifier_rules(ids, "generic/identifiers.py")
+    assert [r.success for r in results] == [True]  # index check only
+
+
+def test_identifier_index_checked_for_older_dd(tmp_path):
+    rule = "validate_identifier_index"
+    assert _validate_sources(tmp_path, rule, [(99, None)], "3.40.1") == [False]
 
 
 def _run_identifier_rules(ids, rule_name):
@@ -70,7 +124,11 @@ def _run_identifier_rules(ids, rule_name):
     collector = ResultCollector(options, "")
     rules = load_rules(collector, options)
     executor = RuleExecutor(None, rules, collector, options)
+    # Select rules on the DD version like RuleExecutor.apply_rules_to_data
+    ids_version = Version(ids._dd_version)
     for rule in rules:
+        if ids_version not in SpecifierSet(rule.version):
+            continue
         collector.set_context(rule, [(ids, ids.metadata.name, 0)])
         executor.run(rule, [ids])
     assert all(result.exc is None for result in collector.results)
@@ -78,7 +136,7 @@ def _run_identifier_rules(ids, rule_name):
 
 
 def test_identifier_name_tracks_index_and_name():
-    ids = imas.IDSFactory("3.40.1").core_sources()
+    ids = imas.IDSFactory(LATEST).core_sources()
     ids.source.resize(1)
     ids.source[0].identifier.index = 1
     ids.source[0].identifier.name = "nbi"
@@ -93,7 +151,7 @@ def test_identifier_name_tracks_index_and_name():
     }
 
 
-@pytest.fixture(params=["3.38.1", "3.40.1", "4.1.1"])
+@pytest.fixture(params=["3.38.1", "3.40.1", LATEST])
 def wall_identifiers(request):
     ids = imas.IDSFactory(request.param).wall()
     ids.description_ggd.resize(1)
@@ -127,8 +185,10 @@ def test_plural_identifier_indices(wall_identifiers, indices, expected):
     [
         ([20], ["235U"], [True]),
         ([20], ["U_235"], [True]),  # real DD alias
-        ([20], ["invalid"], [False]),
-        ([20, 20], ["235U", "invalid"], [True, False]),
+        ([20], ["238U"], [False]),  # bundled name of another index
+        ([20], ["235u"], [False]),  # names are case sensitive
+        ([20], ["invalid"], []),  # unknown name: may be valid in another DD version
+        ([20, 20], ["235U", "238U"], [True, False]),
         ([20, 20], ["235U"], [True, True]),  # singleton name
         ([20], ["235U", "U_235"], [True, True]),  # singleton index
         ([20, 20], ["235U", "235U", "235U"], [False]),
@@ -150,7 +210,7 @@ def test_plural_identifier_names(wall_identifiers, indices, names, expected):
 
 
 def test_plural_identifier_brdf_uses_its_own_enumeration():
-    ids = imas.IDSFactory("4.1.1").wall()
+    ids = imas.IDSFactory(LATEST).wall()
     ids.description_ggd.resize(1)
     ids.description_ggd[0].brdf.resize(1)
     ids.description_ggd[0].brdf[0].type.resize(1)
@@ -162,7 +222,7 @@ def test_plural_identifier_brdf_uses_its_own_enumeration():
 
 
 def test_plural_identifier_netcdf(tmp_path):
-    ids = imas.IDSFactory("4.1.1").wall()
+    ids = imas.IDSFactory(LATEST).wall()
     ids.ids_properties.homogeneous_time = 1
     ids.time = [0.0]
     ids.description_ggd.resize(1)
@@ -174,9 +234,9 @@ def test_plural_identifier_netcdf(tmp_path):
     material.grid_subset.resize(1)
     node = material.grid_subset[0].identifiers
     node.indices = [20, 999999]
-    node.names = ["invalid", "unknown"]
+    node.names = ["238U", "unknown"]  # name of another index, unknown index
     uri = str(tmp_path / "wall.nc")
-    with imas.DBEntry(uri, "x", dd_version="4.1.1") as entry:
+    with imas.DBEntry(uri, "x", dd_version=LATEST) as entry:
         entry.put(ids)
     results = validate(
         uri, ValidateOptions(rule_filter=RuleFilter(name=["generic/identifiers.py"]))
@@ -188,7 +248,7 @@ def test_plural_identifier_netcdf(tmp_path):
     }
 
 
-@pytest.mark.parametrize("version", ["3.40.1", "4.1.1"])
+@pytest.mark.parametrize("version", ["3.40.1", LATEST])
 @pytest.mark.parametrize(
     "ids_name, path, valid_index, valid_name",
     [
@@ -226,7 +286,7 @@ def test_legacy_identifier_references(version, ids_name, path, valid_index, vali
     node.name = valid_name
     results = _run_identifier_rules(ids, "generic/identifiers.py")
     assert [r.success for r in results] == [True, True]
-    node.name = "invalid"
+    node.name = valid_name.upper()  # known name with the wrong case: reported
     results = _run_identifier_rules(ids, "generic/identifiers.py")
     assert [r.success for r in results] == [True, False]
     assert results[-1].nodes_dict == {
