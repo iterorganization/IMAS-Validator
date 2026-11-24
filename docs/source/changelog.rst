@@ -29,9 +29,19 @@ New rules
   toroidal current density against the signs of Ip and B0.
 - ``generic/equilibrium.py``: non-negative pressure, and toroidal flux phi zero
   on the magnetic axis.
-- ``generic/ggd.py``: consistency of GGD grids and quantities (grid and subset
-  identifiers and indices, coordinate types, number of elements per subset,
-  time modes) for the IDSs that use GGD.
+- ``generic/ggd.py``: consistency of GGD grids and quantities (filled grid,
+  space and subset identifiers, DD3 coordinate types, geometry content and size,
+  number of elements per subset, time modes) for the IDSs that use GGD.
+- ``generic/identifiers.py``: identifier indices (singular ``index`` and plural
+  ``indices``) of every IDS must be defined in their Data Dictionary identifier
+  enumeration, and identifier names must match the name or an alias of their
+  index. These rules also cover the GGD identifiers, which ``generic/ggd.py`` no
+  longer checks against their enumeration. Negative (private) indices are not
+  checked. imas-python bundles only the identifier enumerations of its newest DD
+  version, which are used for data of every DD version. Because names can change
+  between DD versions, a name unknown to the bundled enumeration is not reported; a
+  name that the bundled enumeration gives to another index, or that only differs in
+  case, is.
 
 New features
 ''''''''''''
@@ -58,6 +68,9 @@ Improvements and bug fixes
   of these IDSs check every ion that has a ``z_ion``, not only when the first
   ion has one.
 - Node coverage is not computed when disabled, also when a rule raises.
+- ``generic/ggd.py:validate_obj_per_dim_geometry_size`` compared the
+  ``geometry_content`` structure instead of its index, so the geometry lengths
+  were never checked. It now checks them.
 - The CLI help explains that options taking several values must come after the
   URIs.
 - ``imas-python`` 2.2.0 or later is required.
