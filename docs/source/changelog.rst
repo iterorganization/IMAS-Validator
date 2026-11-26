@@ -29,6 +29,13 @@ New rules
   toroidal current density against the signs of Ip and B0.
 - ``generic/equilibrium.py``: non-negative pressure, and toroidal flux phi zero
   on the magnetic axis.
+- ``generic/equilibrium_consistency.py``: consistency of the ``equilibrium``
+  profiles with each other and with the 2D equilibrium: pressure and f against
+  the integrals of dpressure_dpsi and f_df_dpsi, q against dphi/dpsi,
+  rho_tor_norm against phi, q_95 and q_axis against the q profile, the
+  integrated toroidal current density against ip, profiles_1d/psi against
+  psi_axis and psi_boundary, and psi_axis, psi_boundary and volume against the
+  2D psi map.
 - ``generic/ggd.py``: consistency of GGD grids and quantities (grid and subset
   identifiers and indices, coordinate types, number of elements per subset,
   time modes) for the IDSs that use GGD.

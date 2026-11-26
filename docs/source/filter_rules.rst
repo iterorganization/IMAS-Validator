@@ -48,7 +48,8 @@ Use the explicit options rather than the shortcuts when:
 
 - a string is also an IDS name but you want to match it in rule names. For
   example, ``--filter_name equilibrium`` selects the rules of the
-  ``equilibrium.py`` files, while ``-f equilibrium`` (like
+  ``equilibrium.py`` and ``equilibrium_consistency.py`` files (use
+  ``--filter_name equilibrium.py`` for the former only), while ``-f equilibrium`` (like
   ``--filter_ids equilibrium``) selects all the rules applying to the
   ``equilibrium`` IDS, including generic GGD rules;
 - the command must behave the same in every environment, e.g. in scripts or
