@@ -1,5 +1,9 @@
 """Generic rules applying to all IDSs"""
 
+import numpy as np
+from imas.ids_data_type import IDSDataType
+
+
 @validator("*")
 def validate_homogeneous_time(ids):
     """Validation function for the time mode (ids_properties.homogeneous_time).
@@ -60,6 +64,14 @@ def validate_increasing_time(ids):
                 last_time = struct.time
 
 
+def _less_equal_ignore_nan(lhs, rhs):
+    """Element-wise ``lhs <= rhs``, where comparisons involving NaN are True."""
+    return np.logical_or(
+        np.logical_or(np.isnan(lhs), np.isnan(rhs)),
+        lhs <= rhs,
+    )
+
+
 @validator("*")
 def validate_min_max(ids):
     """Validate that ``*_min`` values are lower than ``*_max`` values, and the related
@@ -70,6 +82,7 @@ def validate_min_max(ids):
     * ``{value}_min <= {value}_max`` is only checked when both values are filled.
     * ``{value}_min <= {value} <= {value}_max`` (value is within bounds) is only
       validated when all three quantities are filled.
+    * NaN elements are ignored: a comparison involving a NaN is considered valid.
     """
     for quantity_min in Select(ids, "_min$", has_value=True):
         quantity_name = str(quantity_min.metadata.name)[:-4]  # strip off _min
@@ -78,7 +91,7 @@ def validate_min_max(ids):
 
         # If _max exists and is filled, check that it is >= _min
         if quantity_max is not None and quantity_max.has_value:
-            assert quantity_min <= quantity_max
+            assert _less_equal_ignore_nan(quantity_min, quantity_max)
 
             # quantity exist, is not a structure and is filled, check that the quantity
             # is within bounds:
@@ -87,7 +100,10 @@ def validate_min_max(ids):
                 and not quantity.metadata.data_type.value.startswith("struct")
                 and quantity.has_value
             ):
-                assert quantity_min <= quantity <= quantity_max
+                assert np.logical_and(
+                    _less_equal_ignore_nan(quantity_min, quantity),
+                    _less_equal_ignore_nan(quantity, quantity_max),
+                )
 
 
 @validator("*")
@@ -96,13 +112,13 @@ def validate_errorbars(ids):
     that error_upper is also filled whenever ``error_lower`` is non empty
     """
     for error_upper in Select(ids, "_error_upper$", has_value=True):
-        assert (
-            error_upper >= 0
+        assert np.logical_or(
+            np.isnan(error_upper), error_upper >= 0
         ), "Negative value found for errorbar, while their values must be positive."
 
     for error_lower in Select(ids, "_error_lower$", has_value=True):
-        assert (
-            error_lower >= 0
+        assert np.logical_or(
+            np.isnan(error_lower), error_lower >= 0
         ), "Negative value found for errorbar, while their values must be positive."
         error_lower_name = str(error_lower.metadata.name)
         error_upper_name = error_lower_name.replace("_error_lower", "_error_upper")
@@ -114,19 +130,64 @@ def validate_errorbars(ids):
 
 @validator("*")
 def validate_density_positive(ids):
-    """Validate that density values are positive"""
+    """Validate that density values are positive, ignoring NaN values"""
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "m^-3" and not (
             "derivative" in str(node.metadata.path)
         ):
-            assert node >= 0, "Negative value found for a density"
+            assert np.logical_or(
+                np.isnan(node), node >= 0
+            ), "Negative value found for a density"
 
 
 @validator("*")
 def validate_temperature_positive(ids):
-    """Validate that temperature and energy values are positive"""
+    """Validate that temperature and energy values are positive, ignoring NaN
+    values
+    """
     for node in Select(ids, "^((?!_error_).)*$", has_value=True):
         if node.metadata.units == "eV" and not (
             "derivative" in str(node.metadata.path)
         ):
-            assert node >= 0, "Negative value found for a temperature or energy"
+            assert np.logical_or(
+                np.isnan(node), node >= 0
+            ), "Negative value found for a temperature or energy"
+
+
+UNIQUE_NAME_DOC = "Short string identifier (unique for a given device)"
+
+
+def _unique_name_nodes(ids, has_value=True):
+    """Yield (name, aos) for all ``name`` nodes documented as unique identifiers
+    that are part of an array of structures ``aos``.
+    """
+    for name in Select(ids, "(^|/)name$", has_value=has_value):
+        if not str(name.metadata.documentation).startswith(UNIQUE_NAME_DOC):
+            continue
+        # name of a structure or of the IDS toplevel has no siblings to compare with
+        if Parent(name).metadata.data_type == IDSDataType.STRUCT_ARRAY:
+            yield name, Parent(name, 2)
+
+
+@validator("*")
+def validate_unique_names(ids):
+    """Validate that ``name`` nodes documented as "Short string identifier (unique
+    for a given device)" are unique among the elements of their array of structures,
+    e.g. ``pf_active/coil(:)/name`` or ``divertors/divertor(i)/target(:)/name``.
+
+    Notes:
+
+    * Uniqueness is checked separately for each instance of the array of structures
+      (e.g. the targets of each divertor, or the gaps of each time slice).
+    * Empty names are ignored.
+    """
+    groups = {}
+    for name, aos in _unique_name_nodes(ids):
+        groups.setdefault(id(aos._obj), (aos, []))[1].append(name)
+
+    for aos, names in groups.values():
+        values = np.array([str(name) for name in names])
+        for i, name in enumerate(names):
+            assert np.all(
+                name != np.delete(values, i)
+            ), f"Duplicate name {str(name)!r} in {aos._obj!r}"

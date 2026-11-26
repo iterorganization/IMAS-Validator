@@ -6,7 +6,6 @@ import logging
 import sys
 
 import imas  # type: ignore
-from packaging.version import Version
 
 # from imas_validator.exceptions import IMASVersionError
 from imas_validator.rules.loading import load_rules
@@ -35,7 +34,6 @@ def validate(
         List of IDSValidationResult objects
     """
 
-    _check_imas_version()
     try:
         dbentry = imas.DBEntry(imas_uri, "r")
     except (imas.exception.ALException, imas.exception.LowlevelError) as e:
@@ -57,32 +55,3 @@ def validate(
     logger.info(f"{len(results_collection.results)} results obtained")
     dbentry.close()
     return results_collection
-
-
-def _check_imas_version() -> None:
-    """Check if the installed IMAS version is sufficient."""
-    # TODO: check if this is the best level to test for the IMAS version
-    if not imas.backends.imas_core.imas_interface.has_imas:
-        version_found = imas.backends.imas_core.imas_interface.ll_interface._al_version
-        if version_found is None:
-            logger.info(
-                "No IMAS install could be found."
-                "IDS Validation will work with limited functionality."
-            )
-            return
-        else:
-            logger.info(f"Found IMAS install with version {version_found}.")
-
-    if imas.backends.imas_core.imas_interface.ll_interface._al_version < Version("5.1"):
-        logger.info(
-            "IDS Validation requires an IMAS installation of version 5.1 or newer."
-            "See the README for more details."
-        )
-
-    # if not imas.backends.imas_core.imas_interface.has_imas:
-    #     raise IMASVersionError()
-    # if imas.backends.imas_core.imas_interface.ll_interface._al_version
-    # < Version("5.1"):
-    #     raise IMASVersionError(
-    #         imas.backends.imas_core.imas_interface.ll_interface._al_version
-    #     )

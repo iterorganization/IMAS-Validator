@@ -21,7 +21,9 @@ def list_all_occurrences(ids_name: str):
 
 
 @lru_cache
-def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
+def get(
+    ids_name: str, occurrence: int = 0, autoconvert: bool = False, lazy: bool = False
+):
     # Trying to get an IDS that isn't filled is an error:
     if occurrence not in list_all_occurrences(ids_name):
         raise imas.exception.DataEntryException(f"IDS {ids_name!r}, occurrence {occurrence} is empty.")
@@ -35,7 +37,6 @@ def get(ids_name: str, occurrence: int = 0, autoconvert: bool = False):
 
 def test_validate(caplog):
     module = "imas_validator.validate.validate"
-    # patch _check_imas_version for now
     with patch(
         f"{module}.imas.DBEntry",
         spec=True,
@@ -43,7 +44,7 @@ def test_validate(caplog):
         get=get,
         uri="",
         factory=imas.IDSFactory("3.40.1"),
-    ), patch(f"{module}._check_imas_version"):
+    ):
         validate_options = ValidateOptions(
             rulesets=["test-ruleset"],
             extra_rule_dirs=[Path("tests/rulesets/validate-test")],

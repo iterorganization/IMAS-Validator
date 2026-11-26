@@ -22,6 +22,7 @@ class IDSValidationRule:
         func: Callable,
         *ids_names: str,
         version: str = "",
+        lazy: bool = False,
         **kwfields: Dict[str, Any],
     ):
         """Initialize IDSValidationRule
@@ -30,6 +31,8 @@ class IDSValidationRule:
             rule_path: Path to file where the rule is defined
             func: Function that defines validation rules
             ids_names: Names of ids instances to be validated
+            version: DD version specifier set that the IDSs must match
+            lazy: The rule only reads a few nodes, so the IDSs may be lazy loaded
             kwfields: keyword arguments to be inputted in the validation function
         """
         self.func = func
@@ -37,6 +40,7 @@ class IDSValidationRule:
         self.name = f"{rule_path.parts[-2]}/{rule_path.parts[-1]}:{self.func.__name__}"
         self.ids_names, self.ids_occs = self.parse_ids_names(*ids_names)
         self.version = version
+        self.lazy = lazy
         self.kwfields = kwfields
         # kwfields explicitly parsed
 
@@ -99,7 +103,9 @@ class ValidatorRegistry:
         self.validators: List[IDSValidationRule] = []
         self.rule_path: Path = rule_path
 
-    def validator(self, *ids_names: str, version: str = "") -> Callable:
+    def validator(
+        self, *ids_names: str, version: str = "", lazy: bool = False
+    ) -> Callable:
         """Decorator to register functions as validation rules
 
         The validation rule function will be called with the requested IDSs as
@@ -111,6 +117,13 @@ class ValidatorRegistry:
                 any IDS. Add the occurrence number by appending the ids name with
                 an integer `>=0` like ``"summary:2"``. Occurrence number is required
                 for multi-IDS validation.
+            version: Specifier set (for example ``">=4.0.0.dev0"``) that the DD version
+                of the stored IDS must match for the rule to apply.
+            lazy: Set to ``True`` for rules that read only a few nodes of possibly
+                large IDSs. The IDSs are then lazy loaded, so only the data that the
+                rule accesses is read. This is ignored when another rule applying to
+                the same IDS needs it fully loaded, or when node coverage is tracked.
+                Lazy-loaded IDSs cannot be traversed with ``iter_nonempty_``.
 
         Example:
             .. code-block:: python
@@ -128,7 +141,9 @@ class ValidatorRegistry:
 
         # explicit kwfields
         def decorator(func: Callable) -> Callable:
-            rule = IDSValidationRule(self.rule_path, func, *ids_names, version=version)
+            rule = IDSValidationRule(
+                self.rule_path, func, *ids_names, version=version, lazy=lazy
+            )
             self.validators.append(rule)
             return func
 
