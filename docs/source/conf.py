@@ -41,14 +41,16 @@ issue_url = jira_url = "https://github.com/iterorganization/IMAS-Validator/issue
 # IMAS-Validator
 repository_url = f"{iter_projects}/{src_project}/"
 blob_url = urljoin(repository_url, "blob/")
-mr_url = urljoin(repository_url, "pulls/")
-
+mr_url = urljoin(repository_url, "pull/")
+issue_url = urljoin(repository_url, "issues/")
 
 # Configuration of sphinx.ext.extlinks
 # See https://www.sphinx-doc.org/en/master/usage/extensions/extlinks.html
 # unique name: (base URL, label prefix)
 extlinks = {
     "src": (blob_url + "%s", f"main/%s"),
+    "issue": (issue_url + "%s", "#%s"),
+    "merge": (mr_url + "%s", "#%s"),
 }
 
 full_version = Version(imas_validator.__version__)
